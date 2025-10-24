@@ -247,7 +247,9 @@ export default function PresenterControl() {
               variant="ghost" 
               size="sm" 
               className="gap-2 text-white hover:bg-gray-800"
-              onClick={() => setLocation("/presenter")}
+              onClick={() => {
+                window.location.href = "/presenter";
+              }}
             >
               <ArrowLeft className="w-4 h-4" />
               Retour
