@@ -684,7 +684,7 @@ export const appRouter = router({
           token: invitation.token,
           email: invitation.email,
           name: invitation.name,
-          inviteLink: `${process.env.VITE_APP_URL || ""}/invite/${invitation.token}`,
+          inviteLink: `${process.env.VITE_APP_URL || "https://3000-ih44u8onzba9v1o4wiete-6d7b15e5.manusvm.computer"}/invite/${invitation.token}`,
         };
       }),
 

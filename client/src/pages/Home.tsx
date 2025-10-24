@@ -23,6 +23,11 @@ export default function Home() {
             {isAuthenticated ? (
               <div className="flex items-center gap-4">
                 <span className="text-sm text-gray-600">Bienvenue, {user?.name || "Utilisateur"}</span>
+                {user?.role === "admin" && (
+                  <Link href="/admin/invitations">
+                    <Button variant="outline" size="sm">Administration</Button>
+                  </Link>
+                )}
                 <Link href="/presenter">
                   <Button variant="default">Tableau de bord</Button>
                 </Link>
