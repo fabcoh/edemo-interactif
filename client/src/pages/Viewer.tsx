@@ -26,6 +26,8 @@ export default function Viewer() {
   const [presenterCursorX, setPresenterCursorX] = useState(0);
   const [presenterCursorY, setPresenterCursorY] = useState(0);
   const [presenterCursorVisible, setPresenterCursorVisible] = useState(false);
+  const [presenterPanOffsetX, setPresenterPanOffsetX] = useState(0);
+  const [presenterPanOffsetY, setPresenterPanOffsetY] = useState(0);
   const [documentError, setDocumentError] = useState<string | null>(null);
 
   // Extract session code from URL if present
@@ -78,11 +80,15 @@ export default function Viewer() {
       setPresenterCursorX(cursorQuery.data.cursorX);
       setPresenterCursorY(cursorQuery.data.cursorY);
       setPresenterCursorVisible(cursorQuery.data.cursorVisible);
+      setPresenterPanOffsetX(cursorQuery.data.panOffsetX);
+      setPresenterPanOffsetY(cursorQuery.data.panOffsetY);
       console.log('[Viewer] Cursor data:', {
         zoom: cursorQuery.data.zoomLevel,
         x: cursorQuery.data.cursorX,
         y: cursorQuery.data.cursorY,
         visible: cursorQuery.data.cursorVisible,
+        panOffsetX: cursorQuery.data.panOffsetX,
+        panOffsetY: cursorQuery.data.panOffsetY,
       });
     }
   }, [cursorQuery.data]);
@@ -167,7 +173,7 @@ export default function Viewer() {
                   src={currentDocument.fileUrl}
                   alt="Document"
                   style={{
-                    transform: `scale(${presenterZoom / 100})`,
+                    transform: `scale(${presenterZoom / 100}) translate(${presenterPanOffsetX / (presenterZoom / 100)}px, ${presenterPanOffsetY / (presenterZoom / 100)}px)`,
                     transition: "transform 0.2s ease-out",
                   }}
                   className="object-contain max-w-full max-h-full"

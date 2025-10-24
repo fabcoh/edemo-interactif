@@ -143,6 +143,10 @@ export const presenterCursors = mysqlTable("presenter_cursors", {
   cursorY: float("cursorY").default(0).notNull(),
   /** Whether the cursor should be visible */
   cursorVisible: boolean("cursorVisible").default(false).notNull(),
+  /** Pan offset X in pixels */
+  panOffsetX: float("panOffsetX").default(0).notNull(),
+  /** Pan offset Y in pixels */
+  panOffsetY: float("panOffsetY").default(0).notNull(),
   /** Timestamps */
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

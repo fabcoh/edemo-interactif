@@ -216,6 +216,8 @@ export const appRouter = router({
         cursorX: z.number(),
         cursorY: z.number(),
         cursorVisible: z.boolean(),
+        panOffsetX: z.number(),
+        panOffsetY: z.number(),
       }))
       .mutation(async ({ ctx, input }) => {
         const sessions = await getPresentationSessionsByPresenter(ctx.user.id);
@@ -233,7 +235,9 @@ export const appRouter = router({
           input.zoomLevel,
           input.cursorX,
           input.cursorY,
-          input.cursorVisible
+          input.cursorVisible,
+          input.panOffsetX,
+          input.panOffsetY
         );
 
         return { success: true };
@@ -259,6 +263,8 @@ export const appRouter = router({
             cursorX: 0,
             cursorY: 0,
             cursorVisible: false,
+            panOffsetX: 0,
+            panOffsetY: 0,
           };
         }
 
@@ -267,6 +273,8 @@ export const appRouter = router({
           cursorX: cursor.cursorX,
           cursorY: cursor.cursorY,
           cursorVisible: cursor.cursorVisible,
+          panOffsetX: cursor.panOffsetX,
+          panOffsetY: cursor.panOffsetY,
         };
       }),
   }),

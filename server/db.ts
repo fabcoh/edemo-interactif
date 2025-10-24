@@ -523,7 +523,9 @@ export async function updatePresenterCursor(
   zoomLevel: number,
   cursorX: number,
   cursorY: number,
-  cursorVisible: boolean
+  cursorVisible: boolean,
+  panOffsetX: number,
+  panOffsetY: number
 ): Promise<PresenterCursor> {
   const db = await getDb();
   if (!db) {
@@ -546,6 +548,8 @@ export async function updatePresenterCursor(
         cursorX,
         cursorY,
         cursorVisible,
+        panOffsetX,
+        panOffsetY,
         updatedAt: new Date(),
       })
       .where(eq(presenterCursors.sessionId, sessionId));
@@ -556,6 +560,8 @@ export async function updatePresenterCursor(
       cursorX,
       cursorY,
       cursorVisible,
+      panOffsetX,
+      panOffsetY,
       updatedAt: new Date(),
     };
   } else {
@@ -566,6 +572,8 @@ export async function updatePresenterCursor(
       cursorX,
       cursorY,
       cursorVisible,
+      panOffsetX,
+      panOffsetY,
     });
 
     const result = await db

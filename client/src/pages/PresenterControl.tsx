@@ -206,6 +206,8 @@ export default function PresenterControl() {
         cursorX: xPercent,
         cursorY: yPercent,
         cursorVisible: showMouseCursor && zoom > 100,
+        panOffsetX: panOffset.x,
+        panOffsetY: panOffset.y,
       });
     }
   };
@@ -283,6 +285,8 @@ export default function PresenterControl() {
                     cursorX: mousePos.x,
                     cursorY: mousePos.y,
                     cursorVisible: showMouseCursor && newZoom > 100,
+                    panOffsetX: panOffset.x,
+                    panOffsetY: panOffset.y,
                   });
                 }
               }}
@@ -308,6 +312,8 @@ export default function PresenterControl() {
                     cursorX: mousePos.x,
                     cursorY: mousePos.y,
                     cursorVisible: showMouseCursor && newZoom > 100,
+                    panOffsetX: panOffset.x,
+                    panOffsetY: panOffset.y,
                   });
                 }
               }}
@@ -330,6 +336,8 @@ export default function PresenterControl() {
                     cursorX: mousePos.x,
                     cursorY: mousePos.y,
                     cursorVisible: showMouseCursor && newZoom > 100,
+                    panOffsetX: panOffset.x,
+                    panOffsetY: panOffset.y,
                   });
                 }
               }}
@@ -349,6 +357,8 @@ export default function PresenterControl() {
                     cursorX: mousePos.x,
                     cursorY: mousePos.y,
                     cursorVisible: false,
+                    panOffsetX: panOffset.x,
+                    panOffsetY: panOffset.y,
                   });
                 }
               }}
@@ -542,6 +552,8 @@ export default function PresenterControl() {
                             cursorX: xPercent,
                             cursorY: yPercent,
                             cursorVisible: true,
+                            panOffsetX: panOffset.x,
+                            panOffsetY: panOffset.y,
                           });
                         }
                       }
@@ -562,6 +574,8 @@ export default function PresenterControl() {
                             cursorX: mousePos.x,
                             cursorY: mousePos.y,
                             cursorVisible: showMouseCursor && newZoom > 100,
+                            panOffsetX: panOffset.x,
+                            panOffsetY: panOffset.y,
                           });
                         }
                       } else if (e.touches.length === 1) {
@@ -589,6 +603,8 @@ export default function PresenterControl() {
                             cursorX: xPercent,
                             cursorY: yPercent,
                             cursorVisible: true,
+                            panOffsetX: panOffset.x,
+                            panOffsetY: panOffset.y,
                           });
                         }
                       }
@@ -607,6 +623,8 @@ export default function PresenterControl() {
                             cursorX: mousePos.x,
                             cursorY: mousePos.y,
                             cursorVisible: false,
+                            panOffsetX: panOffset.x,
+                            panOffsetY: panOffset.y,
                           });
                         }
                       }
