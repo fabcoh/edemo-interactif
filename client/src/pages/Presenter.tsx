@@ -234,8 +234,9 @@ export default function Presenter() {
           <div className="md:col-span-2">
             {selectedSession ? (
               <Tabs defaultValue="documents" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
+                <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="documents">Documents</TabsTrigger>
+                  <TabsTrigger value="collaborators">Collaborateurs</TabsTrigger>
                   <TabsTrigger value="share">Partage</TabsTrigger>
                 </TabsList>
 
@@ -288,6 +289,100 @@ export default function Presenter() {
                           ))}
                         </div>
                       )}
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                {/* Collaborators Tab */}
+                <TabsContent value="collaborators" className="space-y-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Users className="w-5 h-5" />
+                        Collaborateurs
+                      </CardTitle>
+                      <CardDescription>
+                        Invitez d'autres commerciaux à contrôler cette présentation
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {/* Invite Form */}
+                      <div className="space-y-3 pb-4 border-b">
+                        <Label>Inviter un Collaborateur</Label>
+                        <div className="flex gap-2">
+                          <Input
+                            type="email"
+                            placeholder="Email du collaborateur"
+                            value={collaboratorEmail}
+                            onChange={(e) => setCollaboratorEmail(e.target.value)}
+                          />
+                          <Button
+                            onClick={async () => {
+                              if (collaboratorEmail && selectedSessionId) {
+                                await inviteCollaboratorMutation.mutateAsync({
+                                  sessionId: selectedSessionId,
+                                  collaboratorEmail,
+                                  permission: "control",
+                                });
+                              }
+                            }}
+                            disabled={!collaboratorEmail || inviteCollaboratorMutation.isPending}
+                          >
+                            <Plus className="w-4 h-4" />
+                            Inviter
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Collaborators List */}
+                      <div>
+                        <Label className="mb-3 block">Collaborateurs Actuels</Label>
+                        {collaboratorsQuery.isLoading ? (
+                          <div className="text-center py-4 text-gray-500">Chargement...</div>
+                        ) : (collaboratorsQuery.data || []).length === 0 ? (
+                          <div className="text-center py-4 text-gray-500">
+                            Aucun collaborateur pour le moment
+                          </div>
+                        ) : (
+                          <div className="space-y-2">
+                            {(collaboratorsQuery.data || []).map((collab) => (
+                              <div
+                                key={collab.id}
+                                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                              >
+                                <div>
+                                  <div className="font-semibold text-sm">{collab.name || "Sans nom"}</div>
+                                  <div className="text-xs text-gray-600 flex items-center gap-1 mt-1">
+                                    <Mail className="w-3 h-3" />
+                                    {collab.email}
+                                  </div>
+                                  <div className="text-xs text-blue-600 mt-1">
+                                    Permission: {collab.permission}
+                                  </div>
+                                </div>
+                                <button
+                                  onClick={async () => {
+                                    if (selectedSessionId) {
+                                      await removeCollaboratorMutation.mutateAsync({
+                                        sessionId: selectedSessionId,
+                                        collaboratorId: collab.collaboratorId,
+                                      });
+                                    }
+                                  }}
+                                  className="p-2 hover:bg-red-100 rounded-lg transition-colors"
+                                >
+                                  <X className="w-4 h-4 text-red-600" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="bg-blue-50 p-3 rounded-lg text-sm text-blue-900">
+                        <p className="font-semibold mb-1">💡 Info:</p>
+                        <p>Les collaborateurs peuvent contrôler la présentation avec le même code de session</p>
+                      </div>
                     </CardContent>
                   </Card>
                 </TabsContent>
