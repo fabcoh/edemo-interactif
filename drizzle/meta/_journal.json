@@ -64,6 +64,20 @@
       "when": 1761323333204,
       "tag": "0008_wonderful_thaddeus_ross",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1761332234749,
+      "tag": "0009_cooing_raider",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1761332807893,
+      "tag": "0010_careful_dragon_lord",
+      "breakpoints": true
     }
   ]
 }

@@ -1,6 +1,6 @@
 import { eq, and } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, presentationSessions, documents, presentationViewers, presentationCollaborators, presenterCursors, viewerCursors, PresentationSession, Document, PresenterCursor, ViewerCursor } from "../drizzle/schema";
+import { InsertUser, users, presentationSessions, documents, presentationViewers, presentationCollaborators, presenterCursors, viewerCursors, commercialInvitations, PresentationSession, Document, PresenterCursor, ViewerCursor, CommercialInvitation, InsertCommercialInvitation } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -665,5 +665,84 @@ export async function getViewerCursors(sessionId: number): Promise<ViewerCursor[
     .where(eq(viewerCursors.sessionId, sessionId));
 
   return result;
+}
+
+
+
+/**
+ * Create a commercial invitation
+ */
+export async function createCommercialInvitation(
+  email: string,
+  name: string | null,
+  createdBy: number
+): Promise<CommercialInvitation> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Generate a unique token
+  const token = Math.random().toString(36).substring(2) + Date.now().toString(36);
+
+  const [invitation] = await db.insert(commercialInvitations).values({
+    token,
+    email,
+    name,
+    createdBy,
+  });
+
+  const [created] = await db
+    .select()
+    .from(commercialInvitations)
+    .where(eq(commercialInvitations.id, Number(invitation.insertId)));
+
+  return created;
+}
+
+/**
+ * Get all commercial invitations (admin only)
+ */
+export async function getAllCommercialInvitations(): Promise<CommercialInvitation[]> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  return await db.select().from(commercialInvitations);
+}
+
+/**
+ * Get a commercial invitation by token
+ */
+export async function getCommercialInvitationByToken(token: string): Promise<CommercialInvitation | null> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const [invitation] = await db
+    .select()
+    .from(commercialInvitations)
+    .where(eq(commercialInvitations.token, token));
+
+  return invitation || null;
+}
+
+/**
+ * Mark invitation as used
+ */
+export async function markInvitationAsUsed(token: string, userId: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(commercialInvitations)
+    .set({ used: true, userId, usedAt: new Date() })
+    .where(eq(commercialInvitations.token, token));
+}
+
+/**
+ * Delete a commercial invitation (revoke access)
+ */
+export async function deleteCommercialInvitation(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.delete(commercialInvitations).where(eq(commercialInvitations.id, id));
 }
 

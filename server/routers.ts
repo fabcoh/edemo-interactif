@@ -26,6 +26,11 @@ import {
   getPresenterCursor,
   updateViewerCursor,
   getViewerCursors,
+  createCommercialInvitation,
+  getAllCommercialInvitations,
+  getCommercialInvitationByToken,
+  markInvitationAsUsed,
+  deleteCommercialInvitation,
 } from "./db";
 import { storagePut, storageGet } from "./storage";
 import { TRPCError } from "@trpc/server";
@@ -645,6 +650,170 @@ export const appRouter = router({
 
         await updateCollaboratorPermission(input.collaboratorId, input.sessionId, input.permission);
         return { success: true };
+      }),
+  }),
+
+  // ============ ADMIN ROUTES ============
+
+  admin: router({
+    /**
+     * Create a commercial invitation (admin only)
+     */
+    createCommercialInvitation: protectedProcedure
+      .input(z.object({
+        email: z.string().email(),
+        name: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // Check if user is admin
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Only admins can create commercial invitations",
+          });
+        }
+
+        const invitation = await createCommercialInvitation(
+          input.email,
+          input.name || null,
+          ctx.user.id
+        );
+
+        return {
+          id: invitation.id,
+          token: invitation.token,
+          email: invitation.email,
+          name: invitation.name,
+          inviteLink: `${process.env.VITE_APP_URL || ""}/invite/${invitation.token}`,
+        };
+      }),
+
+    /**
+     * Get all commercial invitations (admin only)
+     */
+    getCommercialInvitations: protectedProcedure
+      .query(async ({ ctx }) => {
+        // Check if user is admin
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Only admins can view commercial invitations",
+          });
+        }
+
+        return await getAllCommercialInvitations();
+      }),
+
+    /**
+     * Delete a commercial invitation (admin only)
+     */
+    deleteCommercialInvitation: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // Check if user is admin
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Only admins can delete commercial invitations",
+          });
+        }
+
+        await deleteCommercialInvitation(input.id);
+        return { success: true };
+      }),
+  }),
+
+  // ============ INVITATION ROUTES ============
+
+  invitation: router({
+    /**
+     * Get invitation details by token (public)
+     */
+    getInvitationByToken: publicProcedure
+      .input(z.object({
+        token: z.string(),
+      }))
+      .query(async ({ input }) => {
+        const invitation = await getCommercialInvitationByToken(input.token);
+        
+        if (!invitation) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Invitation not found",
+          });
+        }
+
+        if (invitation.used) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "This invitation has already been used",
+          });
+        }
+
+        return {
+          email: invitation.email,
+          name: invitation.name,
+        };
+      }),
+
+    /**
+     * Accept invitation and create commercial account (public)
+     */
+    acceptInvitation: publicProcedure
+      .input(z.object({
+        token: z.string(),
+        email: z.string().email(),
+      }))
+      .mutation(async ({ input }) => {
+        const invitation = await getCommercialInvitationByToken(input.token);
+        
+        if (!invitation) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Invitation not found",
+          });
+        }
+
+        if (invitation.used) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "This invitation has already been used",
+          });
+        }
+
+        // Verify email matches
+        if (invitation.email.toLowerCase() !== input.email.toLowerCase()) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Email does not match the invitation",
+          });
+        }
+
+        // Create user account with commercial role
+        // Note: This is a simplified version. In production, you'd integrate with OAuth
+        const openId = `commercial-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+        
+        const db = await import("./db").then(m => m.getDb());
+        if (!db) throw new Error("Database not available");
+
+        const { users } = await import("../drizzle/schema");
+        const [user] = await db.insert(users).values({
+          openId,
+          email: input.email,
+          name: invitation.name || input.email,
+          role: "commercial",
+          loginMethod: "invitation",
+        });
+
+        // Mark invitation as used
+        await markInvitationAsUsed(input.token, Number(user.insertId));
+
+        return {
+          success: true,
+          userId: Number(user.insertId),
+        };
       }),
   }),
 

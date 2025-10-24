@@ -16,7 +16,7 @@ export const users = mysqlTable("users", {
   name: text("name"),
   email: varchar("email", { length: 320 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
-  role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
+  role: mysqlEnum("role", ["user", "admin", "commercial"]).default("user").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
@@ -176,4 +176,31 @@ export const viewerCursors = mysqlTable("viewer_cursors", {
 
 export type ViewerCursor = typeof viewerCursors.$inferSelect;
 export type InsertViewerCursor = typeof viewerCursors.$inferInsert;
+
+
+/**
+ * Commercial Invitations table
+ * Stores invitation tokens for commercial users
+ */
+export const commercialInvitations = mysqlTable("commercial_invitations", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Unique invitation token */
+  token: varchar("token", { length: 64 }).notNull().unique(),
+  /** Email address of the invited commercial */
+  email: varchar("email", { length: 320 }).notNull(),
+  /** Name of the commercial (optional) */
+  name: text("name"),
+  /** Whether the invitation has been used */
+  used: boolean("used").default(false).notNull(),
+  /** User ID if the invitation has been used */
+  userId: int("userId"),
+  /** Admin who created the invitation */
+  createdBy: int("createdBy").notNull(),
+  /** Timestamps */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  usedAt: timestamp("usedAt"),
+});
+
+export type CommercialInvitation = typeof commercialInvitations.$inferSelect;
+export type InsertCommercialInvitation = typeof commercialInvitations.$inferInsert;
 
