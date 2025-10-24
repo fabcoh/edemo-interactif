@@ -102,3 +102,52 @@ export const presentationViewers = mysqlTable("presentation_viewers", {
 export type PresentationViewer = typeof presentationViewers.$inferSelect;
 export type InsertPresentationViewer = typeof presentationViewers.$inferInsert;
 
+
+
+/**
+ * Presentation folders/categories table
+ * Allows organizing presentations by theme/category
+ */
+export const presentationFolders = mysqlTable("presentation_folders", {
+  id: int("id").autoincrement().primaryKey(),
+  /** The user who owns this folder */
+  userId: int("userId").notNull(),
+  /** Folder name/theme */
+  name: varchar("name", { length: 255 }).notNull(),
+  /** Folder description */
+  description: text("description"),
+  /** Folder color for UI display */
+  color: varchar("color", { length: 20 }).default("#3B82F6").notNull(),
+  /** Timestamps */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type PresentationFolder = typeof presentationFolders.$inferSelect;
+export type InsertPresentationFolder = typeof presentationFolders.$inferInsert;
+
+/**
+ * Presenter cursor/pointer tracking table
+ * Tracks the presenter's mouse position for viewers to see
+ */
+export const presenterCursors = mysqlTable("presenter_cursors", {
+  id: int("id").autoincrement().primaryKey(),
+  /** The session this cursor belongs to */
+  sessionId: int("sessionId").notNull(),
+  /** X coordinate of the cursor (0-100 percentage) */
+  cursorX: int("cursorX").notNull(),
+  /** Y coordinate of the cursor (0-100 percentage) */
+  cursorY: int("cursorY").notNull(),
+  /** Current zoom level */
+  zoomLevel: int("zoomLevel").default(100).notNull(),
+  /** Pan X offset */
+  panX: int("panX").default(0).notNull(),
+  /** Pan Y offset */
+  panY: int("panY").default(0).notNull(),
+  /** Timestamps */
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type PresenterCursor = typeof presenterCursors.$inferSelect;
+export type InsertPresenterCursor = typeof presenterCursors.$inferInsert;
+

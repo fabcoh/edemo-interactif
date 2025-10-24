@@ -16,6 +16,13 @@ import {
   updateDocumentOrder,
   recordPresentationViewer,
   getSessionViewersCount,
+  createPresentationFolder,
+  getUserFolders,
+  deletePresentationFolder,
+  deletePresentationSession,
+  updatePresenterCursor,
+  getPresenterCursor,
+  deleteUser,
 } from "./db";
 import { storagePut, storageGet } from "./storage";
 import { TRPCError } from "@trpc/server";
@@ -87,8 +94,7 @@ export const appRouter = router({
     }),
 
     /**
-     * Get a specific session by code (for viewers)
-     * Public access - anyone with the code can view
+     * Get a specific session by code (public for viewers)
      */
     getSessionByCode: publicProcedure
       .input(z.object({
@@ -103,39 +109,25 @@ export const appRouter = router({
           });
         }
 
-        // Get current document if one is selected
-        let currentDocument = null;
-        if (session.currentDocumentId) {
-          currentDocument = await getDocument(session.currentDocumentId);
-        }
-
         return {
           id: session.id,
           title: session.title,
-          sessionCode: session.sessionCode,
-          currentDocument: currentDocument ? {
-            id: currentDocument.id,
-            title: currentDocument.title,
-            type: currentDocument.type,
-            fileUrl: currentDocument.fileUrl,
-            mimeType: currentDocument.mimeType,
-          } : null,
+          currentDocumentId: session.currentDocumentId,
           currentOrientation: session.currentOrientation,
+          isActive: session.isActive,
         };
       }),
 
     /**
-     * Update current document being displayed
-     * Only the presenter can update
+     * Update the current document being displayed
      */
-    updateCurrentDocument: protectedProcedure
+    setCurrentDocument: protectedProcedure
       .input(z.object({
         sessionId: z.number(),
         documentId: z.number().nullable(),
         orientation: z.enum(["portrait", "landscape"]),
       }))
       .mutation(async ({ ctx, input }) => {
-        // Verify the user owns this session
         const sessions = await getPresentationSessionsByPresenter(ctx.user.id);
         const sessionExists = sessions.some(s => s.id === input.sessionId);
         
@@ -197,6 +189,28 @@ export const appRouter = router({
 
         const count = await getSessionViewersCount(input.sessionId);
         return { count };
+      }),
+
+    /**
+     * Delete a presentation session
+     */
+    deleteSession: protectedProcedure
+      .input(z.object({
+        sessionId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const sessions = await getPresentationSessionsByPresenter(ctx.user.id);
+        const sessionExists = sessions.some(s => s.id === input.sessionId);
+        
+        if (!sessionExists) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You don't have permission to delete this session",
+          });
+        }
+
+        await deletePresentationSession(input.sessionId);
+        return { success: true };
       }),
   }),
 
@@ -390,6 +404,193 @@ export const appRouter = router({
           sessionId: session.id,
           viewerIdentifier,
         };
+      }),
+  }),
+
+  // ============ PRESENTATION FOLDERS ROUTES ============
+
+  folders: router({
+    /**
+     * Create a new presentation folder
+     */
+    createFolder: protectedProcedure
+      .input(z.object({
+        name: z.string().min(1).max(255),
+        description: z.string().optional(),
+        color: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const folder = await createPresentationFolder(
+          ctx.user.id,
+          input.name,
+          input.description,
+          input.color
+        );
+        return {
+          id: folder.id,
+          name: folder.name,
+          description: folder.description,
+          color: folder.color,
+        };
+      }),
+
+    /**
+     * Get all folders for the current user
+     */
+    getFolders: protectedProcedure.query(async ({ ctx }) => {
+      const folders = await getUserFolders(ctx.user.id);
+      return folders.map(f => ({
+        id: f.id,
+        name: f.name,
+        description: f.description,
+        color: f.color,
+      }));
+    }),
+
+    /**
+     * Delete a folder
+     */
+    deleteFolder: protectedProcedure
+      .input(z.object({
+        folderId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const folders = await getUserFolders(ctx.user.id);
+        const folderExists = folders.some(f => f.id === input.folderId);
+        
+        if (!folderExists) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You don't have permission to delete this folder",
+          });
+        }
+
+        await deletePresentationFolder(input.folderId);
+        return { success: true };
+      }),
+  }),
+
+  // ============ CURSOR TRACKING ROUTES ============
+
+  cursor: router({
+    /**
+     * Update presenter cursor position and zoom level
+     */
+    updateCursor: protectedProcedure
+      .input(z.object({
+        sessionId: z.number(),
+        cursorX: z.number().min(0).max(100),
+        cursorY: z.number().min(0).max(100),
+        zoomLevel: z.number().min(50).max(300).optional(),
+        panX: z.number().optional(),
+        panY: z.number().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const sessions = await getPresentationSessionsByPresenter(ctx.user.id);
+        const sessionExists = sessions.some(s => s.id === input.sessionId);
+        
+        if (!sessionExists) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You don't have permission to update cursor for this session",
+          });
+        }
+
+        const cursor = await updatePresenterCursor(
+          input.sessionId,
+          input.cursorX,
+          input.cursorY,
+          input.zoomLevel || 100,
+          input.panX || 0,
+          input.panY || 0
+        );
+
+        return {
+          cursorX: cursor.cursorX,
+          cursorY: cursor.cursorY,
+          zoomLevel: cursor.zoomLevel,
+          panX: cursor.panX,
+          panY: cursor.panY,
+        };
+      }),
+
+    /**
+     * Get presenter cursor position for a session (public - for viewers)
+     */
+    getCursor: publicProcedure
+      .input(z.object({
+        sessionCode: z.string(),
+      }))
+      .query(async ({ input }) => {
+        const session = await getPresentationSessionByCode(input.sessionCode);
+        if (!session) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Session not found",
+          });
+        }
+
+        const cursor = await getPresenterCursor(session.id);
+        if (!cursor) {
+          return null;
+        }
+
+        return {
+          cursorX: cursor.cursorX,
+          cursorY: cursor.cursorY,
+          zoomLevel: cursor.zoomLevel,
+          panX: cursor.panX,
+          panY: cursor.panY,
+        };
+      }),
+  }),
+
+  // ============ ADMIN ROUTES ============
+
+  admin: router({
+    /**
+     * Delete a presentation session (admin only)
+     */
+    deleteSession: protectedProcedure
+      .input(z.object({
+        sessionId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Only admins can delete sessions",
+          });
+        }
+
+        await deletePresentationSession(input.sessionId);
+        return { success: true };
+      }),
+
+    /**
+     * Delete a user (admin only)
+     */
+    deleteUserAccount: protectedProcedure
+      .input(z.object({
+        userId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Only admins can delete users",
+          });
+        }
+
+        if (input.userId === ctx.user.id) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "You cannot delete your own account",
+          });
+        }
+
+        await deleteUser(input.userId);
+        return { success: true };
       }),
   }),
 });

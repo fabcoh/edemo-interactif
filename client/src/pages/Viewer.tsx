@@ -17,6 +17,7 @@ export default function Viewer() {
   const [enteredCode, setEnteredCode] = useState("");
   const [isJoined, setIsJoined] = useState(false);
   const [viewerCount, setViewerCount] = useState(0);
+  const [currentDocument, setCurrentDocument] = useState<any>(null);
 
   // Extract session code from URL if present
   useEffect(() => {
@@ -38,6 +39,25 @@ export default function Viewer() {
     }
   );
 
+  // Get documents for the session
+  const documentsQuery = trpc.documents.getSessionDocuments.useQuery(
+    { sessionId: sessionQuery.data?.id || 0 },
+    { 
+      enabled: isJoined && !!sessionQuery.data?.id,
+      refetchInterval: 1000,
+    }
+  );
+
+  // Update current document when session data changes
+  useEffect(() => {
+    if (sessionQuery.data?.currentDocumentId && documentsQuery.data) {
+      const doc = documentsQuery.data.find(d => d.id === sessionQuery.data?.currentDocumentId);
+      setCurrentDocument(doc || null);
+    } else {
+      setCurrentDocument(null);
+    }
+  }, [sessionQuery.data?.currentDocumentId, documentsQuery.data]);
+
   const joinSessionMutation = trpc.viewer.joinSession.useMutation({
     onSuccess: () => {
       setIsJoined(true);
@@ -58,7 +78,6 @@ export default function Viewer() {
   };
 
   const session = sessionQuery.data;
-  const currentDocument = session?.currentDocument;
   const orientation = session?.currentOrientation || "portrait";
 
   if (!isJoined || !enteredCode) {
@@ -108,10 +127,10 @@ export default function Viewer() {
 
   if (sessionQuery.isLoading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-          <p className="text-white">Connexion à la présentation...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Connexion à la présentation...</p>
         </div>
       </div>
     );
@@ -119,26 +138,18 @@ export default function Viewer() {
 
   if (sessionQuery.isError || !session) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md bg-gray-800 border-gray-700">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md border-red-200">
           <CardHeader>
-            <CardTitle className="text-white">Présentation Non Trouvée</CardTitle>
+            <CardTitle className="text-red-600">Erreur de Connexion</CardTitle>
             <CardDescription>
-              Le code de session est invalide ou la présentation est inactive
+              La présentation n'a pas pu être trouvée ou est inactive
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button
-              onClick={handleLeaveSession}
-              className="w-full mb-2"
-            >
-              Essayer un Autre Code
+            <Button onClick={handleLeaveSession} className="w-full">
+              Réessayer
             </Button>
-            <Link href="/">
-              <Button variant="outline" className="w-full">
-                Retour à l'Accueil
-              </Button>
-            </Link>
           </CardContent>
         </Card>
       </div>
@@ -146,12 +157,12 @@ export default function Viewer() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 flex flex-col">
+    <div className="h-screen flex flex-col bg-gray-900">
       {/* Header */}
       <header className="bg-gray-800 border-b border-gray-700 px-4 py-3 flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-white">{session.title}</h1>
-          <p className="text-xs text-gray-400">Code: {session.sessionCode}</p>
+          <p className="text-xs text-gray-400">Code: {enteredCode}</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 text-gray-300 text-sm">
