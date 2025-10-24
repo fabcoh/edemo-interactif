@@ -3,7 +3,7 @@
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useParams, Link } from "wouter";
+import { useParams, Link, useLocation } from "wouter";
 import { ArrowLeft, Users, Copy, Share2, Upload, X, ZoomIn, ZoomOut, Check } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useEffect, useRef } from "react";
@@ -16,6 +16,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 export default function PresenterControl() {
   const { isAuthenticated } = useAuth();
   const { sessionId } = useParams<{ sessionId: string }>();
+  const [, setLocation] = useLocation();
   const [selectedDocumentId, setSelectedDocumentId] = useState<number | null>(null);
   const [displayedDocumentId, setDisplayedDocumentId] = useState<number | null>(null);
   const [orientation, setOrientation] = useState<"portrait" | "landscape">("portrait");
@@ -242,12 +243,15 @@ export default function PresenterControl() {
       <header className="bg-black shadow-lg">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link href="/presenter">
-              <Button variant="ghost" size="sm" className="gap-2 text-white hover:bg-gray-800">
-                <ArrowLeft className="w-4 h-4" />
-                Retour
-              </Button>
-            </Link>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="gap-2 text-white hover:bg-gray-800"
+              onClick={() => setLocation("/presenter")}
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Retour
+            </Button>
             <div>
               <h1 className="text-xl font-bold">{currentSession.title}</h1>
               <p className="text-xs text-gray-400">Code: {currentSession.sessionCode}</p>
