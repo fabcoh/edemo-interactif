@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Copy, Share2, Trash2, Eye, FileText, Image, Video, Users, Mail, X } from "lucide-react";
+import { Plus, Copy, Share2, Trash2, Eye, FileText, Image, Video, Users, Mail, X, Play } from "lucide-react";
 import { Link } from "wouter";
 
 /**
@@ -208,23 +208,32 @@ export default function Presenter() {
                 ) : (
                   <div className="space-y-2">
                     {sessions.map((session) => (
-                      <button
-                        key={session.id}
-                        onClick={() => setSelectedSessionId(session.id)}
-                        className={`w-full text-left p-3 rounded-lg transition-colors ${
-                          selectedSessionId === session.id
-                            ? "bg-blue-100 border-2 border-blue-500"
-                            : "bg-gray-100 hover:bg-gray-200 border-2 border-transparent"
-                        }`}
-                      >
-                        <div className="font-semibold text-sm">{session.title}</div>
-                        <div className="text-xs text-gray-600 mt-1">
-                          Code: {session.sessionCode}
-                        </div>
-                        <div className={`text-xs mt-1 ${session.isActive ? "text-green-600" : "text-red-600"}`}>
-                          {session.isActive ? "🟢 Active" : "🔴 Inactive"}
-                        </div>
-                      </button>
+                      <div key={session.id} className="space-y-2">
+                        <button
+                          onClick={() => setSelectedSessionId(session.id)}
+                          className={`w-full text-left p-3 rounded-lg transition-colors ${
+                            selectedSessionId === session.id
+                              ? "bg-blue-100 border-2 border-blue-500"
+                              : "bg-gray-100 hover:bg-gray-200 border-2 border-transparent"
+                          }`}
+                        >
+                          <div className="font-semibold text-sm">{session.title}</div>
+                          <div className="text-xs text-gray-600 mt-1">
+                            Code: {session.sessionCode}
+                          </div>
+                          <div className={`text-xs mt-1 ${session.isActive ? "text-green-600" : "text-red-600"}`}>
+                            {session.isActive ? "🟢 Active" : "🔴 Inactive"}
+                          </div>
+                        </button>
+                        {selectedSessionId === session.id && (
+                          <Link href={`/presenter/control/${session.id}`}>
+                            <Button className="w-full gap-2" size="sm">
+                              <Play className="w-4 h-4" />
+                              Présenter
+                            </Button>
+                          </Link>
+                        )}
+                      </div>
                     ))}
                   </div>
                 )}
