@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link } from "wouter";
-import { ArrowLeft, Users, X } from "lucide-react";
+import { ArrowLeft, Users, X, ZoomIn, ZoomOut } from "lucide-react";
 
 /**
  * Viewer Page - Display presentation content in real-time (fullscreen)
@@ -20,6 +20,8 @@ export default function Viewer() {
   const [isJoined, setIsJoined] = useState(false);
   const [viewerCount, setViewerCount] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(true);
+  const [zoom, setZoom] = useState(100);
+  const [documentError, setDocumentError] = useState<string | null>(null);
 
   // Extract session code from URL if present
   useEffect(() => {
@@ -66,58 +68,128 @@ export default function Viewer() {
     }
   };
 
+  const handleZoomIn = () => {
+    setZoom((prev) => Math.min(prev + 10, 200));
+  };
+
+  const handleZoomOut = () => {
+    setZoom((prev) => Math.max(prev - 10, 50));
+  };
+
+  const resetZoom = () => {
+    setZoom(100);
+  };
+
   // If joined and fullscreen, show only the document
   if (isJoined && isFullscreen && currentDocument) {
     return (
       <div className="fixed inset-0 bg-black flex flex-col">
-        {/* Minimal Header */}
-        <div className="bg-gray-900 border-b border-gray-700 px-4 py-2 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <h1 className="text-sm font-bold text-white">{session?.title || "Présentation"}</h1>
-            <span className="text-xs text-gray-400">Code: {session?.sessionCode}</span>
+        {/* Minimal Header - Very compact */}
+        <div className="bg-gray-950 border-b border-gray-800 px-4 py-2 flex justify-between items-center h-12 flex-shrink-0">
+          <div className="flex items-center gap-3 min-w-0">
+            <h1 className="text-xs font-bold text-white truncate">{session?.title || "Présentation"}</h1>
+            <span className="text-xs text-gray-500 whitespace-nowrap">
+              {session?.sessionCode}
+            </span>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 text-xs text-gray-400">
-              <Users className="w-4 h-4" />
-              <span>{viewerCount} spectateur(s)</span>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <div className="flex items-center gap-1 text-xs text-gray-400">
+              <Users className="w-3 h-3" />
+              <span className="whitespace-nowrap">{viewerCount}</span>
             </div>
             <Button
               size="sm"
               variant="ghost"
               onClick={() => setIsFullscreen(false)}
-              className="text-gray-400 hover:text-white"
+              className="text-gray-400 hover:text-white h-8 w-8 p-0"
             >
               <X className="w-4 h-4" />
             </Button>
           </div>
         </div>
 
-        {/* Document Display - Fullscreen */}
-        <div className="flex-1 bg-black flex items-center justify-center overflow-hidden">
-          {currentDocument.type === "pdf" && (
-            <iframe
-              src={currentDocument.fileUrl}
-              className="w-full h-full"
-              title="PDF Document"
-            />
-          )}
-          {currentDocument.type === "image" && (
-            <div className="flex items-center justify-center w-full h-full">
-              <img
-                src={currentDocument.fileUrl}
-                alt="Document"
-                className="max-w-full max-h-full object-contain"
-              />
+        {/* Document Display - Fullscreen with zoom controls */}
+        <div className="flex-1 bg-black flex flex-col items-center justify-center overflow-hidden relative">
+          {/* Zoom Controls - Floating on top right */}
+          {(currentDocument.type === "image" || currentDocument.type === "pdf") && (
+            <div className="absolute top-4 right-4 flex gap-2 z-10 bg-gray-900 bg-opacity-80 rounded-lg p-2">
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={handleZoomOut}
+                className="text-gray-300 hover:text-white h-8 w-8 p-0"
+                title="Zoom out"
+              >
+                <ZoomOut className="w-4 h-4" />
+              </Button>
+              <span className="text-xs text-gray-300 flex items-center px-2 min-w-12 justify-center">
+                {zoom}%
+              </span>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={handleZoomIn}
+                className="text-gray-300 hover:text-white h-8 w-8 p-0"
+                title="Zoom in"
+              >
+                <ZoomIn className="w-4 h-4" />
+              </Button>
+              <div className="w-px bg-gray-700" />
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={resetZoom}
+                className="text-gray-300 hover:text-white h-8 w-8 p-0 text-xs"
+                title="Reset zoom"
+              >
+                100%
+              </Button>
             </div>
           )}
-          {currentDocument.type === "video" && (
-            <video
-              src={currentDocument.fileUrl}
-              controls
-              className="max-w-full max-h-full"
-              autoPlay
-            />
-          )}
+
+          {/* Document Content */}
+          <div className="w-full h-full flex items-center justify-center overflow-auto">
+            {documentError && (
+              <div className="text-center text-red-400 p-4">
+                <p className="text-sm">Erreur lors du chargement du document</p>
+                <p className="text-xs text-gray-400 mt-2">{documentError}</p>
+              </div>
+            )}
+
+            {!documentError && currentDocument.type === "pdf" && (
+              <iframe
+                src={currentDocument.fileUrl}
+                className="w-full h-full"
+                title="PDF Document"
+                onError={() => setDocumentError("Impossible de charger le PDF")}
+              />
+            )}
+
+            {!documentError && currentDocument.type === "image" && (
+              <div className="flex items-center justify-center w-full h-full p-4">
+                <img
+                  src={currentDocument.fileUrl}
+                  alt="Document"
+                  style={{
+                    transform: `scale(${zoom / 100})`,
+                    transition: "transform 0.2s ease-out",
+                  }}
+                  className="object-contain max-w-full max-h-full"
+                  onError={() => setDocumentError("Impossible de charger l'image")}
+                />
+              </div>
+            )}
+
+            {!documentError && currentDocument.type === "video" && (
+              <video
+                src={currentDocument.fileUrl}
+                controls
+                autoPlay
+                className="max-w-full max-h-full object-contain"
+                onError={() => setDocumentError("Impossible de charger la vidéo")}
+              />
+            )}
+          </div>
         </div>
       </div>
     );
@@ -237,7 +309,11 @@ export default function Viewer() {
             {/* Fullscreen Button */}
             {currentDocument && (
               <Button
-                onClick={() => setIsFullscreen(true)}
+                onClick={() => {
+                  setZoom(100);
+                  setDocumentError(null);
+                  setIsFullscreen(true);
+                }}
                 className="w-full gap-2"
                 size="lg"
               >

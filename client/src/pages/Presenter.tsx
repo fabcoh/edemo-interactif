@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Copy, Share2, Trash2, Eye, FileText, Image, Video, Users, Mail, X, Play } from "lucide-react";
+import { Plus, Copy, Share2, Trash2, Eye, FileText, Image, Video, Users, Mail, X, Play, Edit2, Check } from "lucide-react";
 import { Link } from "wouter";
 
 /**
@@ -20,6 +20,8 @@ export default function Presenter() {
   const [selectedSessionId, setSelectedSessionId] = useState<number | null>(null);
   const [collaboratorEmail, setCollaboratorEmail] = useState("");
   const [showCollaboratorDialog, setShowCollaboratorDialog] = useState(false);
+  const [editingSessionId, setEditingSessionId] = useState<number | null>(null);
+  const [editingTitle, setEditingTitle] = useState("");
 
   // Queries
   const sessionsQuery = trpc.presentation.getSessions.useQuery(undefined, {
@@ -64,6 +66,14 @@ export default function Presenter() {
     },
   });
 
+  const updateTitleMutation = trpc.presentationSettings.updateTitle.useMutation({
+    onSuccess: () => {
+      setEditingSessionId(null);
+      setEditingTitle("");
+      sessionsQuery.refetch();
+    },
+  });
+
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -99,6 +109,15 @@ export default function Presenter() {
       await deleteDocumentMutation.mutateAsync({
         documentId,
         sessionId: selectedSessionId,
+      });
+    }
+  };
+
+  const handleUpdateTitle = async (sessionId: number) => {
+    if (editingTitle.trim()) {
+      await updateTitleMutation.mutateAsync({
+        sessionId,
+        title: editingTitle,
       });
     }
   };
@@ -209,23 +228,58 @@ export default function Presenter() {
                   <div className="space-y-2">
                     {sessions.map((session) => (
                       <div key={session.id} className="space-y-2">
-                        <button
-                          onClick={() => setSelectedSessionId(session.id)}
-                          className={`w-full text-left p-3 rounded-lg transition-colors ${
-                            selectedSessionId === session.id
-                              ? "bg-blue-100 border-2 border-blue-500"
-                              : "bg-gray-100 hover:bg-gray-200 border-2 border-transparent"
-                          }`}
-                        >
-                          <div className="font-semibold text-sm">{session.title}</div>
-                          <div className="text-xs text-gray-600 mt-1">
-                            Code: {session.sessionCode}
+                        {editingSessionId === session.id ? (
+                          <div className="flex gap-2">
+                            <Input
+                              value={editingTitle}
+                              onChange={(e) => setEditingTitle(e.target.value)}
+                              placeholder="Nouveau titre"
+                              className="text-sm"
+                              autoFocus
+                            />
+                            <Button
+                              size="sm"
+                              onClick={() => handleUpdateTitle(session.id)}
+                              disabled={!editingTitle.trim() || updateTitleMutation.isPending}
+                              className="gap-1"
+                            >
+                              <Check className="w-4 h-4" />
+                            </Button>
                           </div>
-                          <div className={`text-xs mt-1 ${session.isActive ? "text-green-600" : "text-red-600"}`}>
-                            {session.isActive ? "🟢 Active" : "🔴 Inactive"}
-                          </div>
-                        </button>
-                        {selectedSessionId === session.id && (
+                        ) : (
+                          <button
+                            onClick={() => setSelectedSessionId(session.id)}
+                            className={`w-full text-left p-3 rounded-lg transition-colors ${
+                              selectedSessionId === session.id
+                                ? "bg-blue-100 border-2 border-blue-500"
+                                : "bg-gray-100 hover:bg-gray-200 border-2 border-transparent"
+                            }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <div className="font-semibold text-sm">{session.title}</div>
+                                <div className="text-xs text-gray-600 mt-1">
+                                  Code: {session.sessionCode}
+                                </div>
+                                <div className={`text-xs mt-1 ${session.isActive ? "text-green-600" : "text-red-600"}`}>
+                                  {session.isActive ? "🟢 Active" : "🔴 Inactive"}
+                                </div>
+                              </div>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setEditingSessionId(session.id);
+                                  setEditingTitle(session.title);
+                                }}
+                                className="p-2 hover:bg-gray-300 rounded-lg transition-colors"
+                                title="Renommer"
+                              >
+                                <Edit2 className="w-4 h-4 text-gray-600" />
+                              </button>
+                            </div>
+                          </button>
+                        )}
+                        {selectedSessionId === session.id && editingSessionId !== session.id && (
                           <Link href={`/presenter/control/${session.id}`}>
                             <Button className="w-full gap-2" size="sm">
                               <Play className="w-4 h-4" />
@@ -409,6 +463,27 @@ export default function Presenter() {
                         </CardDescription>
                       </CardHeader>
                       <CardContent className="space-y-4">
+                        <div>
+                          <Label>Titre de la Présentation</Label>
+                          <div className="flex gap-2 mt-2">
+                            <Input
+                              value={selectedSession.title}
+                              readOnly
+                              className="font-semibold"
+                            />
+                            <Button
+                              variant="outline"
+                              onClick={() => {
+                                setEditingSessionId(selectedSession.id);
+                                setEditingTitle(selectedSession.title);
+                              }}
+                              title="Renommer"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+
                         <div>
                           <Label>Code de Session</Label>
                           <div className="flex gap-2 mt-2">

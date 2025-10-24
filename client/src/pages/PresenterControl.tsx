@@ -4,7 +4,7 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useParams, Link } from "wouter";
-import { ArrowLeft, Play, Pause, Users, Copy, Share2 } from "lucide-react";
+import { ArrowLeft, Play, Pause, Users, Copy, Share2, Upload } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 /**
@@ -48,6 +48,49 @@ export default function PresenterControl() {
       // Session ended
     },
   });
+
+  const uploadDocumentMutation = trpc.documents.uploadDocument.useMutation({
+    onSuccess: () => {
+      documentsQuery.refetch();
+      // Reset file input
+      const fileInput = document.getElementById('document-upload') as HTMLInputElement;
+      if (fileInput) fileInput.value = '';
+    },
+  });
+
+  const handleUploadDocument = async (file: File) => {
+    if (!file) return;
+
+    // Validate file type
+    const validTypes = ['application/pdf', 'image/png', 'image/jpeg', 'video/mp4'];
+    if (!validTypes.includes(file.type)) {
+      alert('Format de fichier non supporté. Veuillez utiliser PDF, PNG, JPG ou MP4.');
+      return;
+    }
+
+    // Validate file size (max 100MB)
+    if (file.size > 100 * 1024 * 1024) {
+      alert('Le fichier est trop volumineux. Maximum 100MB.');
+      return;
+    }
+
+    // Read file as base64
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const base64 = (e.target?.result as string).split(',')[1];
+      const fileType = file.type === 'application/pdf' ? 'pdf' : file.type.startsWith('image/') ? 'image' : 'video';
+
+      await uploadDocumentMutation.mutateAsync({
+        sessionId: sessionIdNum,
+        title: file.name.replace(/\.[^/.]+$/, ''),
+        type: fileType as 'pdf' | 'image' | 'video',
+        fileData: base64,
+        fileName: file.name,
+        mimeType: file.type,
+      });
+    };
+    reader.readAsDataURL(file);
+  };
 
   if (!isAuthenticated) {
     return (
@@ -99,7 +142,7 @@ export default function PresenterControl() {
   };
 
   const getShareLink = (sessionCode: string) => {
-    return `${window.location.origin}/viewer?code=${sessionCode}`;
+    return `${window.location.origin}/view/${sessionCode}`;
   };
 
   const copyToClipboard = (text: string) => {
@@ -253,6 +296,40 @@ export default function PresenterControl() {
 
           {/* Control Panel */}
           <div className="space-y-4">
+            {/* Upload Documents */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Ajouter un Document</CardTitle>
+                <CardDescription>Pendant la présentation</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <input
+                    id="document-upload"
+                    type="file"
+                    accept=".pdf,image/png,image/jpeg,.mp4"
+                    onChange={(e) => {
+                      if (e.target.files?.[0]) {
+                        handleUploadDocument(e.target.files[0]);
+                      }
+                    }}
+                    disabled={uploadDocumentMutation.isPending}
+                    className="hidden"
+                  />
+                  <Button
+                    onClick={() => document.getElementById('document-upload')?.click()}
+                    disabled={uploadDocumentMutation.isPending}
+                    className="w-full gap-2"
+                    variant="outline"
+                  >
+                    <Upload className="w-4 h-4" />
+                    {uploadDocumentMutation.isPending ? "Upload..." : "Télécharger"}
+                  </Button>
+                  <p className="text-xs text-gray-500">PDF, PNG, JPG, MP4 (max 100MB)</p>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Display Controls */}
             <Card>
               <CardHeader>
@@ -344,6 +421,10 @@ export default function PresenterControl() {
                 <div>
                   <p className="text-gray-600">Documents:</p>
                   <p className="font-bold text-gray-900">{documents.length}</p>
+                </div>
+                <div>
+                  <p className="text-gray-600">Titre:</p>
+                  <p className="font-bold text-gray-900 truncate">{currentSession.title}</p>
                 </div>
               </CardContent>
             </Card>
