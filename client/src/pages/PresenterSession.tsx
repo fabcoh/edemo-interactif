@@ -44,8 +44,8 @@ export default function PresenterSession() {
             <CardTitle>Accès Refusé</CardTitle>
           </CardHeader>
           <CardContent>
-            <Link href="/">
-              <Button className="w-full">Retour à l'accueil</Button>
+            <Link href="/presenter">
+              <Button className="w-full">Retour au Tableau de Bord</Button>
             </Link>
           </CardContent>
         </Card>
