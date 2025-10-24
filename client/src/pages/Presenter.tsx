@@ -247,9 +247,9 @@ export default function Presenter() {
                             </Button>
                           </div>
                         ) : (
-                          <button
+                          <div
                             onClick={() => setSelectedSessionId(session.id)}
-                            className={`w-full text-left p-3 rounded-lg transition-colors ${
+                            className={`w-full text-left p-3 rounded-lg transition-colors cursor-pointer ${
                               selectedSessionId === session.id
                                 ? "bg-blue-100 border-2 border-blue-500"
                                 : "bg-gray-100 hover:bg-gray-200 border-2 border-transparent"
@@ -277,7 +277,7 @@ export default function Presenter() {
                                 <Edit2 className="w-4 h-4 text-gray-600" />
                               </button>
                             </div>
-                          </button>
+                          </div>
                         )}
                         {selectedSessionId === session.id && editingSessionId !== session.id && (
                           <Link href={`/presenter/control/${session.id}`}>
