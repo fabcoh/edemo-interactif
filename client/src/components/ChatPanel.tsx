@@ -1,9 +1,8 @@
 import { useState, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Send, Paperclip, Link as LinkIcon } from "lucide-react";
+import { Send, Paperclip, Link as LinkIcon, Trash2 } from "lucide-react";
 
 interface ChatPanelProps {
   sessionId: number;
@@ -86,29 +85,25 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
   const messages = messagesQuery.data || [];
 
   return (
-    <Card className="bg-gray-800 border-gray-700 flex flex-col h-[500px]">
-      <CardHeader className="pb-1 pt-2 px-2 border-b border-gray-700">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-[11px] flex items-center gap-1">
-            💬 Chat de Présentation
-          </CardTitle>
-          {messages.length > 0 && (
-            <Button
-              onClick={() => {
-                if (confirm("Êtes-vous sûr de vouloir supprimer tous les messages ?")) {
-                  deleteAllMessagesMutation.mutate({ sessionId });
-                }
-              }}
-              variant="ghost"
-              size="sm"
-              className="h-6 px-2 text-[10px] text-red-400 hover:text-red-300 hover:bg-red-900/20"
-            >
-              Effacer tout
-            </Button>
-          )}
-        </div>
-      </CardHeader>
-      <CardContent className="flex-1 flex flex-col p-1 overflow-hidden">
+    <div className="bg-gray-800 border border-gray-700 rounded-lg flex flex-col h-[500px] relative">
+      {/* Delete All Button - Floating on the right */}
+      {messages.length > 0 && (
+        <Button
+          onClick={() => {
+            if (confirm("Êtes-vous sûr de vouloir supprimer tous les messages ?")) {
+              deleteAllMessagesMutation.mutate({ sessionId });
+            }
+          }}
+          variant="ghost"
+          size="sm"
+          className="absolute -right-24 top-2 h-8 px-3 text-xs text-red-400 hover:text-red-300 hover:bg-red-900/20 gap-1 z-10"
+        >
+          <Trash2 className="w-3 h-3" />
+          Effacer tout
+        </Button>
+      )}
+
+      <div className="flex-1 flex flex-col p-2 overflow-hidden">
         {/* Input Area - At the top */}
         <div className="flex gap-1 mb-2">
           <input
@@ -227,8 +222,8 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
             ))
           )}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 

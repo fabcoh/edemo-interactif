@@ -1,6 +1,5 @@
-import { useRef, useEffect } from "react";
+import { useRef } from "react";
 import { trpc } from "@/lib/trpc";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Paperclip, Link as LinkIcon } from "lucide-react";
 
 interface ChatViewerProps {
@@ -16,22 +15,16 @@ export function ChatViewer({ sessionId }: ChatViewerProps) {
     { refetchInterval: 2000 }
   );
 
-  // Removed auto-scroll to prevent page jumping
-
   const messages = messagesQuery.data || [];
 
+  // Don't show chat if no messages
   if (messages.length === 0) {
-    return null; // Don't show chat if no messages
+    return null;
   }
 
   return (
-    <Card className="bg-transparent border-none flex flex-col max-h-[400px] shadow-none">
-      <CardHeader className="pb-1 pt-2 px-2 border-b border-gray-600 bg-gray-800 bg-opacity-80 rounded-t-lg">
-        <CardTitle className="text-[11px] flex items-center gap-1">
-          💬 Messages du Présentateur
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="flex-1 flex flex-col p-1 overflow-y-auto space-y-1 bg-transparent flex-col-reverse">
+    <div className="bg-gray-800 bg-opacity-90 border border-gray-600 rounded-lg flex flex-col max-h-[400px] p-2">
+      <div className="flex-1 overflow-y-auto space-y-1 flex flex-col-reverse">
         {[...messages].reverse().map((msg) => (
           <div
             key={msg.id}
@@ -80,9 +73,8 @@ export function ChatViewer({ sessionId }: ChatViewerProps) {
             </div>
           </div>
         ))}
-        <div ref={messagesEndRef} />
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 

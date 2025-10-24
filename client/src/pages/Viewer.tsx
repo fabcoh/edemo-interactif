@@ -219,7 +219,7 @@ export default function Viewer() {
     <div className="min-h-screen bg-gray-900 text-white">
       {/* Header */}
       <header className="bg-gray-800 border-b border-gray-700">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+        <div className="container mx-auto px-4 py-2 flex justify-between items-center">
           <div>
             <h1 className="text-xl font-bold">{session?.title || "Présentation"}</h1>
             <p className="text-sm text-gray-400">
@@ -238,7 +238,7 @@ export default function Viewer() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-2">
         {!isJoined ? (
           <div className="max-w-md mx-auto">
             <Card>
@@ -275,7 +275,7 @@ export default function Viewer() {
             <p className="text-sm text-gray-500 mt-2">Vérifiez le code de session et réessayez.</p>
           </div>
         ) : (
-          <div className="space-y-4 relative">
+          <div className="space-y-2 relative">
             {/* Chat Notification Popup */}
             {session && <ChatNotification sessionId={session.id} />}
 
