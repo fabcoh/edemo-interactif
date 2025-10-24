@@ -65,6 +65,17 @@ export default function PresenterControl() {
     },
   });
 
+  const deleteDocumentMutation = trpc.documents.deleteDocument.useMutation({
+    onSuccess: () => {
+      documentsQuery.refetch();
+      setSelectedDocumentId(null);
+      if (displayedDocumentId === selectedDocumentId) {
+        setDisplayedDocumentId(null);
+      }
+    },
+  });
+
+
   const handleUploadDocument = async (file: File) => {
     if (!file) return;
 
@@ -292,21 +303,32 @@ export default function PresenterControl() {
                   >
                     {doc.type === "image" && (
                       <>
+                        <div 
+                          className="absolute inset-0"
+                          style={{
+                            background: `linear-gradient(135deg, hsl(${(doc.id * 60) % 360}, 70%, 40%), hsl(${(doc.id * 60 + 60) % 360}, 70%, 40%))`
+                          }}
+                        />
                         <img
                           src={doc.fileUrl}
                           alt={doc.title}
-                          className="w-full h-full object-cover pointer-events-none"
-                          onError={(e) => {
-                            // Hide image on error, show fallback
-                            e.currentTarget.style.display = 'none';
-                          }}
-                          loading="lazy"
+                          className="w-full h-full object-cover pointer-events-none relative z-10"
                         />
-                        <div className="absolute inset-0 flex flex-col items-end justify-end text-white pointer-events-none z-10 p-1" style={{
-                          background: `linear-gradient(135deg, hsl(${(doc.id * 60) % 360}, 70%, 40%), hsl(${(doc.id * 60 + 60) % 360}, 70%, 40%))`
-                        }}>
+                        <div className="absolute inset-0 flex flex-col items-end justify-end text-white pointer-events-none z-20 p-1">
                           <div className="text-xs text-center font-semibold line-clamp-1 bg-black bg-opacity-60 px-1 rounded">{doc.title}</div>
                         </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (confirm('Êtes-vous sûr de vouloir supprimer ce document ?')) {
+                              deleteDocumentMutation.mutate({ documentId: doc.id, sessionId: sessionIdNum });
+                            }
+                          }}
+                          className="absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white rounded-full p-1 z-30 transition-colors"
+                          title="Supprimer ce document"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
                       </>
                     )}
                     {doc.type === "pdf" && (
