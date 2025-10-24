@@ -86,7 +86,7 @@ export default function Presenter() {
 
   const sessions = sessionsQuery.data || [];
   const documents = documentsQuery.data || [];
-  const selectedSession = sessions.find(s => s.id === selectedSessionId);
+  const selectedSession = sessionsQuery.data?.find(s => s.id === selectedSessionId);
 
   const handleCreateSession = async () => {
     if (newSessionTitle.trim()) {
@@ -117,7 +117,7 @@ export default function Presenter() {
   };
 
   const getShareLink = (sessionCode: string) => {
-    return `${window.location.origin}/viewer?code=${sessionCode}`;
+    return `${window.location.origin}/view/${sessionCode}`;
   };
 
   const copyToClipboard = (text: string) => {
@@ -389,77 +389,85 @@ export default function Presenter() {
 
                 {/* Share Tab */}
                 <TabsContent value="share" className="space-y-4">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Partager la Présentation</CardTitle>
-                      <CardDescription>
-                        Partagez cette présentation avec votre audience
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div>
-                        <Label>Code de Session</Label>
-                        <div className="flex gap-2 mt-2">
-                          <Input
-                            value={selectedSession.sessionCode}
-                            readOnly
-                            className="font-mono"
-                          />
-                          <Button
-                            variant="outline"
-                            onClick={() => copyToClipboard(selectedSession.sessionCode)}
-                          >
-                            <Copy className="w-4 h-4" />
-                          </Button>
+                  {selectedSession ? (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Partager la Présentation</CardTitle>
+                        <CardDescription>
+                          Partagez cette présentation avec votre audience
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div>
+                          <Label>Code de Session</Label>
+                          <div className="flex gap-2 mt-2">
+                            <Input
+                              value={selectedSession.sessionCode}
+                              readOnly
+                              className="font-mono"
+                            />
+                            <Button
+                              variant="outline"
+                              onClick={() => copyToClipboard(selectedSession.sessionCode)}
+                            >
+                              <Copy className="w-4 h-4" />
+                            </Button>
+                          </div>
                         </div>
-                      </div>
 
-                      <div>
-                        <Label>Lien de Partage</Label>
-                        <div className="flex gap-2 mt-2">
-                          <Input
-                            value={getShareLink(selectedSession.sessionCode)}
-                            readOnly
-                            className="text-sm"
-                          />
-                          <Button
-                            variant="outline"
-                            onClick={() => copyToClipboard(getShareLink(selectedSession.sessionCode))}
-                          >
-                            <Copy className="w-4 h-4" />
-                          </Button>
+                        <div>
+                          <Label>Lien de Partage</Label>
+                          <div className="flex gap-2 mt-2">
+                            <Input
+                              value={getShareLink(selectedSession.sessionCode)}
+                              readOnly
+                              className="text-sm"
+                            />
+                            <Button
+                              variant="outline"
+                              onClick={() => copyToClipboard(getShareLink(selectedSession.sessionCode))}
+                            >
+                              <Copy className="w-4 h-4" />
+                            </Button>
+                          </div>
                         </div>
-                      </div>
 
-                      <div className="pt-4 space-y-2">
-                        <a
-                          href={generateWhatsAppLink(selectedSession.sessionCode)}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <Button className="w-full gap-2 bg-green-600 hover:bg-green-700">
-                            <Share2 className="w-4 h-4" />
-                            Partager sur WhatsApp
-                          </Button>
-                        </a>
+                        <div className="pt-4 space-y-2">
+                          <a
+                            href={generateWhatsAppLink(selectedSession.sessionCode)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <Button className="w-full gap-2 bg-green-600 hover:bg-green-700">
+                              <Share2 className="w-4 h-4" />
+                              Partager sur WhatsApp
+                            </Button>
+                          </a>
 
-                        <Link href={`/viewer?code=${selectedSession.sessionCode}`}>
-                          <Button variant="outline" className="w-full gap-2">
-                            <Eye className="w-4 h-4" />
-                            Aperçu Spectateur
-                          </Button>
-                        </Link>
-                      </div>
+                          <Link href={`/view/${selectedSession.sessionCode}`}>
+                            <Button variant="outline" className="w-full gap-2">
+                              <Eye className="w-4 h-4" />
+                              Aperçu Spectateur
+                            </Button>
+                          </Link>
+                        </div>
 
-                      <div className="bg-blue-50 p-4 rounded-lg text-sm text-blue-900">
-                        <p className="font-semibold mb-2">💡 Conseil:</p>
-                        <p>
-                          Partagez le lien WhatsApp avec votre audience. Ils pourront voir
-                          les documents que vous afficherez en temps réel!
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
+                        <div className="bg-blue-50 p-4 rounded-lg text-sm text-blue-900">
+                          <p className="font-semibold mb-2">💡 Conseil:</p>
+                          <p>
+                            Partagez le lien WhatsApp avec votre audience. Ils pourront voir
+                            les documents que vous afficherez en temps réel!
+                          </p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    <Card>
+                      <CardContent className="py-12 text-center text-gray-500">
+                        Sélectionnez une présentation pour voir les options de partage
+                      </CardContent>
+                    </Card>
+                  )}
                 </TabsContent>
               </Tabs>
             ) : (
