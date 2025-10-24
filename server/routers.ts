@@ -9,6 +9,8 @@ import {
   getPresentationSessionsByPresenter,
   updateSessionCurrentDocument,
   updateSessionActiveStatus,
+  updateSessionTitle,
+  updateCollaboratorPermission,
   addDocumentToSession,
   getSessionDocuments,
   getDocument,
@@ -482,6 +484,57 @@ export const appRouter = router({
         }
 
         await removeCollaborator(input.sessionId, input.collaboratorId);
+        return { success: true };
+      }),
+
+    /**
+     * Update collaborator permission
+     */
+    updateCollaboratorPermission: protectedProcedure
+      .input(z.object({
+        sessionId: z.number(),
+        collaboratorId: z.number(),
+        permission: z.enum(["view", "edit", "control"]),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // Verify the user owns the presentation
+        const sessions = await getPresentationSessionsByPresenter(ctx.user.id);
+        const sessionExists = sessions.some(s => s.id === input.sessionId);
+        
+        if (!sessionExists) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You don't have permission to update collaborator permissions",
+          });
+        }
+
+        await updateCollaboratorPermission(input.collaboratorId, input.sessionId, input.permission);
+        return { success: true };
+      }),
+  }),
+
+  presentationSettings: router({
+    /**
+     * Update presentation title
+     */
+    updateTitle: protectedProcedure
+      .input(z.object({
+        sessionId: z.number(),
+        title: z.string().min(1).max(255),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // Verify the user owns the presentation
+        const sessions = await getPresentationSessionsByPresenter(ctx.user.id);
+        const sessionExists = sessions.some(s => s.id === input.sessionId);
+        
+        if (!sessionExists) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You don't have permission to update this presentation",
+          });
+        }
+
+        await updateSessionTitle(input.sessionId, input.title);
         return { success: true };
       }),
   }),

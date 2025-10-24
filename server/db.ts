@@ -193,6 +193,50 @@ export async function updateSessionActiveStatus(
     .where(eq(presentationSessions.id, sessionId));
 }
 
+/**
+ * Update presentation session title
+ */
+export async function updateSessionTitle(
+  sessionId: number,
+  title: string
+): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(presentationSessions)
+    .set({
+      title,
+      updatedAt: new Date(),
+    })
+    .where(eq(presentationSessions.id, sessionId));
+}
+
+/**
+ * Update collaborator permission
+ */
+export async function updateCollaboratorPermission(
+  collaboratorId: number,
+  sessionId: number,
+  permission: "view" | "edit" | "control"
+): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(presentationCollaborators)
+    .set({
+      permission,
+      updatedAt: new Date(),
+    })
+    .where(
+      and(
+        eq(presentationCollaborators.id, collaboratorId),
+        eq(presentationCollaborators.sessionId, sessionId)
+      )
+    );
+}
+
 // ============ DOCUMENT QUERIES ============
 
 /**
