@@ -690,7 +690,7 @@ export default function PresenterControl() {
                 <CardTitle className="text-xs">Format</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Select value={orientation} onValueChange={(val) => setOrientation(val as "portrait" | "landscape")}>
+                <Select key={orientation} value={orientation} onValueChange={(val) => setOrientation(val as "portrait" | "landscape")}>
                   <SelectTrigger className="bg-gray-700 border-gray-600 text-white h-8 text-xs">
                     <SelectValue />
                   </SelectTrigger>
