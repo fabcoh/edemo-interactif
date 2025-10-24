@@ -37,7 +37,7 @@ export default function PresenterControl() {
   );
 
   // Mutations
-  const updateDocumentMutation = trpc.presentation.setCurrentDocument.useMutation({
+  const updateDocumentMutation = trpc.presentation.updateCurrentDocument.useMutation({
     onSuccess: () => {
       // Document updated successfully
     },

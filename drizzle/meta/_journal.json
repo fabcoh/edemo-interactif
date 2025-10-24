@@ -15,13 +15,6 @@
       "when": 1761302545169,
       "tag": "0001_minor_ken_ellis",
       "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1761305531164,
-      "tag": "0002_plain_daredevil",
-      "breakpoints": true
     }
   ]
 }

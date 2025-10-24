@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Copy, Share2, Trash2, Eye, FileText, Image, Video, Play } from "lucide-react";
+import { Plus, Copy, Share2, Trash2, Eye, FileText, Image, Video } from "lucide-react";
 import { Link } from "wouter";
 
 /**
@@ -96,7 +96,7 @@ export default function Presenter() {
   };
 
   const getShareLink = (sessionCode: string) => {
-    return `${window.location.origin}/view/${sessionCode}`;
+    return `${window.location.origin}/viewer?code=${sessionCode}`;
   };
 
   const copyToClipboard = (text: string) => {
@@ -183,37 +183,25 @@ export default function Presenter() {
                     Aucune présentation. Créez-en une!
                   </div>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     {sessions.map((session) => (
-                      <div
+                      <button
                         key={session.id}
-                        className={`p-3 rounded-lg transition-colors border-2 ${
+                        onClick={() => setSelectedSessionId(session.id)}
+                        className={`w-full text-left p-3 rounded-lg transition-colors ${
                           selectedSessionId === session.id
-                            ? "bg-blue-100 border-blue-500"
-                            : "bg-gray-100 border-transparent hover:bg-gray-200"
+                            ? "bg-blue-100 border-2 border-blue-500"
+                            : "bg-gray-100 hover:bg-gray-200 border-2 border-transparent"
                         }`}
                       >
-                        <button
-                          onClick={() => setSelectedSessionId(session.id)}
-                          className="w-full text-left"
-                        >
-                          <div className="font-semibold text-sm">{session.title}</div>
-                          <div className="text-xs text-gray-600 mt-1">
-                            Code: {session.sessionCode}
-                          </div>
-                          <div className={`text-xs mt-1 ${session.isActive ? "text-green-600" : "text-red-600"}`}>
-                            {session.isActive ? "🟢 Active" : "🔴 Inactive"}
-                          </div>
-                        </button>
-                        {selectedSessionId === session.id && (
-                          <Link href={`/presenter/control/${session.id}`} className="block mt-2">
-                            <Button size="sm" className="w-full gap-2" variant="default">
-                              <Play className="w-4 h-4" />
-                              Contrôler la Présentation
-                            </Button>
-                          </Link>
-                        )}
-                      </div>
+                        <div className="font-semibold text-sm">{session.title}</div>
+                        <div className="text-xs text-gray-600 mt-1">
+                          Code: {session.sessionCode}
+                        </div>
+                        <div className={`text-xs mt-1 ${session.isActive ? "text-green-600" : "text-red-600"}`}>
+                          {session.isActive ? "🟢 Active" : "🔴 Inactive"}
+                        </div>
+                      </button>
                     ))}
                   </div>
                 )}
@@ -343,13 +331,6 @@ export default function Presenter() {
                           <Button variant="outline" className="w-full gap-2">
                             <Eye className="w-4 h-4" />
                             Aperçu Spectateur
-                          </Button>
-                        </Link>
-
-                        <Link href={`/presenter/control/${selectedSession.id}`}>
-                          <Button className="w-full gap-2">
-                            <Play className="w-4 h-4" />
-                            Contrôler la Présentation
                           </Button>
                         </Link>
                       </div>

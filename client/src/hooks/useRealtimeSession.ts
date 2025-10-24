@@ -37,7 +37,7 @@ export function useRealtimeSession(sessionCode: string, enabled: boolean = true)
  * Hook for presenter to manage the current document display
  */
 export function usePresenterControl(sessionId: number) {
-  const updateDocumentMutation = trpc.presentation.setCurrentDocument.useMutation();
+  const updateDocumentMutation = trpc.presentation.updateCurrentDocument.useMutation();
   const viewerCountQuery = trpc.presentation.getViewerCount.useQuery(
     { sessionId },
     { refetchInterval: 2000 } // Check viewer count every 2 seconds
