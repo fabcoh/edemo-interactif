@@ -16,10 +16,7 @@ export function ChatViewer({ sessionId }: ChatViewerProps) {
     { refetchInterval: 2000 }
   );
 
-  // Auto-scroll to bottom when new messages arrive
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messagesQuery.data]);
+  // Removed auto-scroll to prevent page jumping
 
   const messages = messagesQuery.data || [];
 

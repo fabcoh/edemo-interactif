@@ -29,10 +29,7 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
     },
   });
 
-  // Auto-scroll to bottom when new messages arrive
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messagesQuery.data]);
+  // Removed auto-scroll to prevent page jumping
 
   const handleSendTextMessage = async () => {
     if (!message.trim()) return;
