@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRoute } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link } from "wouter";
 import { ArrowLeft, Users, X, ZoomIn, ZoomOut } from "lucide-react";
+import { useEffect } from "react";
 
 /**
  * Viewer Page - Display presentation content in real-time (fullscreen)
@@ -21,6 +22,10 @@ export default function Viewer() {
   const [viewerCount, setViewerCount] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(true);
   const [zoom, setZoom] = useState(100);
+  const [presenterZoom, setPresenterZoom] = useState(100);
+  const [presenterCursorX, setPresenterCursorX] = useState(0);
+  const [presenterCursorY, setPresenterCursorY] = useState(0);
+  const [presenterCursorVisible, setPresenterCursorVisible] = useState(false);
   const [documentError, setDocumentError] = useState<string | null>(null);
 
   // Extract session code from URL if present
@@ -57,6 +62,25 @@ export default function Viewer() {
     },
   });
 
+  // Get presenter's cursor and zoom in real-time
+  const cursorQuery = trpc.presentation.getCursorAndZoom.useQuery(
+    { sessionCode: enteredCode },
+    {
+      enabled: isJoined && !!enteredCode,
+      refetchInterval: 500, // Poll every 500ms for smooth cursor tracking
+    }
+  );
+
+  // Update presenter zoom and cursor when data arrives
+  useEffect(() => {
+    if (cursorQuery.data) {
+      setPresenterZoom(cursorQuery.data.zoomLevel);
+      setPresenterCursorX(cursorQuery.data.cursorX);
+      setPresenterCursorY(cursorQuery.data.cursorY);
+      setPresenterCursorVisible(cursorQuery.data.cursorVisible);
+    }
+  }, [cursorQuery.data]);
+
   const session = sessionQuery.data;
   const currentDocument = session?.currentDocument;
 
@@ -78,6 +102,8 @@ export default function Viewer() {
 
   const resetZoom = () => {
     setZoom(100);
+    // Use presenter's zoom if available, otherwise reset to 100
+    setZoom(presenterZoom);
   };
 
   // If joined and fullscreen, show only the document
@@ -123,7 +149,7 @@ export default function Viewer() {
                 <ZoomOut className="w-4 h-4" />
               </Button>
               <span className="text-xs text-gray-300 flex items-center px-2 min-w-12 justify-center">
-                {zoom}%
+                {presenterZoom}%
               </span>
               <Button
                 size="sm"
@@ -166,17 +192,30 @@ export default function Viewer() {
             )}
 
             {!documentError && currentDocument.type === "image" && (
-              <div className="flex items-center justify-center w-full h-full p-4">
+              <div className="flex items-center justify-center w-full h-full p-4 relative">
                 <img
                   src={currentDocument.fileUrl}
                   alt="Document"
                   style={{
-                    transform: `scale(${zoom / 100})`,
+                    transform: `scale(${presenterZoom / 100})`,
                     transition: "transform 0.2s ease-out",
                   }}
                   className="object-contain max-w-full max-h-full"
                   onError={() => setDocumentError("Impossible de charger l'image")}
                 />
+                {/* Presenter cursor - Green for viewer */}
+                {presenterCursorVisible && presenterZoom > 100 && (
+                  <div
+                    className="absolute w-6 h-6 border-2 border-green-500 rounded-full pointer-events-none"
+                    style={{
+                      left: `${presenterCursorX}px`,
+                      top: `${presenterCursorY}px`,
+                      transform: "translate(-50%, -50%)",
+                    }}
+                  >
+                    <div className="absolute inset-1 border-2 border-green-500 rounded-full opacity-50" />
+                  </div>
+                )}
               </div>
             )}
 

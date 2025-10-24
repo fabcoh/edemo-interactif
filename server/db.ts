@@ -1,6 +1,6 @@
 import { eq, and } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, presentationSessions, documents, presentationViewers, presentationCollaborators, PresentationSession, Document } from "../drizzle/schema";
+import { InsertUser, users, presentationSessions, documents, presentationViewers, presentationCollaborators, presenterCursors, PresentationSession, Document, PresenterCursor } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -508,5 +508,89 @@ export async function removeCollaborator(sessionId: number, collaboratorId: numb
         eq(presentationCollaborators.collaboratorId, collaboratorId)
       )
     );
+}
+
+
+
+
+// ============ PRESENTER CURSOR & ZOOM QUERIES ============
+
+/**
+ * Update or create presenter cursor and zoom data for a session
+ */
+export async function updatePresenterCursor(
+  sessionId: number,
+  zoomLevel: number,
+  cursorX: number,
+  cursorY: number,
+  cursorVisible: boolean
+): Promise<PresenterCursor> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  // Check if cursor data exists for this session
+  const existing = await db
+    .select()
+    .from(presenterCursors)
+    .where(eq(presenterCursors.sessionId, sessionId))
+    .limit(1);
+
+  if (existing.length > 0) {
+    // Update existing record
+    await db
+      .update(presenterCursors)
+      .set({
+        zoomLevel,
+        cursorX,
+        cursorY,
+        cursorVisible,
+        updatedAt: new Date(),
+      })
+      .where(eq(presenterCursors.sessionId, sessionId));
+
+    return {
+      ...existing[0],
+      zoomLevel,
+      cursorX,
+      cursorY,
+      cursorVisible,
+      updatedAt: new Date(),
+    };
+  } else {
+    // Create new record
+    await db.insert(presenterCursors).values({
+      sessionId,
+      zoomLevel,
+      cursorX,
+      cursorY,
+      cursorVisible,
+    });
+
+    const result = await db
+      .select()
+      .from(presenterCursors)
+      .where(eq(presenterCursors.sessionId, sessionId))
+      .limit(1);
+
+    return result[0];
+  }
+}
+
+/**
+ * Get presenter cursor and zoom data for a session
+ */
+export async function getPresenterCursor(sessionId: number): Promise<PresenterCursor | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db
+    .select()
+    .from(presenterCursors)
+    .where(eq(presenterCursors.sessionId, sessionId))
+    .limit(1);
+
+  return result.length > 0 ? result[0] : undefined;
 }
 

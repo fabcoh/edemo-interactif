@@ -127,3 +127,26 @@ export const presentationCollaborators = mysqlTable("presentation_collaborators"
 export type PresentationCollaborator = typeof presentationCollaborators.$inferSelect;
 export type InsertPresentationCollaborator = typeof presentationCollaborators.$inferInsert;
 
+/**
+ * Presenter Cursor and Zoom table
+ * Tracks the presenter's cursor position and zoom level for real-time synchronization with viewers
+ */
+export const presenterCursors = mysqlTable("presenter_cursors", {
+  id: int("id").autoincrement().primaryKey(),
+  /** The session this cursor data belongs to */
+  sessionId: int("sessionId").notNull(),
+  /** Current zoom level (50-200) */
+  zoomLevel: int("zoomLevel").default(100).notNull(),
+  /** Cursor X position (relative to the document) */
+  cursorX: int("cursorX").default(0).notNull(),
+  /** Cursor Y position (relative to the document) */
+  cursorY: int("cursorY").default(0).notNull(),
+  /** Whether the cursor should be visible */
+  cursorVisible: boolean("cursorVisible").default(false).notNull(),
+  /** Timestamps */
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type PresenterCursor = typeof presenterCursors.$inferSelect;
+export type InsertPresenterCursor = typeof presenterCursors.$inferInsert;
+

@@ -22,6 +22,8 @@ import {
   getPresentationCollaborators,
   getSharedPresentations,
   removeCollaborator,
+  updatePresenterCursor,
+  getPresenterCursor,
 } from "./db";
 import { storagePut, storageGet } from "./storage";
 import { TRPCError } from "@trpc/server";
@@ -203,6 +205,67 @@ export const appRouter = router({
 
         const count = await getSessionViewersCount(input.sessionId);
         return { count };
+      }),
+
+    updateZoomAndCursor: protectedProcedure
+      .input(z.object({
+        sessionId: z.number(),
+        zoomLevel: z.number().min(50).max(200),
+        cursorX: z.number(),
+        cursorY: z.number(),
+        cursorVisible: z.boolean(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const sessions = await getPresentationSessionsByPresenter(ctx.user.id);
+        const sessionExists = sessions.some(s => s.id === input.sessionId);
+        
+        if (!sessionExists) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You don't have permission to update this session",
+          });
+        }
+
+        const cursor = await updatePresenterCursor(
+          input.sessionId,
+          input.zoomLevel,
+          input.cursorX,
+          input.cursorY,
+          input.cursorVisible
+        );
+
+        return { success: true };
+      }),
+
+    getCursorAndZoom: publicProcedure
+      .input(z.object({
+        sessionCode: z.string(),
+      }))
+      .query(async ({ input }) => {
+        const session = await getPresentationSessionByCode(input.sessionCode);
+        if (!session) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Session not found",
+          });
+        }
+
+        const cursor = await getPresenterCursor(session.id);
+        if (!cursor) {
+          return {
+            zoomLevel: 100,
+            cursorX: 0,
+            cursorY: 0,
+            cursorVisible: false,
+          };
+        }
+
+        return {
+          zoomLevel: cursor.zoomLevel,
+          cursorX: cursor.cursorX,
+          cursorY: cursor.cursorY,
+          cursorVisible: cursor.cursorVisible,
+        };
       }),
   }),
 
