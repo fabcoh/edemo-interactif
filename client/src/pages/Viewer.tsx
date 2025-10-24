@@ -219,7 +219,9 @@ export default function Viewer() {
               <Users className="w-4 h-4" />
               <span>{viewerCount} spectateur(s)</span>
             </div>
-
+            <Link href="/">
+              <Button variant="outline" size="sm">Accueil</Button>
+            </Link>
           </div>
         </div>
       </header>

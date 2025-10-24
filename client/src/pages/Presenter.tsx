@@ -159,6 +159,9 @@ export default function Presenter() {
             <h1 className="text-2xl font-bold text-gray-900">Tableau de Bord Présentateur</h1>
             <p className="text-sm text-gray-600">Bienvenue, {user?.name}</p>
           </div>
+          <Link href="/">
+            <Button variant="outline">Accueil</Button>
+          </Link>
         </div>
       </header>
 
