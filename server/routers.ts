@@ -921,6 +921,78 @@ export const appRouter = router({
 
         return messages;
       }),
+
+    /**
+     * Delete a single message
+     */
+    deleteMessage: protectedProcedure
+      .input(z.object({
+        messageId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await import("./db").then(m => m.getDb());
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+
+        const { chatMessages } = await import("../drizzle/schema");
+        const { eq, and } = await import("drizzle-orm");
+
+        // Verify the message belongs to a session owned by the user
+        const message = await db
+          .select()
+          .from(chatMessages)
+          .where(eq(chatMessages.id, input.messageId))
+          .limit(1);
+
+        if (message.length === 0) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Message not found" });
+        }
+
+        const sessions = await getPresentationSessionsByPresenter(ctx.user.id);
+        const sessionExists = sessions.some(s => s.id === message[0].sessionId);
+
+        if (!sessionExists) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You don't have permission to delete this message",
+          });
+        }
+
+        // Delete the message
+        await db.delete(chatMessages).where(eq(chatMessages.id, input.messageId));
+
+        return { success: true };
+      }),
+
+    /**
+     * Delete all messages for a session
+     */
+    deleteAllMessages: protectedProcedure
+      .input(z.object({
+        sessionId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await import("./db").then(m => m.getDb());
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+
+        // Verify user owns this session
+        const sessions = await getPresentationSessionsByPresenter(ctx.user.id);
+        const sessionExists = sessions.some(s => s.id === input.sessionId);
+
+        if (!sessionExists) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You don't have permission to delete messages in this session",
+          });
+        }
+
+        const { chatMessages } = await import("../drizzle/schema");
+        const { eq } = await import("drizzle-orm");
+
+        // Delete all messages for this session
+        await db.delete(chatMessages).where(eq(chatMessages.sessionId, input.sessionId));
+
+        return { success: true };
+      }),
   }),
 });
 

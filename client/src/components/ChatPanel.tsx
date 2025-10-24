@@ -29,6 +29,20 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
     },
   });
 
+  // Mutation to delete a message
+  const deleteMessageMutation = trpc.chat.deleteMessage.useMutation({
+    onSuccess: () => {
+      messagesQuery.refetch();
+    },
+  });
+
+  // Mutation to delete all messages
+  const deleteAllMessagesMutation = trpc.chat.deleteAllMessages.useMutation({
+    onSuccess: () => {
+      messagesQuery.refetch();
+    },
+  });
+
   // Removed auto-scroll to prevent page jumping
 
   const handleSendTextMessage = async () => {
@@ -77,9 +91,25 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
   return (
     <Card className="bg-gray-800 border-gray-700 flex flex-col h-[500px]">
       <CardHeader className="pb-1 pt-2 px-2 border-b border-gray-700">
-        <CardTitle className="text-[11px] flex items-center gap-1">
-          💬 Chat de Présentation
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-[11px] flex items-center gap-1">
+            💬 Chat de Présentation
+          </CardTitle>
+          {messages.length > 0 && (
+            <Button
+              onClick={() => {
+                if (confirm("Êtes-vous sûr de vouloir supprimer tous les messages ?")) {
+                  deleteAllMessagesMutation.mutate({ sessionId });
+                }
+              }}
+              variant="ghost"
+              size="sm"
+              className="h-6 px-2 text-[10px] text-red-400 hover:text-red-300 hover:bg-red-900/20"
+            >
+              Effacer tout
+            </Button>
+          )}
+        </div>
       </CardHeader>
       <CardContent className="flex-1 flex flex-col p-1 overflow-hidden">
         {/* Messages Container */}
@@ -92,8 +122,19 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
             messages.map((msg) => (
               <div
                 key={msg.id}
-                className="bg-green-600 rounded-lg p-2 max-w-[85%] ml-auto"
+                className="bg-green-600 rounded-lg p-2 max-w-[85%] ml-auto relative group"
               >
+                <button
+                  onClick={() => {
+                    if (confirm("Supprimer ce message ?")) {
+                      deleteMessageMutation.mutate({ messageId: msg.id });
+                    }
+                  }}
+                  className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                  title="Supprimer"
+                >
+                  ×
+                </button>
                 {msg.messageType === "text" && (
                   <p className="text-xs text-white break-words">{msg.content}</p>
                 )}

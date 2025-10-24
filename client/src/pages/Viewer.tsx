@@ -203,9 +203,9 @@ export default function Viewer() {
           {/* Chat Notification Popup */}
           {session && <ChatNotification sessionId={session.id} />}
 
-          {/* Chat in Fullscreen - Fixed at bottom */}
+          {/* Chat in Fullscreen - Fixed at bottom center */}
           {session && (
-            <div className="absolute bottom-4 right-4 w-80 max-h-[300px] z-50">
+            <div className="absolute bottom-0 left-0 right-0 z-50">
               <ChatViewer sessionId={session.id} />
             </div>
           )}
