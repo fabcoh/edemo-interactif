@@ -299,7 +299,11 @@ export const appRouter = router({
 
         try {
           // Convert base64 to buffer
-          const buffer = Buffer.from(input.fileData, "base64");
+          // Remove data URL prefix if present (e.g., "data:image/jpeg;base64,")
+          const base64Data = input.fileData.includes('base64,') 
+            ? input.fileData.split('base64,')[1] 
+            : input.fileData;
+          const buffer = Buffer.from(base64Data, "base64");
           
           // Generate unique file key
           const fileKey = generateFileKey(`presentations/${input.sessionId}/${input.type}`);

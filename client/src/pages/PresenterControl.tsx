@@ -358,7 +358,8 @@ export default function PresenterControl() {
             <input
               id="document-upload"
               type="file"
-              accept=".pdf,image/png,image/jpeg,.mp4"
+              accept=".pdf,image/png,image/jpeg,image/jpg,.mp4"
+              capture="environment"
               onChange={(e) => {
                 if (e.target.files?.[0]) {
                   handleUploadDocument(e.target.files[0]);
@@ -368,11 +369,11 @@ export default function PresenterControl() {
             />
             <Button
               onClick={() => document.getElementById('document-upload')?.click()}
-              size="sm"
-              className="bg-blue-600 hover:bg-blue-700 h-8 text-xs"
+              size="default"
+              className="bg-blue-600 hover:bg-blue-700 h-10 text-sm font-semibold px-4 touch-manipulation"
             >
-              <Upload className="w-3 h-3 mr-1" />
-              Ajouter
+              <Upload className="w-4 h-4 mr-2" />
+              Ajouter Document
             </Button>
           </div>
 
