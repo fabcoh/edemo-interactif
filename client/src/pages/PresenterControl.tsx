@@ -22,6 +22,7 @@ export default function PresenterControl() {
   const [zoom, setZoom] = useState(100);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [showMouseCursor, setShowMouseCursor] = useState(false);
+  const [imageErrors, setImageErrors] = useState<Set<number>>(new Set());
 
   const sessionIdNum = sessionId ? parseInt(sessionId) : 0;
 
@@ -223,11 +224,11 @@ export default function PresenterControl() {
         </div>
       </header>
 
-      <main className="flex-1 container mx-auto px-4 py-6 flex flex-col gap-6 overflow-hidden">
+      <main className="flex-1 container mx-auto px-4 py-2 flex flex-col gap-2 overflow-hidden">
         {/* Thumbnails Bar - Top */}
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold">Documents ({documents.length})</h2>
+            <h2 className="text-xs font-semibold">Documents ({documents.length})</h2>
             <input
               id="document-upload"
               type="file"
@@ -243,11 +244,11 @@ export default function PresenterControl() {
             <Button
               onClick={() => document.getElementById('document-upload')?.click()}
               disabled={uploadDocumentMutation.isPending}
-              className="gap-2 bg-blue-600 hover:bg-blue-700"
+              className="gap-1 bg-blue-600 hover:bg-blue-700 px-2 py-1"
               size="sm"
             >
-              <Upload className="w-4 h-4" />
-              {uploadDocumentMutation.isPending ? "Upload..." : "Ajouter"}
+              <Upload className="w-3 h-3" />
+              <span className="text-xs">{uploadDocumentMutation.isPending ? "..." : "+"}</span>
             </Button>
           </div>
 
@@ -269,7 +270,7 @@ export default function PresenterControl() {
                 >
                   {/* Thumbnail with Preview */}
                   <div
-                    className={`w-28 h-36 rounded-lg overflow-hidden border-2 transition-all flex items-center justify-center bg-gray-700 ${
+                    className={`w-28 h-36 rounded-lg overflow-hidden border-2 transition-all flex items-center justify-center bg-gradient-to-br from-gray-700 to-gray-900 ${
                       selectedDocumentId === doc.id
                         ? "border-blue-500 ring-2 ring-blue-400"
                         : "border-gray-600 hover:border-gray-400"
@@ -282,24 +283,40 @@ export default function PresenterControl() {
                       e.stopPropagation();
                       handleDisplayDocument(doc.id);
                     }}
+                    style={{
+                      backgroundImage: `linear-gradient(135deg, hsl(${(doc.id * 60) % 360}, 70%, 50%), hsl(${(doc.id * 60 + 60) % 360}, 70%, 50%))`
+                    }}
                   >
-                    {doc.type === "image" && (
+                    {doc.type === "image" && !imageErrors.has(doc.id) && (
                       <img
                         src={doc.fileUrl}
                         alt={doc.title}
                         className="w-full h-full object-cover pointer-events-none"
+                        onError={() => {
+                          setImageErrors(prev => {
+                            const newSet = new Set(prev);
+                            newSet.add(doc.id);
+                            return newSet;
+                          });
+                        }}
                       />
                     )}
+                    {(doc.type === "image" && imageErrors.has(doc.id)) && (
+                      <div className="text-center flex flex-col items-center justify-center w-full h-full">
+                        <div className="text-2xl mb-1">🖼️</div>
+                        <div className="text-xs text-white font-semibold text-center px-1 line-clamp-2">{doc.title}</div>
+                      </div>
+                    )}
                     {doc.type === "pdf" && (
-                      <div className="text-center">
+                      <div className="text-center flex flex-col items-center justify-center w-full h-full">
                         <div className="text-3xl mb-1">📄</div>
-                        <div className="text-xs text-gray-300">PDF</div>
+                        <div className="text-xs text-white font-semibold text-center px-1 line-clamp-2">{doc.title}</div>
                       </div>
                     )}
                     {doc.type === "video" && (
-                      <div className="text-center">
+                      <div className="text-center flex flex-col items-center justify-center w-full h-full">
                         <div className="text-3xl mb-1">🎬</div>
-                        <div className="text-xs text-gray-300">Vidéo</div>
+                        <div className="text-xs text-white font-semibold text-center px-1 line-clamp-2">{doc.title}</div>
                       </div>
                     )}
                   </div>
@@ -443,39 +460,33 @@ export default function PresenterControl() {
           </div>
 
           {/* Right Panel - Controls & Info */}
-          <div className="lg:col-span-1 flex flex-col gap-4">
+          <div className="lg:col-span-1 flex flex-col gap-2">
             {/* Format Controls */}
-            <Card className="bg-gray-800 border-gray-700">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm">Format</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Select value={orientation} onValueChange={(val) => setOrientation(val as "portrait" | "landscape")}>
-                  <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-gray-700 border-gray-600">
-                    <SelectItem value="portrait">📱 Portrait</SelectItem>
-                    <SelectItem value="landscape">🖥️ Paysage</SelectItem>
-                  </SelectContent>
-                </Select>
-              </CardContent>
-            </Card>
+            <div className="bg-gray-800 border border-gray-700 rounded-lg p-2">
+              <div className="text-xs font-semibold mb-2">Format</div>
+              <Select value={orientation} onValueChange={(val) => setOrientation(val as "portrait" | "landscape")}>
+                <SelectTrigger className="bg-gray-700 border-gray-600 text-white h-8 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-700 border-gray-600">
+                  <SelectItem value="portrait">📱 Portrait</SelectItem>
+                  <SelectItem value="landscape">🖥️ Paysage</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
             {/* Share Panel */}
-            <Card className="bg-gray-800 border-gray-700">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm">Partager</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
+            <div className="bg-gray-800 border border-gray-700 rounded-lg p-2">
+              <div className="text-xs font-semibold mb-2">Partager</div>
+              <div className="space-y-1">
                 <Button
                   onClick={() => copyToClipboard(getShareLink(currentSession.sessionCode))}
                   variant="outline"
-                  className="w-full gap-2 bg-gray-700 border-gray-600 hover:bg-gray-600 text-white"
+                  className="w-full gap-1 bg-gray-700 border-gray-600 hover:bg-gray-600 text-white h-8 text-xs"
                   size="sm"
                 >
-                  <Copy className="w-4 h-4" />
-                  Copier Lien
+                  <Copy className="w-3 h-3" />
+                  <span className="text-xs">Lien</span>
                 </Button>
 
                 <a
@@ -484,38 +495,32 @@ export default function PresenterControl() {
                   rel="noopener noreferrer"
                   className="block"
                 >
-                  <Button className="w-full gap-2 bg-green-600 hover:bg-green-700" size="sm">
-                    <Share2 className="w-4 h-4" />
-                    WhatsApp
+                  <Button className="w-full gap-1 bg-green-600 hover:bg-green-700 h-8 text-xs" size="sm">
+                    <Share2 className="w-3 h-3" />
+                    <span className="text-xs">WhatsApp</span>
                   </Button>
                 </a>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
             {/* Info Panel */}
-            <Card className="bg-gray-800 border-gray-700 flex-1">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm">Infos</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-xs">
+            <div className="bg-gray-800 border border-gray-700 rounded-lg p-2 text-xs flex-1 overflow-y-auto">
+              <div className="text-xs font-semibold mb-2">Infos</div>
+              <div className="space-y-2">
                 <div>
-                  <p className="text-gray-400">Code:</p>
-                  <p className="font-mono font-bold">{currentSession.sessionCode}</p>
+                  <p className="text-gray-500 text-xs">Code:</p>
+                  <p className="font-mono font-bold text-xs">{currentSession.sessionCode}</p>
                 </div>
                 <div>
-                  <p className="text-gray-400">Spectateurs:</p>
-                  <p className="font-bold">{viewerCount}</p>
+                  <p className="text-gray-500 text-xs">Spectateurs:</p>
+                  <p className="font-bold text-xs">{viewerCount}</p>
                 </div>
                 <div>
-                  <p className="text-gray-400">Documents:</p>
-                  <p className="font-bold">{documents.length}</p>
+                  <p className="text-gray-500 text-xs">Documents:</p>
+                  <p className="font-bold text-xs">{documents.length}</p>
                 </div>
-                <div>
-                  <p className="text-gray-400">Titre:</p>
-                  <p className="font-bold truncate">{currentSession.title}</p>
-                </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         </div>
       </main>
