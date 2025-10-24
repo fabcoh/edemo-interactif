@@ -542,3 +542,9 @@ export const appRouter = router({
 
 export type AppRouter = typeof appRouter;
 
+
+
+
+// Temporary: Add updateZoom and updateCursor mutations
+// These will be added to the presentation router
+

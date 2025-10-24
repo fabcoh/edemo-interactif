@@ -5,19 +5,19 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useParams, Link } from "wouter";
-import { ArrowLeft, Users, Copy, Share2, Upload, X, ZoomIn, ZoomOut } from "lucide-react";
+import { ArrowLeft, Users, Copy, Share2, Upload, X, ZoomIn, ZoomOut, Check } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
 
 /**
  * Presenter Control Page - Control document display during presentation
- * Layout: Thumbnails on top, centered preview below, controls on right
+ * Layout: Thumbnails on top with previews, centered preview below, controls on right
  */
 export default function PresenterControl() {
   const { isAuthenticated } = useAuth();
   const { sessionId } = useParams<{ sessionId: string }>();
   const [selectedDocumentId, setSelectedDocumentId] = useState<number | null>(null);
-  const [previewDocumentId, setPreviewDocumentId] = useState<number | null>(null);
+  const [displayedDocumentId, setDisplayedDocumentId] = useState<number | null>(null);
   const [orientation, setOrientation] = useState<"portrait" | "landscape">("portrait");
   const [zoom, setZoom] = useState(100);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -118,16 +118,18 @@ export default function PresenterControl() {
   const documents = documentsQuery.data || [];
   const viewerCount = viewerCountQuery.data?.count || 0;
   const selectedDocument = documents.find(d => d.id === selectedDocumentId);
-  const previewDocument = documents.find(d => d.id === previewDocumentId);
+  const displayedDocument = documents.find(d => d.id === displayedDocumentId);
 
-  const handleDisplayDocument = async (docId: number | null) => {
-    if (!docId) return;
+  const handleDisplayDocument = async (docId: number) => {
+    // Send zoom with the document
     await updateDocumentMutation.mutateAsync({
       sessionId: sessionIdNum,
       documentId: docId,
       orientation,
     });
+    setDisplayedDocumentId(docId);
     setSelectedDocumentId(docId);
+    setZoom(100); // Reset zoom when displaying new document
   };
 
   const handleClearDisplay = async () => {
@@ -136,7 +138,7 @@ export default function PresenterControl() {
       documentId: null,
       orientation,
     });
-    setSelectedDocumentId(null);
+    setDisplayedDocumentId(null);
   };
 
   const handleEndSession = async () => {
@@ -249,7 +251,7 @@ export default function PresenterControl() {
             </Button>
           </div>
 
-          {/* Horizontal Thumbnails Scroll */}
+          {/* Horizontal Thumbnails Scroll with Previews */}
           <div className="flex gap-3 overflow-x-auto pb-2 bg-gray-800 p-3 rounded-lg">
             {documentsQuery.isLoading ? (
               <div className="text-center py-4 text-gray-400 w-full">Chargement...</div>
@@ -265,31 +267,39 @@ export default function PresenterControl() {
                   onClick={() => setSelectedDocumentId(doc.id)}
                   onDoubleClick={() => handleDisplayDocument(doc.id)}
                 >
-                  {/* Thumbnail */}
+                  {/* Thumbnail with Preview */}
                   <div
-                    className={`w-24 h-32 rounded-lg overflow-hidden border-2 transition-all flex items-center justify-center ${
+                    className={`w-28 h-36 rounded-lg overflow-hidden border-2 transition-all flex items-center justify-center bg-gray-700 ${
                       selectedDocumentId === doc.id
                         ? "border-blue-500 ring-2 ring-blue-400"
                         : "border-gray-600 hover:border-gray-400"
                     }`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedDocumentId(doc.id);
+                    }}
+                    onDoubleClick={(e) => {
+                      e.stopPropagation();
+                      handleDisplayDocument(doc.id);
+                    }}
                   >
                     {doc.type === "image" && (
                       <img
                         src={doc.fileUrl}
                         alt={doc.title}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover pointer-events-none"
                       />
                     )}
                     {doc.type === "pdf" && (
                       <div className="text-center">
-                        <div className="text-2xl mb-1">📄</div>
-                        <div className="text-xs text-gray-400">PDF</div>
+                        <div className="text-3xl mb-1">📄</div>
+                        <div className="text-xs text-gray-300">PDF</div>
                       </div>
                     )}
                     {doc.type === "video" && (
                       <div className="text-center">
-                        <div className="text-2xl mb-1">🎬</div>
-                        <div className="text-xs text-gray-400">Vidéo</div>
+                        <div className="text-3xl mb-1">🎬</div>
+                        <div className="text-xs text-gray-300">Vidéo</div>
                       </div>
                     )}
                   </div>
@@ -298,6 +308,13 @@ export default function PresenterControl() {
                   <div className="absolute top-1 left-1 bg-black bg-opacity-70 text-white text-xs font-bold px-2 py-1 rounded">
                     {idx + 1}
                   </div>
+
+                  {/* Checkmark if Displayed */}
+                  {displayedDocumentId === doc.id && (
+                    <div className="absolute top-1 right-1 bg-green-500 text-white rounded-full p-1">
+                      <Check className="w-4 h-4" />
+                    </div>
+                  )}
 
                   {/* Double-click Hint */}
                   <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 flex items-center justify-center transition-all rounded-lg">
@@ -320,9 +337,9 @@ export default function PresenterControl() {
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-base">
-                    {selectedDocument ? selectedDocument.title : "Aucun document affiché"}
+                    {displayedDocument ? displayedDocument.title : "Aucun document affiché"}
                   </CardTitle>
-                  {selectedDocument && (
+                  {displayedDocument && (
                     <Button
                       onClick={handleClearDisplay}
                       variant="ghost"
@@ -335,24 +352,24 @@ export default function PresenterControl() {
                 </div>
               </CardHeader>
               <CardContent className="flex-1 flex items-center justify-center overflow-hidden relative">
-                {selectedDocument ? (
+                {displayedDocument ? (
                   <div
-                    className="relative w-full h-full flex items-center justify-center"
+                    className="relative w-full h-full flex items-center justify-center cursor-crosshair"
                     onMouseMove={handleMouseMove}
                     onMouseEnter={() => setShowMouseCursor(true)}
                     onMouseLeave={() => setShowMouseCursor(false)}
                   >
-                    {selectedDocument.type === "image" && (
+                    {displayedDocument.type === "image" && (
                       <>
                         <img
-                          src={selectedDocument.fileUrl}
-                          alt={selectedDocument.title}
+                          src={displayedDocument.fileUrl}
+                          alt={displayedDocument.title}
                           className="max-w-full max-h-full object-contain transition-transform"
                           style={{
                             transform: `scale(${zoom / 100})`,
                           }}
                         />
-                        {/* Cursor Indicator */}
+                        {/* Cursor Indicator - Visible to Presenter */}
                         {showMouseCursor && zoom > 100 && (
                           <div
                             className="absolute w-6 h-6 border-2 border-red-500 rounded-full pointer-events-none"
@@ -367,15 +384,15 @@ export default function PresenterControl() {
                         )}
                       </>
                     )}
-                    {selectedDocument.type === "pdf" && (
+                    {displayedDocument.type === "pdf" && (
                       <div className="text-center">
                         <div className="text-6xl mb-4">📄</div>
-                        <p className="text-gray-400">{selectedDocument.title}</p>
+                        <p className="text-gray-400">{displayedDocument.title}</p>
                       </div>
                     )}
-                    {selectedDocument.type === "video" && (
+                    {displayedDocument.type === "video" && (
                       <video
-                        src={selectedDocument.fileUrl}
+                        src={displayedDocument.fileUrl}
                         controls
                         className="max-w-full max-h-full"
                       />
@@ -392,7 +409,7 @@ export default function PresenterControl() {
             </Card>
 
             {/* Zoom Controls */}
-            {selectedDocument?.type === "image" && (
+            {displayedDocument?.type === "image" && (
               <div className="flex items-center gap-2 bg-gray-800 p-3 rounded-lg border border-gray-700">
                 <Button
                   onClick={() => setZoom(Math.max(50, zoom - 10))}
@@ -502,57 +519,6 @@ export default function PresenterControl() {
           </div>
         </div>
       </main>
-
-      {/* Preview Modal */}
-      {previewDocument && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-800 rounded-lg max-w-2xl w-full max-h-[80vh] flex flex-col border border-gray-700">
-            <div className="flex items-center justify-between p-4 border-b border-gray-700">
-              <h3 className="font-bold text-lg">{previewDocument.title}</h3>
-              <Button
-                onClick={() => setPreviewDocumentId(null)}
-                variant="ghost"
-                size="sm"
-                className="text-gray-400 hover:text-white"
-              >
-                <X className="w-5 h-5" />
-              </Button>
-            </div>
-            <div className="flex-1 flex items-center justify-center p-4 overflow-auto">
-              {previewDocument.type === "image" && (
-                <img
-                  src={previewDocument.fileUrl}
-                  alt={previewDocument.title}
-                  className="max-w-full max-h-full object-contain rounded"
-                />
-              )}
-              {previewDocument.type === "pdf" && (
-                <div className="text-center">
-                  <div className="text-6xl mb-4">📄</div>
-                  <p className="text-gray-400">{previewDocument.title}</p>
-                </div>
-              )}
-              {previewDocument.type === "video" && (
-                <div className="text-center">
-                  <div className="text-6xl mb-4">🎬</div>
-                  <p className="text-gray-400">{previewDocument.title}</p>
-                </div>
-              )}
-            </div>
-            <div className="p-4 border-t border-gray-700">
-              <Button
-                onClick={() => {
-                  handleDisplayDocument(previewDocument.id);
-                  setPreviewDocumentId(null);
-                }}
-                className="w-full gap-2 bg-blue-600 hover:bg-blue-700"
-              >
-                Afficher aux spectateurs
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
