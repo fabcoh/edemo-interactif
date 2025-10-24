@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "wouter";
+import { useRoute } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,7 +12,7 @@ import { ArrowLeft, Users } from "lucide-react";
  * Viewer Page - Display presentation content in real-time
  */
 export default function Viewer() {
-  const [, params] = useLocation();
+  const [match, params] = useRoute("/view/:code");
   const [sessionCode, setSessionCode] = useState("");
   const [enteredCode, setEnteredCode] = useState("");
   const [isJoined, setIsJoined] = useState(false);
@@ -20,14 +20,22 @@ export default function Viewer() {
 
   // Extract session code from URL if present
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get("code");
-    if (code) {
-      setSessionCode(code);
-      setEnteredCode(code);
+    // Check if we're on the /view/:code route
+    if (match && params?.code) {
+      setSessionCode(params.code);
+      setEnteredCode(params.code);
       setIsJoined(true);
+    } else {
+      // Fallback to query parameter
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get("code");
+      if (code) {
+        setSessionCode(code);
+        setEnteredCode(code);
+        setIsJoined(true);
+      }
     }
-  }, []);
+  }, [match, params]);
 
   // Real-time query with polling
   const sessionQuery = trpc.presentation.getSessionByCode.useQuery(
@@ -51,191 +59,129 @@ export default function Viewer() {
     }
   };
 
-  const handleLeaveSession = () => {
-    setSessionCode("");
-    setEnteredCode("");
-    setIsJoined(false);
-  };
-
   const session = sessionQuery.data;
   const currentDocument = session?.currentDocument;
-  const orientation = session?.currentOrientation || "portrait";
-
-  if (!isJoined || !enteredCode) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle>Rejoindre une Présentation</CardTitle>
-            <CardDescription>
-              Entrez le code de session pour voir la présentation en direct
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="code">Code de Session</Label>
-              <Input
-                id="code"
-                placeholder="Ex: ABC12345"
-                value={sessionCode}
-                onChange={(e) => setSessionCode(e.target.value.toUpperCase())}
-                onKeyPress={(e) => {
-                  if (e.key === "Enter") {
-                    handleJoinSession();
-                  }
-                }}
-                className="font-mono text-lg tracking-widest"
-              />
-            </div>
-            <Button
-              onClick={handleJoinSession}
-              disabled={!sessionCode.trim()}
-              className="w-full"
-              size="lg"
-            >
-              Rejoindre
-            </Button>
-            <Link href="/">
-              <Button variant="outline" className="w-full">
-                Retour
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  if (sessionQuery.isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-          <p className="text-white">Connexion à la présentation...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (sessionQuery.isError || !session) {
-    return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md bg-gray-800 border-gray-700">
-          <CardHeader>
-            <CardTitle className="text-white">Présentation Non Trouvée</CardTitle>
-            <CardDescription>
-              Le code de session est invalide ou la présentation est inactive
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button
-              onClick={handleLeaveSession}
-              className="w-full mb-2"
-            >
-              Essayer un Autre Code
-            </Button>
-            <Link href="/">
-              <Button variant="outline" className="w-full">
-                Retour à l'Accueil
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   return (
-    <div className="min-h-screen bg-gray-900 flex flex-col">
+    <div className="min-h-screen bg-gray-900 text-white">
       {/* Header */}
-      <header className="bg-gray-800 border-b border-gray-700 px-4 py-3 flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-white">{session.title}</h1>
-          <p className="text-xs text-gray-400">Code: {session.sessionCode}</p>
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 text-gray-300 text-sm">
-            <Users className="w-4 h-4" />
-            <span>En direct</span>
+      <header className="bg-black border-b border-gray-700">
+        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+          <div>
+            <h1 className="text-xl font-bold">{session?.title || "Présentation"}</h1>
+            <p className="text-sm text-gray-400">
+              Code: {session?.sessionCode || "---"}
+            </p>
           </div>
-          <Button
-            onClick={handleLeaveSession}
-            variant="outline"
-            size="sm"
-            className="gap-2"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Quitter
-          </Button>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 text-sm">
+              <Users className="w-4 h-4" />
+              <span>{viewerCount} spectateur(s)</span>
+            </div>
+            {!isJoined && (
+              <Link href="/">
+                <Button variant="outline">Retour</Button>
+              </Link>
+            )}
+          </div>
         </div>
       </header>
 
-      {/* Main Content Area */}
-      <main className="flex-1 flex items-center justify-center p-4 overflow-hidden">
-        {currentDocument ? (
-          <div
-            className={`w-full h-full flex items-center justify-center ${
-              orientation === "landscape" ? "max-w-6xl" : "max-w-2xl"
-            }`}
-          >
-            {currentDocument.type === "pdf" && (
-              <div className="w-full h-full bg-white rounded-lg shadow-2xl overflow-hidden">
-                <iframe
-                  src={`${currentDocument.fileUrl}#toolbar=0&navpanes=0&scrollbar=0`}
-                  className="w-full h-full border-none"
-                  title="PDF Viewer"
-                />
-              </div>
-            )}
-
-            {currentDocument.type === "image" && (
-              <div className="w-full h-full flex items-center justify-center bg-white rounded-lg shadow-2xl overflow-hidden">
-                <img
-                  src={currentDocument.fileUrl}
-                  alt={currentDocument.title}
-                  className={`${
-                    orientation === "portrait"
-                      ? "max-h-full w-auto"
-                      : "max-w-full h-auto"
-                  }`}
-                />
-              </div>
-            )}
-
-            {currentDocument.type === "video" && (
-              <div className="w-full h-full bg-black rounded-lg shadow-2xl overflow-hidden">
-                <video
-                  src={currentDocument.fileUrl}
-                  controls
-                  className="w-full h-full"
-                  autoPlay
-                />
-              </div>
-            )}
+      <main className="container mx-auto px-4 py-8">
+        {!isJoined ? (
+          <div className="max-w-md mx-auto">
+            <Card>
+              <CardHeader>
+                <CardTitle>Rejoindre une Présentation</CardTitle>
+                <CardDescription>
+                  Entrez le code de session pour voir la présentation en direct
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label>Code de Session</Label>
+                  <Input
+                    placeholder="Ex: ABC12345"
+                    value={sessionCode}
+                    onChange={(e) => setSessionCode(e.target.value.toUpperCase())}
+                    onKeyPress={(e) => e.key === "Enter" && handleJoinSession()}
+                    className="mt-2"
+                  />
+                </div>
+                <Button onClick={handleJoinSession} className="w-full">
+                  Rejoindre
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        ) : sessionQuery.isLoading ? (
+          <div className="text-center py-12">
+            <p className="text-gray-400">Chargement...</p>
+          </div>
+        ) : !session ? (
+          <div className="text-center py-12">
+            <p className="text-gray-400">Présentation non trouvée</p>
+            <Link href="/">
+              <Button variant="outline" className="mt-4">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Retour
+              </Button>
+            </Link>
           </div>
         ) : (
-          <div className="text-center">
-            <div className="text-6xl mb-4">⏳</div>
-            <h2 className="text-2xl font-bold text-white mb-2">
-              En Attente de Contenu
-            </h2>
-            <p className="text-gray-400">
-              Le présentateur va bientôt afficher un document
-            </p>
+          <div className="space-y-4">
+            {/* Document Display */}
+            {currentDocument ? (
+              <Card className="bg-gray-800 border-gray-700">
+                <CardContent className="p-0">
+                  {currentDocument.type === "pdf" && (
+                    <div className="bg-black p-4 rounded-lg">
+                      <iframe
+                        src={currentDocument.fileUrl}
+                        className="w-full h-96 rounded"
+                        title="PDF Document"
+                      />
+                    </div>
+                  )}
+                  {currentDocument.type === "image" && (
+                    <div className="bg-black p-4 rounded-lg flex justify-center">
+                      <img
+                        src={currentDocument.fileUrl}
+                        alt="Document"
+                        className="max-h-96 rounded"
+                      />
+                    </div>
+                  )}
+                  {currentDocument.type === "video" && (
+                    <div className="bg-black p-4 rounded-lg">
+                      <video
+                        src={currentDocument.fileUrl}
+                        controls
+                        className="w-full h-96 rounded"
+                      />
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ) : (
+              <Card className="bg-gray-800 border-gray-700">
+                <CardContent className="py-12 text-center text-gray-400">
+                  En attente du premier document...
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Info */}
+            <Card className="bg-blue-900 border-blue-700">
+              <CardContent className="py-4">
+                <p className="text-sm text-blue-100">
+                  ✅ Vous êtes connecté à la présentation. Les documents s'afficheront en temps réel.
+                </p>
+              </CardContent>
+            </Card>
           </div>
         )}
       </main>
-
-      {/* Footer Info */}
-      <footer className="bg-gray-800 border-t border-gray-700 px-4 py-3 text-center text-sm text-gray-400">
-        {currentDocument ? (
-          <p>
-            📄 {currentDocument.title} • {currentDocument.type.toUpperCase()}
-          </p>
-        ) : (
-          <p>Connecté à la présentation "{session.title}"</p>
-        )}
-      </footer>
     </div>
   );
 }
