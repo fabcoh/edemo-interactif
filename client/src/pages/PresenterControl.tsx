@@ -22,6 +22,11 @@ export default function PresenterControl() {
   const [zoom, setZoom] = useState(100);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [showMouseCursor, setShowMouseCursor] = useState(false);
+  const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
+  const [isPanning, setIsPanning] = useState(false);
+  const [panStart, setPanStart] = useState({ x: 0, y: 0 });
+  const [initialPinchDistance, setInitialPinchDistance] = useState<number | null>(null);
+  const [initialZoom, setInitialZoom] = useState(100);
 
   const sessionIdNum = sessionId ? parseInt(sessionId) : 0;
 
@@ -142,6 +147,7 @@ export default function PresenterControl() {
     setDisplayedDocumentId(docId);
     setSelectedDocumentId(docId);
     setZoom(100); // Reset zoom when displaying new document
+    setPanOffset({ x: 0, y: 0 }); // Reset pan offset
   };
 
   const handleClearDisplay = async () => {
@@ -192,6 +198,13 @@ export default function PresenterControl() {
         cursorVisible: showMouseCursor && zoom > 100,
       });
     }
+  };
+
+  // Calculate distance between two touch points for pinch-to-zoom
+  const getTouchDistance = (touches: React.TouchList) => {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
   };
 
   if (!currentSession) {
@@ -245,34 +258,93 @@ export default function PresenterControl() {
       </header>
 
       <main className="flex-1 container mx-auto px-4 py-6 flex flex-col gap-4 overflow-hidden">
-        {/* Zoom Controls - Top */}
+        {/* Zoom Controls - Top with Slider */}
         {displayedDocument?.type === "image" && (
-          <div className="flex items-center gap-2 bg-gray-800 p-2 rounded-lg border border-gray-700">
-            <span className="text-xs text-gray-400 mr-2">Zoom:</span>
+          <div className="flex items-center gap-3 bg-gray-800 p-3 rounded-lg border border-gray-700">
+            <span className="text-xs text-gray-400 whitespace-nowrap">Zoom:</span>
             <Button
-              onClick={() => setZoom(Math.max(50, zoom - 10))}
+              onClick={() => {
+                const newZoom = Math.max(50, zoom - 10);
+                setZoom(newZoom);
+                if (currentSession) {
+                  updateZoomAndCursorMutation.mutate({
+                    sessionId: sessionIdNum,
+                    zoomLevel: newZoom,
+                    cursorX: mousePos.x,
+                    cursorY: mousePos.y,
+                    cursorVisible: showMouseCursor && newZoom > 100,
+                  });
+                }
+              }}
               variant="outline"
               size="sm"
-              className="bg-gray-700 border-gray-600 hover:bg-gray-600 h-8"
+              className="bg-gray-700 border-gray-600 hover:bg-gray-600 h-8 w-8 p-0"
             >
               <ZoomOut className="w-3 h-3" />
             </Button>
-            <div className="flex-1 text-center text-xs font-semibold w-12">
+            <input
+              type="range"
+              min="50"
+              max="200"
+              step="5"
+              value={zoom}
+              onChange={(e) => {
+                const newZoom = parseInt(e.target.value);
+                setZoom(newZoom);
+                if (currentSession) {
+                  updateZoomAndCursorMutation.mutate({
+                    sessionId: sessionIdNum,
+                    zoomLevel: newZoom,
+                    cursorX: mousePos.x,
+                    cursorY: mousePos.y,
+                    cursorVisible: showMouseCursor && newZoom > 100,
+                  });
+                }
+              }}
+              className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+              style={{
+                background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((zoom - 50) / 150) * 100}%, #374151 ${((zoom - 50) / 150) * 100}%, #374151 100%)`
+              }}
+            />
+            <div className="text-xs font-semibold text-white w-12 text-center">
               {zoom}%
             </div>
             <Button
-              onClick={() => setZoom(Math.min(200, zoom + 10))}
+              onClick={() => {
+                const newZoom = Math.min(200, zoom + 10);
+                setZoom(newZoom);
+                if (currentSession) {
+                  updateZoomAndCursorMutation.mutate({
+                    sessionId: sessionIdNum,
+                    zoomLevel: newZoom,
+                    cursorX: mousePos.x,
+                    cursorY: mousePos.y,
+                    cursorVisible: showMouseCursor && newZoom > 100,
+                  });
+                }
+              }}
               variant="outline"
               size="sm"
-              className="bg-gray-700 border-gray-600 hover:bg-gray-600 h-8"
+              className="bg-gray-700 border-gray-600 hover:bg-gray-600 h-8 w-8 p-0"
             >
               <ZoomIn className="w-3 h-3" />
             </Button>
             <Button
-              onClick={() => setZoom(100)}
+              onClick={() => {
+                setZoom(100);
+                if (currentSession) {
+                  updateZoomAndCursorMutation.mutate({
+                    sessionId: sessionIdNum,
+                    zoomLevel: 100,
+                    cursorX: mousePos.x,
+                    cursorY: mousePos.y,
+                    cursorVisible: false,
+                  });
+                }
+              }}
               variant="outline"
               size="sm"
-              className="bg-gray-700 border-gray-600 hover:bg-gray-600 h-8 text-xs"
+              className="bg-gray-700 border-gray-600 hover:bg-gray-600 h-8 text-xs px-2"
             >
               Réinit
             </Button>
@@ -402,19 +474,136 @@ export default function PresenterControl() {
               <CardContent className="flex-1 flex items-center justify-center overflow-hidden relative p-4">
                 {displayedDocument ? (
                   <div
-                    className="relative w-full h-full flex items-center justify-center cursor-crosshair"
-                    onMouseMove={handleMouseMove}
+                    className="relative w-full h-full flex items-center justify-center overflow-hidden"
+                    style={{ cursor: isPanning ? 'grabbing' : (zoom > 100 ? 'grab' : 'crosshair') }}
+                    onMouseDown={(e) => {
+                      if (zoom > 100) {
+                        setIsPanning(true);
+                        setPanStart({ x: e.clientX - panOffset.x, y: e.clientY - panOffset.y });
+                      }
+                    }}
+                    onMouseMove={(e) => {
+                      if (isPanning && zoom > 100) {
+                        setPanOffset({
+                          x: e.clientX - panStart.x,
+                          y: e.clientY - panStart.y,
+                        });
+                      }
+                      handleMouseMove(e);
+                    }}
+                    onMouseUp={() => setIsPanning(false)}
+                    onMouseLeave={() => {
+                      setIsPanning(false);
+                      setShowMouseCursor(false);
+                    }}
                     onMouseEnter={() => setShowMouseCursor(true)}
-                    onMouseLeave={() => setShowMouseCursor(false)}
+                    onTouchStart={(e) => {
+                      if (e.touches.length === 2) {
+                        // Pinch-to-zoom: two fingers
+                        const distance = getTouchDistance(e.touches);
+                        setInitialPinchDistance(distance);
+                        setInitialZoom(zoom);
+                        setIsPanning(false);
+                      } else if (e.touches.length === 1) {
+                        // Single finger: show cursor and pan if zoomed
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        const x = e.touches[0].clientX - rect.left;
+                        const y = e.touches[0].clientY - rect.top;
+                        setMousePos({ x, y });
+                        setShowMouseCursor(true);
+                        
+                        if (zoom > 100) {
+                          setIsPanning(true);
+                          setPanStart({
+                            x: e.touches[0].clientX - panOffset.x,
+                            y: e.touches[0].clientY - panOffset.y,
+                          });
+                        }
+                        
+                        // Send cursor position to viewers
+                        if (displayedDocumentId && currentSession) {
+                          updateZoomAndCursorMutation.mutate({
+                            sessionId: sessionIdNum,
+                            zoomLevel: zoom,
+                            cursorX: x,
+                            cursorY: y,
+                            cursorVisible: true,
+                          });
+                        }
+                      }
+                    }}
+                    onTouchMove={(e) => {
+                      if (e.touches.length === 2 && initialPinchDistance) {
+                        // Pinch-to-zoom
+                        e.preventDefault();
+                        const currentDistance = getTouchDistance(e.touches);
+                        const scale = currentDistance / initialPinchDistance;
+                        const newZoom = Math.max(50, Math.min(200, initialZoom * scale));
+                        setZoom(Math.round(newZoom));
+                        
+                        if (currentSession) {
+                          updateZoomAndCursorMutation.mutate({
+                            sessionId: sessionIdNum,
+                            zoomLevel: Math.round(newZoom),
+                            cursorX: mousePos.x,
+                            cursorY: mousePos.y,
+                            cursorVisible: showMouseCursor && newZoom > 100,
+                          });
+                        }
+                      } else if (e.touches.length === 1) {
+                        // Single finger: update cursor position and pan
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        const x = e.touches[0].clientX - rect.left;
+                        const y = e.touches[0].clientY - rect.top;
+                        setMousePos({ x, y });
+                        
+                        if (isPanning && zoom > 100) {
+                          setPanOffset({
+                            x: e.touches[0].clientX - panStart.x,
+                            y: e.touches[0].clientY - panStart.y,
+                          });
+                        }
+                        
+                        // Send cursor position to viewers
+                        if (displayedDocumentId && currentSession) {
+                          updateZoomAndCursorMutation.mutate({
+                            sessionId: sessionIdNum,
+                            zoomLevel: zoom,
+                            cursorX: x,
+                            cursorY: y,
+                            cursorVisible: true,
+                          });
+                        }
+                      }
+                    }}
+                    onTouchEnd={(e) => {
+                      if (e.touches.length === 0) {
+                        setIsPanning(false);
+                        setInitialPinchDistance(null);
+                        setShowMouseCursor(false);
+                        
+                        // Hide cursor for viewers
+                        if (displayedDocumentId && currentSession) {
+                          updateZoomAndCursorMutation.mutate({
+                            sessionId: sessionIdNum,
+                            zoomLevel: zoom,
+                            cursorX: mousePos.x,
+                            cursorY: mousePos.y,
+                            cursorVisible: false,
+                          });
+                        }
+                      }
+                    }}
                   >
                     {displayedDocument.type === "image" && (
                       <>
                         <img
                           src={displayedDocument.fileUrl}
                           alt={displayedDocument.title}
-                          className="max-w-full max-h-full object-contain transition-transform"
+                          className="max-w-full max-h-full object-contain"
                           style={{
-                            transform: `scale(${zoom / 100})`,
+                            transform: `scale(${zoom / 100}) translate(${panOffset.x / (zoom / 100)}px, ${panOffset.y / (zoom / 100)}px)`,
+                            transition: isPanning ? 'none' : 'transform 0.2s ease-out',
                           }}
                         />
                         {/* Cursor Indicator - Red for Presenter */}
