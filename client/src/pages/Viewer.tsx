@@ -11,6 +11,7 @@ import { Link } from "wouter";
 import { ArrowLeft, Users, X, ZoomIn, ZoomOut } from "lucide-react";
 import { useEffect } from "react";
 import { ChatViewer } from "@/components/ChatViewer";
+import { ChatNotification } from "@/components/ChatNotification";
 
 /**
  * Viewer Page - Display presentation content in real-time (fullscreen)
@@ -198,6 +199,16 @@ export default function Viewer() {
               />
             )}
           </div>
+
+          {/* Chat Notification Popup */}
+          {session && <ChatNotification sessionId={session.id} />}
+
+          {/* Chat in Fullscreen - Fixed at bottom */}
+          {session && (
+            <div className="absolute bottom-4 right-4 w-80 max-h-[300px] z-50">
+              <ChatViewer sessionId={session.id} />
+            </div>
+          )}
         </div>
       </div>
     );
@@ -264,7 +275,10 @@ export default function Viewer() {
             <p className="text-sm text-gray-500 mt-2">Vérifiez le code de session et réessayez.</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-4 relative">
+            {/* Chat Notification Popup */}
+            {session && <ChatNotification sessionId={session.id} />}
+
             {/* Document Display */}
             {currentDocument ? (
               <Card className="bg-gray-800 border-gray-700">

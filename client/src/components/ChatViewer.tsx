@@ -25,13 +25,13 @@ export function ChatViewer({ sessionId }: ChatViewerProps) {
   }
 
   return (
-    <Card className="bg-gray-800 border-gray-700 flex flex-col max-h-[300px]">
-      <CardHeader className="pb-2 border-b border-gray-700">
-        <CardTitle className="text-xs flex items-center gap-2">
+    <Card className="bg-gray-800 border-gray-700 flex flex-col max-h-[400px]">
+      <CardHeader className="pb-1 pt-2 px-2 border-b border-gray-700">
+        <CardTitle className="text-[11px] flex items-center gap-1">
           💬 Messages du Présentateur
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 flex flex-col p-2 overflow-y-auto space-y-2">
+      <CardContent className="flex-1 flex flex-col p-1 overflow-y-auto space-y-1">
         {messages.map((msg) => (
           <div
             key={msg.id}
