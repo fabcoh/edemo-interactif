@@ -5,13 +5,13 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useParams, Link } from "wouter";
-import { ArrowLeft, Play, Pause, Users, Copy, Share2, Upload, X, ZoomIn, ZoomOut } from "lucide-react";
+import { ArrowLeft, Users, Copy, Share2, Upload, X, ZoomIn, ZoomOut } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
 
 /**
  * Presenter Control Page - Control document display during presentation
- * Refactored with better UX: visible thumbnails, double-click to display, centered preview, zoom with cursor
+ * Layout: Thumbnails on top, centered preview below, controls on right
  */
 export default function PresenterControl() {
   const { isAuthenticated } = useAuth();
@@ -189,9 +189,9 @@ export default function PresenterControl() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <div className="min-h-screen bg-gray-900 text-white flex flex-col">
       {/* Header */}
-      <header className="bg-black shadow-lg sticky top-0 z-20">
+      <header className="bg-black shadow-lg">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/presenter">
@@ -221,111 +221,101 @@ export default function PresenterControl() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-[calc(100vh-150px)]">
-          {/* Left Panel - Thumbnails */}
-          <div className="lg:col-span-1 flex flex-col gap-4 overflow-hidden">
-            {/* Upload Section */}
-            <Card className="bg-gray-800 border-gray-700">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm">Ajouter Document</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <input
-                  id="document-upload"
-                  type="file"
-                  accept=".pdf,image/png,image/jpeg,.mp4"
-                  onChange={(e) => {
-                    if (e.target.files?.[0]) {
-                      handleUploadDocument(e.target.files[0]);
-                    }
-                  }}
-                  disabled={uploadDocumentMutation.isPending}
-                  className="hidden"
-                />
-                <Button
-                  onClick={() => document.getElementById('document-upload')?.click()}
-                  disabled={uploadDocumentMutation.isPending}
-                  className="w-full gap-2 bg-blue-600 hover:bg-blue-700"
-                  size="sm"
-                >
-                  <Upload className="w-4 h-4" />
-                  {uploadDocumentMutation.isPending ? "Upload..." : "Télécharger"}
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Thumbnails List */}
-            <Card className="bg-gray-800 border-gray-700 flex-1 overflow-hidden flex flex-col">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm">Documents ({documents.length})</CardTitle>
-              </CardHeader>
-              <CardContent className="flex-1 overflow-y-auto">
-                {documentsQuery.isLoading ? (
-                  <div className="text-center py-8 text-gray-400">Chargement...</div>
-                ) : documents.length === 0 ? (
-                  <div className="text-center py-8 text-gray-400 text-sm">
-                    Aucun document
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-2 gap-3">
-                    {documents.map((doc, idx) => (
-                      <div
-                        key={doc.id}
-                        className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${
-                          selectedDocumentId === doc.id
-                            ? "border-blue-500 ring-2 ring-blue-400"
-                            : "border-gray-600 hover:border-gray-400"
-                        }`}
-                        onDoubleClick={() => handleDisplayDocument(doc.id)}
-                        onClick={() => setPreviewDocumentId(doc.id)}
-                      >
-                        {/* Thumbnail Preview */}
-                        <div className="w-full aspect-video bg-gray-700 flex items-center justify-center relative">
-                          {doc.type === "image" && (
-                            <img
-                              src={doc.fileUrl}
-                              alt={doc.title}
-                              className="w-full h-full object-cover"
-                            />
-                          )}
-                          {doc.type === "pdf" && (
-                            <div className="text-center">
-                              <div className="text-2xl mb-1">📄</div>
-                              <div className="text-xs text-gray-400">PDF</div>
-                            </div>
-                          )}
-                          {doc.type === "video" && (
-                            <div className="text-center">
-                              <div className="text-2xl mb-1">🎬</div>
-                              <div className="text-xs text-gray-400">Vidéo</div>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Title Overlay */}
-                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-2">
-                          <p className="text-xs font-semibold truncate">{idx + 1}</p>
-                        </div>
-
-                        {/* Double-click Hint */}
-                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 flex items-center justify-center transition-all">
-                          <div className="text-center opacity-0 group-hover:opacity-100 transition-opacity">
-                            <p className="text-xs font-bold">Double-clic</p>
-                            <p className="text-xs">pour afficher</p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+      <main className="flex-1 container mx-auto px-4 py-6 flex flex-col gap-6 overflow-hidden">
+        {/* Thumbnails Bar - Top */}
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-semibold">Documents ({documents.length})</h2>
+            <input
+              id="document-upload"
+              type="file"
+              accept=".pdf,image/png,image/jpeg,.mp4"
+              onChange={(e) => {
+                if (e.target.files?.[0]) {
+                  handleUploadDocument(e.target.files[0]);
+                }
+              }}
+              disabled={uploadDocumentMutation.isPending}
+              className="hidden"
+            />
+            <Button
+              onClick={() => document.getElementById('document-upload')?.click()}
+              disabled={uploadDocumentMutation.isPending}
+              className="gap-2 bg-blue-600 hover:bg-blue-700"
+              size="sm"
+            >
+              <Upload className="w-4 h-4" />
+              {uploadDocumentMutation.isPending ? "Upload..." : "Ajouter"}
+            </Button>
           </div>
 
-          {/* Center Panel - Main Preview */}
-          <div className="lg:col-span-2 flex flex-col gap-4">
-            {/* Main Display Area */}
+          {/* Horizontal Thumbnails Scroll */}
+          <div className="flex gap-3 overflow-x-auto pb-2 bg-gray-800 p-3 rounded-lg">
+            {documentsQuery.isLoading ? (
+              <div className="text-center py-4 text-gray-400 w-full">Chargement...</div>
+            ) : documents.length === 0 ? (
+              <div className="text-center py-4 text-gray-400 text-sm w-full">
+                Aucun document
+              </div>
+            ) : (
+              documents.map((doc, idx) => (
+                <div
+                  key={doc.id}
+                  className="flex-shrink-0 relative group cursor-pointer"
+                  onClick={() => setSelectedDocumentId(doc.id)}
+                  onDoubleClick={() => handleDisplayDocument(doc.id)}
+                >
+                  {/* Thumbnail */}
+                  <div
+                    className={`w-24 h-32 rounded-lg overflow-hidden border-2 transition-all flex items-center justify-center ${
+                      selectedDocumentId === doc.id
+                        ? "border-blue-500 ring-2 ring-blue-400"
+                        : "border-gray-600 hover:border-gray-400"
+                    }`}
+                  >
+                    {doc.type === "image" && (
+                      <img
+                        src={doc.fileUrl}
+                        alt={doc.title}
+                        className="w-full h-full object-cover"
+                      />
+                    )}
+                    {doc.type === "pdf" && (
+                      <div className="text-center">
+                        <div className="text-2xl mb-1">📄</div>
+                        <div className="text-xs text-gray-400">PDF</div>
+                      </div>
+                    )}
+                    {doc.type === "video" && (
+                      <div className="text-center">
+                        <div className="text-2xl mb-1">🎬</div>
+                        <div className="text-xs text-gray-400">Vidéo</div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Number Badge */}
+                  <div className="absolute top-1 left-1 bg-black bg-opacity-70 text-white text-xs font-bold px-2 py-1 rounded">
+                    {idx + 1}
+                  </div>
+
+                  {/* Double-click Hint */}
+                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 flex items-center justify-center transition-all rounded-lg">
+                    <div className="text-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <p className="text-xs font-bold">2x</p>
+                      <p className="text-xs">afficher</p>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Main Content Area */}
+        <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-6 overflow-hidden">
+          {/* Center - Preview Area */}
+          <div className="lg:col-span-3 flex flex-col gap-4 overflow-hidden">
             <Card className="bg-gray-800 border-gray-700 flex-1 flex flex-col overflow-hidden">
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
@@ -339,7 +329,7 @@ export default function PresenterControl() {
                       size="sm"
                       className="text-red-400 hover:text-red-300"
                     >
-                      <Pause className="w-4 h-4" />
+                      <X className="w-4 h-4" />
                     </Button>
                   )}
                 </div>
@@ -394,7 +384,7 @@ export default function PresenterControl() {
                 ) : (
                   <div className="text-center text-gray-400">
                     <p className="text-lg mb-2">Sélectionnez un document</p>
-                    <p className="text-sm">Clic simple pour aperçu</p>
+                    <p className="text-sm">Clic pour sélectionner</p>
                     <p className="text-sm">Double-clic pour afficher</p>
                   </div>
                 )}
@@ -557,7 +547,6 @@ export default function PresenterControl() {
                 }}
                 className="w-full gap-2 bg-blue-600 hover:bg-blue-700"
               >
-                <Play className="w-4 h-4" />
                 Afficher aux spectateurs
               </Button>
             </div>
