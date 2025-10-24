@@ -842,6 +842,86 @@ export const appRouter = router({
         return { success: true };
       }),
   }),
+
+  chat: router({
+    /**
+     * Send a chat message (text, document, or video link)
+     */
+    sendMessage: protectedProcedure
+      .input(z.object({
+        sessionId: z.number(),
+        messageType: z.enum(["text", "document", "video_link"]),
+        content: z.string().optional(),
+        fileData: z.string().optional(),
+        fileName: z.string().optional(),
+        mimeType: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // Verify user owns this session
+        const sessions = await getPresentationSessionsByPresenter(ctx.user.id);
+        const sessionExists = sessions.some(s => s.id === input.sessionId);
+        
+        if (!sessionExists) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You don't have permission to send messages in this session",
+          });
+        }
+
+        let fileUrl: string | null = null;
+
+        // Handle file upload for documents
+        if (input.messageType === "document" && input.fileData) {
+          const fileKey = generateFileKey(`chat-${input.sessionId}`);
+          const uploadResult = await storagePut(
+            fileKey,
+            input.fileData,
+            input.mimeType || "application/octet-stream"
+          );
+          fileUrl = uploadResult.url;
+        }
+
+        // Insert message into database
+        const db = await import("./db").then(m => m.getDb());
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+
+        const { chatMessages } = await import("../drizzle/schema");
+        await db.insert(chatMessages).values({
+          sessionId: input.sessionId,
+          senderId: ctx.user.id,
+          messageType: input.messageType,
+          content: input.content || null,
+          fileUrl: fileUrl,
+          fileName: input.fileName || null,
+          mimeType: input.mimeType || null,
+        });
+
+        return { success: true };
+      }),
+
+    /**
+     * Get all messages for a session
+     */
+    getMessages: publicProcedure
+      .input(z.object({
+        sessionId: z.number(),
+      }))
+      .query(async ({ input }) => {
+        const db = await import("./db").then(m => m.getDb());
+        if (!db) return [];
+
+        const { chatMessages } = await import("../drizzle/schema");
+        const { eq } = await import("drizzle-orm");
+        
+        const messages = await db
+          .select()
+          .from(chatMessages)
+          .where(eq(chatMessages.sessionId, input.sessionId))
+          .orderBy(chatMessages.createdAt);
+
+        return messages;
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

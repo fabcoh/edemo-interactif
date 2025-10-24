@@ -204,3 +204,31 @@ export const commercialInvitations = mysqlTable("commercial_invitations", {
 export type CommercialInvitation = typeof commercialInvitations.$inferSelect;
 export type InsertCommercialInvitation = typeof commercialInvitations.$inferInsert;
 
+
+/**
+ * Chat Messages table
+ * Stores chat messages for each presentation session
+ */
+export const chatMessages = mysqlTable("chat_messages", {
+  id: int("id").autoincrement().primaryKey(),
+  /** The session this message belongs to */
+  sessionId: int("sessionId").notNull(),
+  /** User ID of the sender (presenter) */
+  senderId: int("senderId").notNull(),
+  /** Message type: text, document, or video_link */
+  messageType: mysqlEnum("messageType", ["text", "document", "video_link"]).default("text").notNull(),
+  /** Text content of the message */
+  content: text("content"),
+  /** File URL for document messages */
+  fileUrl: text("fileUrl"),
+  /** File name for document messages */
+  fileName: varchar("fileName", { length: 255 }),
+  /** MIME type for document messages */
+  mimeType: varchar("mimeType", { length: 100 }),
+  /** Timestamps */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ChatMessage = typeof chatMessages.$inferSelect;
+export type InsertChatMessage = typeof chatMessages.$inferInsert;
+

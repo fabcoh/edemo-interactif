@@ -8,6 +8,7 @@ import { ArrowLeft, Users, Copy, Share2, Upload, X, ZoomIn, ZoomOut, Check } fro
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { ChatPanel } from "@/components/ChatPanel";
 
 /**
  * Presenter Control Page - Control document display during presentation
@@ -19,7 +20,6 @@ export default function PresenterControl() {
   const [, setLocation] = useLocation();
   const [selectedDocumentId, setSelectedDocumentId] = useState<number | null>(null);
   const [displayedDocumentId, setDisplayedDocumentId] = useState<number | null>(null);
-  const [orientation, setOrientation] = useState<"portrait" | "landscape">("portrait");
   const [zoom, setZoom] = useState(100);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const imageRef = useRef<HTMLImageElement>(null);
@@ -87,12 +87,6 @@ export default function PresenterControl() {
   const handleUploadDocument = async (file: File) => {
     if (!file) return;
 
-    const validTypes = ['application/pdf', 'image/png', 'image/jpeg', 'video/mp4'];
-    if (!validTypes.includes(file.type)) {
-      alert('Format de fichier non supporté. Veuillez utiliser PDF, PNG, JPG ou MP4.');
-      return;
-    }
-
     if (file.size > 100 * 1024 * 1024) {
       alert('Le fichier est trop volumineux. Maximum 100MB.');
       return;
@@ -144,7 +138,7 @@ export default function PresenterControl() {
     await updateDocumentMutation.mutateAsync({
       sessionId: sessionIdNum,
       documentId: docId,
-      orientation,
+      orientation: "portrait",
     });
     setDisplayedDocumentId(docId);
     setSelectedDocumentId(docId);
@@ -156,7 +150,7 @@ export default function PresenterControl() {
     await updateDocumentMutation.mutateAsync({
       sessionId: sessionIdNum,
       documentId: null,
-      orientation,
+      orientation: "portrait",
     });
     setDisplayedDocumentId(null);
   };
@@ -384,8 +378,7 @@ export default function PresenterControl() {
             <input
               id="document-upload"
               type="file"
-              accept=".pdf,image/png,image/jpeg,image/jpg,.mp4"
-              capture="environment"
+              accept="*/*"
               onChange={(e) => {
                 if (e.target.files?.[0]) {
                   handleUploadDocument(e.target.files[0]);
@@ -447,16 +440,44 @@ export default function PresenterControl() {
                   </>
                 )}
                 {doc.type === "pdf" && (
-                  <div className="text-center flex flex-col items-center justify-center z-10 relative">
-                    <div className="text-2xl mb-1">📄</div>
-                    <div className="text-xs text-white font-semibold text-center px-2 line-clamp-2">{doc.title}</div>
-                  </div>
+                  <>
+                    <div className="text-center flex flex-col items-center justify-center z-10 relative">
+                      <div className="text-2xl mb-1">📄</div>
+                      <div className="text-xs text-white font-semibold text-center px-2 line-clamp-2">{doc.title}</div>
+                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (confirm('Êtes-vous sûr de vouloir supprimer ce document ?')) {
+                          deleteDocumentMutation.mutate({ documentId: doc.id, sessionId: sessionIdNum });
+                        }
+                      }}
+                      className="absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white rounded-full p-1 z-30 transition-colors"
+                      title="Supprimer ce document"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </>
                 )}
                 {doc.type === "video" && (
-                  <div className="text-center flex flex-col items-center justify-center z-10 relative">
-                    <div className="text-2xl mb-1">🎬</div>
-                    <div className="text-xs text-white font-semibold text-center px-2 line-clamp-2">{doc.title}</div>
-                  </div>
+                  <>
+                    <div className="text-center flex flex-col items-center justify-center z-10 relative">
+                      <div className="text-2xl mb-1">🎬</div>
+                      <div className="text-xs text-white font-semibold text-center px-2 line-clamp-2">{doc.title}</div>
+                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (confirm('Êtes-vous sûr de vouloir supprimer ce document ?')) {
+                          deleteDocumentMutation.mutate({ documentId: doc.id, sessionId: sessionIdNum });
+                        }
+                      }}
+                      className="absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white rounded-full p-1 z-30 transition-colors"
+                      title="Supprimer ce document"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </>
                 )}
 
                 {/* Checkmark if Displayed */}
@@ -690,32 +711,8 @@ export default function PresenterControl() {
 
           {/* Right Panel - Controls & Info */}
           <div className="lg:col-span-1 flex flex-col gap-2 overflow-y-auto">
-            {/* Format Controls */}
-            <Card className="bg-gray-800 border-gray-700">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-xs">Format</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <div className="flex gap-2">
-                  <Button
-                    variant={orientation === "portrait" ? "default" : "outline"}
-                    size="sm"
-                    className="flex-1 h-8 text-xs"
-                    onClick={() => setOrientation("portrait")}
-                  >
-                    📱 Portrait
-                  </Button>
-                  <Button
-                    variant={orientation === "landscape" ? "default" : "outline"}
-                    size="sm"
-                    className="flex-1 h-8 text-xs"
-                    onClick={() => setOrientation("landscape")}
-                  >
-                    🖥️ Paysage
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Chat Panel */}
+            <ChatPanel sessionId={sessionIdNum} />
 
             {/* Share Panel */}
             <Card className="bg-gray-800 border-gray-700">

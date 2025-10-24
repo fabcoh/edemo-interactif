@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Link } from "wouter";
 import { ArrowLeft, Users, X, ZoomIn, ZoomOut } from "lucide-react";
 import { useEffect } from "react";
+import { ChatViewer } from "@/components/ChatViewer";
 
 /**
  * Viewer Page - Display presentation content in real-time (fullscreen)
@@ -305,6 +306,9 @@ export default function Viewer() {
                 </CardContent>
               </Card>
             )}
+
+            {/* Chat Messages */}
+            {session && <ChatViewer sessionId={session.id} />}
 
             {/* Fullscreen Button */}
             {currentDocument && (
