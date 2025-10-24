@@ -696,15 +696,24 @@ export default function PresenterControl() {
                 <CardTitle className="text-xs">Format</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Select key={orientation} value={orientation} onValueChange={(val) => setOrientation(val as "portrait" | "landscape")}>
-                  <SelectTrigger className="bg-gray-700 border-gray-600 text-white h-8 text-xs">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-gray-700 border-gray-600">
-                    <SelectItem value="portrait">📱 Portrait</SelectItem>
-                    <SelectItem value="landscape">🖥️ Paysage</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="flex gap-2">
+                  <Button
+                    variant={orientation === "portrait" ? "default" : "outline"}
+                    size="sm"
+                    className="flex-1 h-8 text-xs"
+                    onClick={() => setOrientation("portrait")}
+                  >
+                    📱 Portrait
+                  </Button>
+                  <Button
+                    variant={orientation === "landscape" ? "default" : "outline"}
+                    size="sm"
+                    className="flex-1 h-8 text-xs"
+                    onClick={() => setOrientation("landscape")}
+                  >
+                    🖥️ Paysage
+                  </Button>
+                </div>
               </CardContent>
             </Card>
 
