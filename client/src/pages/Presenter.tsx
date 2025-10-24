@@ -96,7 +96,7 @@ export default function Presenter() {
   };
 
   const getShareLink = (sessionCode: string) => {
-    return `${window.location.origin}/viewer?code=${sessionCode}`;
+    return `${window.location.origin}/view/${sessionCode}`;
   };
 
   const copyToClipboard = (text: string) => {

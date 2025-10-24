@@ -19,6 +19,7 @@ function Router() {
       <Route path={"/presenter/session/:sessionId"} component={PresenterSession} />
       <Route path={"/presenter/control/:sessionId"} component={PresenterControl} />
       <Route path={"/viewer"} component={Viewer} />
+      <Route path={"/view/:code"} component={Viewer} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

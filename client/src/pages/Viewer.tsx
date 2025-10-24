@@ -12,7 +12,7 @@ import { ArrowLeft, Users } from "lucide-react";
  * Viewer Page - Display presentation content in real-time
  */
 export default function Viewer() {
-  const [, params] = useLocation();
+  const [location] = useLocation();
   const [sessionCode, setSessionCode] = useState("");
   const [enteredCode, setEnteredCode] = useState("");
   const [isJoined, setIsJoined] = useState(false);
@@ -21,14 +21,23 @@ export default function Viewer() {
 
   // Extract session code from URL if present
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get("code");
-    if (code) {
-      setSessionCode(code);
-      setEnteredCode(code);
+    // Extract code from URL path (e.g., /view/ABC12345)
+    const pathMatch = location.match(/\/view\/([A-Z0-9]+)/);
+    if (pathMatch && pathMatch[1]) {
+      setSessionCode(pathMatch[1]);
+      setEnteredCode(pathMatch[1]);
       setIsJoined(true);
+    } else {
+      // Check if code is in query parameters (from ?code=ABC123 format)
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get("code");
+      if (code) {
+        setSessionCode(code);
+        setEnteredCode(code);
+        setIsJoined(true);
+      }
     }
-  }, []);
+  }, [location]);
 
   // Real-time query with polling
   const sessionQuery = trpc.presentation.getSessionByCode.useQuery(
