@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { useRoute } from "wouter";
 import { trpc } from "@/lib/trpc";
@@ -6,10 +8,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link } from "wouter";
-import { ArrowLeft, Users } from "lucide-react";
+import { ArrowLeft, Users, X } from "lucide-react";
 
 /**
- * Viewer Page - Display presentation content in real-time
+ * Viewer Page - Display presentation content in real-time (fullscreen)
  */
 export default function Viewer() {
   const [match, params] = useRoute("/view/:code");
@@ -17,6 +19,7 @@ export default function Viewer() {
   const [enteredCode, setEnteredCode] = useState("");
   const [isJoined, setIsJoined] = useState(false);
   const [viewerCount, setViewerCount] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(true);
 
   // Extract session code from URL if present
   useEffect(() => {
@@ -48,24 +51,83 @@ export default function Viewer() {
 
   const joinSessionMutation = trpc.viewer.joinSession.useMutation({
     onSuccess: () => {
-      setIsJoined(true);
+      setViewerCount((prev) => prev + 1);
     },
   });
-
-  const handleJoinSession = async () => {
-    if (sessionCode.trim()) {
-      setEnteredCode(sessionCode);
-      setIsJoined(true);
-    }
-  };
 
   const session = sessionQuery.data;
   const currentDocument = session?.currentDocument;
 
+  const handleJoinSession = () => {
+    if (sessionCode.trim()) {
+      setEnteredCode(sessionCode);
+      setIsJoined(true);
+      joinSessionMutation.mutate({ sessionCode });
+    }
+  };
+
+  // If joined and fullscreen, show only the document
+  if (isJoined && isFullscreen && currentDocument) {
+    return (
+      <div className="fixed inset-0 bg-black flex flex-col">
+        {/* Minimal Header */}
+        <div className="bg-gray-900 border-b border-gray-700 px-4 py-2 flex justify-between items-center">
+          <div className="flex items-center gap-4">
+            <h1 className="text-sm font-bold text-white">{session?.title || "Présentation"}</h1>
+            <span className="text-xs text-gray-400">Code: {session?.sessionCode}</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 text-xs text-gray-400">
+              <Users className="w-4 h-4" />
+              <span>{viewerCount} spectateur(s)</span>
+            </div>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => setIsFullscreen(false)}
+              className="text-gray-400 hover:text-white"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+
+        {/* Document Display - Fullscreen */}
+        <div className="flex-1 bg-black flex items-center justify-center overflow-hidden">
+          {currentDocument.type === "pdf" && (
+            <iframe
+              src={currentDocument.fileUrl}
+              className="w-full h-full"
+              title="PDF Document"
+            />
+          )}
+          {currentDocument.type === "image" && (
+            <div className="flex items-center justify-center w-full h-full">
+              <img
+                src={currentDocument.fileUrl}
+                alt="Document"
+                className="max-w-full max-h-full object-contain"
+              />
+            </div>
+          )}
+          {currentDocument.type === "video" && (
+            <video
+              src={currentDocument.fileUrl}
+              controls
+              className="max-w-full max-h-full"
+              autoPlay
+            />
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Normal view (not fullscreen)
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       {/* Header */}
-      <header className="bg-black border-b border-gray-700">
+      <header className="bg-gray-800 border-b border-gray-700">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div>
             <h1 className="text-xl font-bold">{session?.title || "Présentation"}</h1>
@@ -148,7 +210,7 @@ export default function Viewer() {
                       <img
                         src={currentDocument.fileUrl}
                         alt="Document"
-                        className="max-h-96 rounded"
+                        className="max-w-full max-h-96 object-contain rounded"
                       />
                     </div>
                   )}
@@ -158,6 +220,7 @@ export default function Viewer() {
                         src={currentDocument.fileUrl}
                         controls
                         className="w-full h-96 rounded"
+                        autoPlay
                       />
                     </div>
                   )}
@@ -165,20 +228,22 @@ export default function Viewer() {
               </Card>
             ) : (
               <Card className="bg-gray-800 border-gray-700">
-                <CardContent className="py-12 text-center text-gray-400">
-                  En attente du premier document...
+                <CardContent className="p-8 text-center text-gray-400">
+                  En attente du document...
                 </CardContent>
               </Card>
             )}
 
-            {/* Info */}
-            <Card className="bg-blue-900 border-blue-700">
-              <CardContent className="py-4">
-                <p className="text-sm text-blue-100">
-                  ✅ Vous êtes connecté à la présentation. Les documents s'afficheront en temps réel.
-                </p>
-              </CardContent>
-            </Card>
+            {/* Fullscreen Button */}
+            {currentDocument && (
+              <Button
+                onClick={() => setIsFullscreen(true)}
+                className="w-full gap-2"
+                size="lg"
+              >
+                Plein écran
+              </Button>
+            )}
           </div>
         )}
       </main>
