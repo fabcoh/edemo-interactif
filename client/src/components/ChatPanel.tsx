@@ -1,9 +1,9 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Send, Paperclip, Link as LinkIcon, X } from "lucide-react";
+import { Send, Paperclip, Link as LinkIcon } from "lucide-react";
 
 interface ChatPanelProps {
   sessionId: number;
@@ -12,7 +12,6 @@ interface ChatPanelProps {
 export function ChatPanel({ sessionId }: ChatPanelProps) {
   const [message, setMessage] = useState("");
   const [isUploading, setIsUploading] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Query messages
@@ -42,8 +41,6 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
       messagesQuery.refetch();
     },
   });
-
-  // Removed auto-scroll to prevent page jumping
 
   const handleSendTextMessage = async () => {
     if (!message.trim()) return;
@@ -112,14 +109,64 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
         </div>
       </CardHeader>
       <CardContent className="flex-1 flex flex-col p-1 overflow-hidden">
-        {/* Messages Container */}
-        <div className="flex-1 overflow-y-auto space-y-1 mb-1">
+        {/* Input Area - At the top */}
+        <div className="flex gap-1 mb-2">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="*/*"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleFileUpload(file);
+            }}
+            className="hidden"
+          />
+          <Button
+            onClick={() => fileInputRef.current?.click()}
+            variant="outline"
+            size="sm"
+            className="h-8 w-8 p-0 bg-gray-700 border-gray-600 hover:bg-gray-600"
+            disabled={isUploading}
+          >
+            <Paperclip className="w-4 h-4" />
+          </Button>
+          <Input
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyPress={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleSendTextMessage();
+              }
+            }}
+            placeholder="Message ou lien vidéo..."
+            className="flex-1 h-8 text-xs bg-gray-700 border-gray-600 text-white placeholder:text-gray-400"
+            disabled={isUploading}
+          />
+          <Button
+            onClick={handleSendTextMessage}
+            size="sm"
+            className="h-8 w-8 p-0 bg-green-600 hover:bg-green-700"
+            disabled={!message.trim() || isUploading}
+          >
+            <Send className="w-4 h-4" />
+          </Button>
+        </div>
+
+        {isUploading && (
+          <div className="text-xs text-gray-400 text-center mb-1">
+            Envoi du fichier...
+          </div>
+        )}
+
+        {/* Messages Container - Reverse order (newest first) */}
+        <div className="flex-1 overflow-y-auto space-y-1 flex flex-col-reverse">
           {messages.length === 0 ? (
             <div className="text-center text-gray-400 text-xs py-4">
               Aucun message. Commencez la conversation !
             </div>
           ) : (
-            messages.map((msg) => (
+            [...messages].reverse().map((msg) => (
               <div
                 key={msg.id}
                 className="bg-green-600 rounded-lg p-2 max-w-[85%] ml-auto relative group"
@@ -179,58 +226,7 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
               </div>
             ))
           )}
-          <div ref={messagesEndRef} />
         </div>
-
-        {/* Input Area */}
-        <div className="flex gap-1">
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="*/*"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) handleFileUpload(file);
-            }}
-            className="hidden"
-          />
-          <Button
-            onClick={() => fileInputRef.current?.click()}
-            variant="outline"
-            size="sm"
-            className="h-8 w-8 p-0 bg-gray-700 border-gray-600 hover:bg-gray-600"
-            disabled={isUploading}
-          >
-            <Paperclip className="w-4 h-4" />
-          </Button>
-          <Input
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            onKeyPress={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                handleSendTextMessage();
-              }
-            }}
-            placeholder="Message ou lien vidéo..."
-            className="flex-1 h-8 text-xs bg-gray-700 border-gray-600 text-white placeholder:text-gray-400"
-            disabled={isUploading}
-          />
-          <Button
-            onClick={handleSendTextMessage}
-            size="sm"
-            className="h-8 w-8 p-0 bg-green-600 hover:bg-green-700"
-            disabled={!message.trim() || isUploading}
-          >
-            <Send className="w-4 h-4" />
-          </Button>
-        </div>
-
-        {isUploading && (
-          <div className="text-xs text-gray-400 text-center mt-1">
-            Envoi du fichier...
-          </div>
-        )}
       </CardContent>
     </Card>
   );

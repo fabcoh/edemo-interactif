@@ -31,8 +31,8 @@ export function ChatViewer({ sessionId }: ChatViewerProps) {
           💬 Messages du Présentateur
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 flex flex-col p-1 overflow-y-auto space-y-1 bg-transparent">
-        {messages.map((msg) => (
+      <CardContent className="flex-1 flex flex-col p-1 overflow-y-auto space-y-1 bg-transparent flex-col-reverse">
+        {[...messages].reverse().map((msg) => (
           <div
             key={msg.id}
             className="bg-green-600 rounded-lg p-2 max-w-[85%] ml-auto"
