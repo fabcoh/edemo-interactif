@@ -1,6 +1,6 @@
 import { eq, and } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, presentationSessions, documents, presentationViewers, PresentationSession, Document } from "../drizzle/schema";
+import { InsertUser, users, presentationSessions, documents, presentationViewers, presentationCollaborators, PresentationSession, Document } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -334,5 +334,135 @@ export async function getSessionViewersCount(sessionId: number): Promise<number>
     .where(eq(presentationViewers.sessionId, sessionId));
 
   return result.length;
+}
+
+
+
+
+/**
+ * Invite a collaborator to a presentation
+ */
+export async function inviteCollaborator(
+  sessionId: number,
+  ownerId: number,
+  collaboratorEmail: string,
+  permission: "view" | "edit" | "control" = "control"
+): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  // Find the collaborator by email
+  const collaborator = await db
+    .select()
+    .from(users)
+    .where(eq(users.email, collaboratorEmail))
+    .limit(1);
+
+  if (collaborator.length === 0) {
+    throw new Error("User not found with this email");
+  }
+
+  const collaboratorId = collaborator[0].id;
+
+  // Check if already invited
+  const existing = await db
+    .select()
+    .from(presentationCollaborators)
+    .where(
+      and(
+        eq(presentationCollaborators.sessionId, sessionId),
+        eq(presentationCollaborators.collaboratorId, collaboratorId)
+      )
+    )
+    .limit(1);
+
+  if (existing.length > 0) {
+    throw new Error("This user is already invited to this presentation");
+  }
+
+  // Create invitation
+  await db.insert(presentationCollaborators).values({
+    sessionId,
+    ownerId,
+    collaboratorId,
+    permission,
+    status: "accepted", // Auto-accept for simplicity
+  });
+}
+
+/**
+ * Get collaborators for a presentation
+ */
+export async function getPresentationCollaborators(sessionId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const result = await db
+    .select({
+      id: presentationCollaborators.id,
+      collaboratorId: presentationCollaborators.collaboratorId,
+      name: users.name,
+      email: users.email,
+      permission: presentationCollaborators.permission,
+      status: presentationCollaborators.status,
+    })
+    .from(presentationCollaborators)
+    .innerJoin(users, eq(presentationCollaborators.collaboratorId, users.id))
+    .where(eq(presentationCollaborators.sessionId, sessionId));
+
+  return result;
+}
+
+/**
+ * Get presentations shared with a user
+ */
+export async function getSharedPresentations(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const result = await db
+    .select({
+      id: presentationSessions.id,
+      title: presentationSessions.title,
+      sessionCode: presentationSessions.sessionCode,
+      isActive: presentationSessions.isActive,
+      currentDocumentId: presentationSessions.currentDocumentId,
+      currentOrientation: presentationSessions.currentOrientation,
+      createdAt: presentationSessions.createdAt,
+      permission: presentationCollaborators.permission,
+      ownerName: users.name,
+    })
+    .from(presentationCollaborators)
+    .innerJoin(presentationSessions, eq(presentationCollaborators.sessionId, presentationSessions.id))
+    .innerJoin(users, eq(presentationSessions.presenterId, users.id))
+    .where(
+      and(
+        eq(presentationCollaborators.collaboratorId, userId),
+        eq(presentationCollaborators.status, "accepted")
+      )
+    );
+
+  return result;
+}
+
+/**
+ * Remove a collaborator from a presentation
+ */
+export async function removeCollaborator(sessionId: number, collaboratorId: number): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  await db
+    .delete(presentationCollaborators)
+    .where(
+      and(
+        eq(presentationCollaborators.sessionId, sessionId),
+        eq(presentationCollaborators.collaboratorId, collaboratorId)
+      )
+    );
 }
 

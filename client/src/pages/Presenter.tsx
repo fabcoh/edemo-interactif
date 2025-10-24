@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Copy, Share2, Trash2, Eye, FileText, Image, Video } from "lucide-react";
+import { Plus, Copy, Share2, Trash2, Eye, FileText, Image, Video, Users, Mail, X } from "lucide-react";
 import { Link } from "wouter";
 
 /**
@@ -18,6 +18,8 @@ export default function Presenter() {
   const { user, isAuthenticated } = useAuth();
   const [newSessionTitle, setNewSessionTitle] = useState("");
   const [selectedSessionId, setSelectedSessionId] = useState<number | null>(null);
+  const [collaboratorEmail, setCollaboratorEmail] = useState("");
+  const [showCollaboratorDialog, setShowCollaboratorDialog] = useState(false);
 
   // Queries
   const sessionsQuery = trpc.presentation.getSessions.useQuery(undefined, {
@@ -40,6 +42,25 @@ export default function Presenter() {
   const deleteDocumentMutation = trpc.documents.deleteDocument.useMutation({
     onSuccess: () => {
       documentsQuery.refetch();
+    },
+  });
+
+  const collaboratorsQuery = trpc.collaboration.getCollaborators.useQuery(
+    { sessionId: selectedSessionId || 0 },
+    { enabled: !!selectedSessionId }
+  );
+
+  const inviteCollaboratorMutation = trpc.collaboration.inviteCollaborator.useMutation({
+    onSuccess: () => {
+      setCollaboratorEmail("");
+      setShowCollaboratorDialog(false);
+      collaboratorsQuery.refetch();
+    },
+  });
+
+  const removeCollaboratorMutation = trpc.collaboration.removeCollaborator.useMutation({
+    onSuccess: () => {
+      collaboratorsQuery.refetch();
     },
   });
 

@@ -16,6 +16,10 @@ import {
   updateDocumentOrder,
   recordPresentationViewer,
   getSessionViewersCount,
+  inviteCollaborator,
+  getPresentationCollaborators,
+  getSharedPresentations,
+  removeCollaborator,
 } from "./db";
 import { storagePut, storageGet } from "./storage";
 import { TRPCError } from "@trpc/server";
@@ -390,6 +394,95 @@ export const appRouter = router({
           sessionId: session.id,
           viewerIdentifier,
         };
+      }),
+  }),
+
+  // ============ COLLABORATION ROUTES ============
+
+  collaboration: router({
+    /**
+     * Invite a collaborator to a presentation
+     */
+    inviteCollaborator: protectedProcedure
+      .input(z.object({
+        sessionId: z.number(),
+        collaboratorEmail: z.string().email(),
+        permission: z.enum(["view", "edit", "control"]).default("control"),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // Verify the user owns the presentation
+        const sessions = await getPresentationSessionsByPresenter(ctx.user.id);
+        const sessionExists = sessions.some(s => s.id === input.sessionId);
+        
+        if (!sessionExists) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You don't have permission to share this presentation",
+          });
+        }
+
+        await inviteCollaborator(
+          input.sessionId,
+          ctx.user.id,
+          input.collaboratorEmail,
+          input.permission
+        );
+
+        return { success: true };
+      }),
+
+    /**
+     * Get collaborators for a presentation
+     */
+    getCollaborators: protectedProcedure
+      .input(z.object({
+        sessionId: z.number(),
+      }))
+      .query(async ({ ctx, input }) => {
+        // Verify the user owns the presentation
+        const sessions = await getPresentationSessionsByPresenter(ctx.user.id);
+        const sessionExists = sessions.some(s => s.id === input.sessionId);
+        
+        if (!sessionExists) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You don't have permission to view collaborators",
+          });
+        }
+
+        return await getPresentationCollaborators(input.sessionId);
+      }),
+
+    /**
+     * Get presentations shared with the current user
+     */
+    getSharedPresentations: protectedProcedure
+      .query(async ({ ctx }) => {
+        return await getSharedPresentations(ctx.user.id);
+      }),
+
+    /**
+     * Remove a collaborator from a presentation
+     */
+    removeCollaborator: protectedProcedure
+      .input(z.object({
+        sessionId: z.number(),
+        collaboratorId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // Verify the user owns the presentation
+        const sessions = await getPresentationSessionsByPresenter(ctx.user.id);
+        const sessionExists = sessions.some(s => s.id === input.sessionId);
+        
+        if (!sessionExists) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You don't have permission to remove collaborators",
+          });
+        }
+
+        await removeCollaborator(input.sessionId, input.collaboratorId);
+        return { success: true };
       }),
   }),
 });

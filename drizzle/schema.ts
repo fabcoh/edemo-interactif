@@ -102,3 +102,28 @@ export const presentationViewers = mysqlTable("presentation_viewers", {
 export type PresentationViewer = typeof presentationViewers.$inferSelect;
 export type InsertPresentationViewer = typeof presentationViewers.$inferInsert;
 
+
+/**
+ * Presentation collaborators table
+ * Allows sharing presentations with other users
+ */
+export const presentationCollaborators = mysqlTable("presentation_collaborators", {
+  id: int("id").autoincrement().primaryKey(),
+  /** The presentation being shared */
+  sessionId: int("sessionId").notNull(),
+  /** The user who owns/created the presentation */
+  ownerId: int("ownerId").notNull(),
+  /** The user being invited to collaborate */
+  collaboratorId: int("collaboratorId").notNull(),
+  /** Permission level: view (read-only), edit (can modify documents), control (can control presentation) */
+  permission: mysqlEnum("permission", ["view", "edit", "control"]).default("control").notNull(),
+  /** Status of the invitation: pending, accepted, rejected */
+  status: mysqlEnum("status", ["pending", "accepted", "rejected"]).default("pending").notNull(),
+  /** Timestamps */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type PresentationCollaborator = typeof presentationCollaborators.$inferSelect;
+export type InsertPresentationCollaborator = typeof presentationCollaborators.$inferInsert;
+
