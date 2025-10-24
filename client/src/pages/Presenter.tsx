@@ -85,9 +85,7 @@ export default function Presenter() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Link href="/">
-              <Button className="w-full">Retour à l'accueil</Button>
-            </Link>
+            <p className="text-sm text-gray-600">Veuillez vous connecter pour accéder au tableau de bord.</p>
           </CardContent>
         </Card>
       </div>
@@ -161,9 +159,6 @@ export default function Presenter() {
             <h1 className="text-2xl font-bold text-gray-900">Tableau de Bord Présentateur</h1>
             <p className="text-sm text-gray-600">Bienvenue, {user?.name}</p>
           </div>
-          <Link href="/">
-            <Button variant="outline">Retour</Button>
-          </Link>
         </div>
       </header>
 

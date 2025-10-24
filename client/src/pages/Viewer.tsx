@@ -219,11 +219,7 @@ export default function Viewer() {
               <Users className="w-4 h-4" />
               <span>{viewerCount} spectateur(s)</span>
             </div>
-            {!isJoined && (
-              <Link href="/">
-                <Button variant="outline">Retour</Button>
-              </Link>
-            )}
+
           </div>
         </div>
       </header>
@@ -262,12 +258,7 @@ export default function Viewer() {
         ) : !session ? (
           <div className="text-center py-12">
             <p className="text-gray-400">Présentation non trouvée</p>
-            <Link href="/">
-              <Button variant="outline" className="mt-4">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Retour
-              </Button>
-            </Link>
+            <p className="text-sm text-gray-500 mt-2">Vérifiez le code de session et réessayez.</p>
           </div>
         ) : (
           <div className="space-y-4">
