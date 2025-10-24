@@ -1,20 +1,27 @@
-import { useState } from "react";
+"use client";
+
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useParams, Link } from "wouter";
-import { ArrowLeft, Play, Pause, Users, Copy, Share2, Upload } from "lucide-react";
+import { ArrowLeft, Play, Pause, Users, Copy, Share2, Upload, X, ZoomIn, ZoomOut } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useState } from "react";
 
 /**
  * Presenter Control Page - Control document display during presentation
+ * Refactored with better UX: visible thumbnails, double-click to display, centered preview, zoom with cursor
  */
 export default function PresenterControl() {
   const { isAuthenticated } = useAuth();
   const { sessionId } = useParams<{ sessionId: string }>();
   const [selectedDocumentId, setSelectedDocumentId] = useState<number | null>(null);
+  const [previewDocumentId, setPreviewDocumentId] = useState<number | null>(null);
   const [orientation, setOrientation] = useState<"portrait" | "landscape">("portrait");
+  const [zoom, setZoom] = useState(100);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [showMouseCursor, setShowMouseCursor] = useState(false);
 
   const sessionIdNum = sessionId ? parseInt(sessionId) : 0;
 
@@ -32,14 +39,15 @@ export default function PresenterControl() {
     { sessionId: sessionIdNum },
     { 
       enabled: !!sessionIdNum && isAuthenticated,
-      refetchInterval: 2000, // Check viewer count every 2 seconds
+      refetchInterval: 2000,
     }
   );
 
   // Mutations
   const updateDocumentMutation = trpc.presentation.updateCurrentDocument.useMutation({
     onSuccess: () => {
-      // Document updated successfully
+      setZoom(100);
+      setShowMouseCursor(false);
     },
   });
 
@@ -52,7 +60,6 @@ export default function PresenterControl() {
   const uploadDocumentMutation = trpc.documents.uploadDocument.useMutation({
     onSuccess: () => {
       documentsQuery.refetch();
-      // Reset file input
       const fileInput = document.getElementById('document-upload') as HTMLInputElement;
       if (fileInput) fileInput.value = '';
     },
@@ -61,20 +68,17 @@ export default function PresenterControl() {
   const handleUploadDocument = async (file: File) => {
     if (!file) return;
 
-    // Validate file type
     const validTypes = ['application/pdf', 'image/png', 'image/jpeg', 'video/mp4'];
     if (!validTypes.includes(file.type)) {
       alert('Format de fichier non supporté. Veuillez utiliser PDF, PNG, JPG ou MP4.');
       return;
     }
 
-    // Validate file size (max 100MB)
     if (file.size > 100 * 1024 * 1024) {
       alert('Le fichier est trop volumineux. Maximum 100MB.');
       return;
     }
 
-    // Read file as base64
     const reader = new FileReader();
     reader.onload = async (e) => {
       const base64 = (e.target?.result as string).split(',')[1];
@@ -113,6 +117,8 @@ export default function PresenterControl() {
   const currentSession = sessions.find(s => s.id === sessionIdNum);
   const documents = documentsQuery.data || [];
   const viewerCount = viewerCountQuery.data?.count || 0;
+  const selectedDocument = documents.find(d => d.id === selectedDocumentId);
+  const previewDocument = documents.find(d => d.id === previewDocumentId);
 
   const handleDisplayDocument = async (docId: number | null) => {
     if (!docId) return;
@@ -121,6 +127,7 @@ export default function PresenterControl() {
       documentId: docId,
       orientation,
     });
+    setSelectedDocumentId(docId);
   };
 
   const handleClearDisplay = async () => {
@@ -129,12 +136,12 @@ export default function PresenterControl() {
       documentId: null,
       orientation,
     });
+    setSelectedDocumentId(null);
   };
 
   const handleEndSession = async () => {
     if (confirm("Êtes-vous sûr de vouloir terminer cette présentation?")) {
       await endSessionMutation.mutateAsync({ sessionId: sessionIdNum });
-      // Redirect after ending
       setTimeout(() => {
         window.location.href = "/presenter";
       }, 1000);
@@ -156,6 +163,14 @@ export default function PresenterControl() {
     return `https://wa.me/?text=${encodeURIComponent(message)}`;
   };
 
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setMousePos({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+  };
+
   if (!currentSession) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -174,26 +189,26 @@ export default function PresenterControl() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-900 text-white">
       {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+      <header className="bg-black shadow-lg sticky top-0 z-20">
+        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/presenter">
-              <Button variant="ghost" size="sm" className="gap-2">
+              <Button variant="ghost" size="sm" className="gap-2 text-white hover:bg-gray-800">
                 <ArrowLeft className="w-4 h-4" />
                 Retour
               </Button>
             </Link>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">{currentSession.title}</h1>
-              <p className="text-sm text-gray-600">Code: {currentSession.sessionCode}</p>
+              <h1 className="text-xl font-bold">{currentSession.title}</h1>
+              <p className="text-xs text-gray-400">Code: {currentSession.sessionCode}</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 px-3 py-2 bg-blue-50 rounded-lg">
-              <Users className="w-4 h-4 text-blue-600" />
-              <span className="font-semibold text-blue-900">{viewerCount} spectateur{viewerCount !== 1 ? "s" : ""}</span>
+            <div className="flex items-center gap-2 px-3 py-2 bg-blue-900 rounded-lg">
+              <Users className="w-4 h-4" />
+              <span className="font-semibold text-sm">{viewerCount} spectateur{viewerCount !== 1 ? "s" : ""}</span>
             </div>
             <Button
               onClick={handleEndSession}
@@ -206,50 +221,98 @@ export default function PresenterControl() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
-        <div className="grid md:grid-cols-3 gap-8">
-          {/* Documents Panel */}
-          <div className="md:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Documents Disponibles</CardTitle>
-                <CardDescription>
-                  Sélectionnez un document pour l'afficher aux spectateurs
-                </CardDescription>
+      <main className="container mx-auto px-4 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-[calc(100vh-150px)]">
+          {/* Left Panel - Thumbnails */}
+          <div className="lg:col-span-1 flex flex-col gap-4 overflow-hidden">
+            {/* Upload Section */}
+            <Card className="bg-gray-800 border-gray-700">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm">Ajouter Document</CardTitle>
               </CardHeader>
               <CardContent>
+                <input
+                  id="document-upload"
+                  type="file"
+                  accept=".pdf,image/png,image/jpeg,.mp4"
+                  onChange={(e) => {
+                    if (e.target.files?.[0]) {
+                      handleUploadDocument(e.target.files[0]);
+                    }
+                  }}
+                  disabled={uploadDocumentMutation.isPending}
+                  className="hidden"
+                />
+                <Button
+                  onClick={() => document.getElementById('document-upload')?.click()}
+                  disabled={uploadDocumentMutation.isPending}
+                  className="w-full gap-2 bg-blue-600 hover:bg-blue-700"
+                  size="sm"
+                >
+                  <Upload className="w-4 h-4" />
+                  {uploadDocumentMutation.isPending ? "Upload..." : "Télécharger"}
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Thumbnails List */}
+            <Card className="bg-gray-800 border-gray-700 flex-1 overflow-hidden flex flex-col">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm">Documents ({documents.length})</CardTitle>
+              </CardHeader>
+              <CardContent className="flex-1 overflow-y-auto">
                 {documentsQuery.isLoading ? (
-                  <div className="text-center py-8 text-gray-500">Chargement...</div>
+                  <div className="text-center py-8 text-gray-400">Chargement...</div>
                 ) : documents.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
-                    <p className="mb-4">Aucun document pour le moment</p>
-                    <Link href={`/presenter/session/${sessionIdNum}`}>
-                      <Button>Ajouter des Documents</Button>
-                    </Link>
+                  <div className="text-center py-8 text-gray-400 text-sm">
+                    Aucun document
                   </div>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
                     {documents.map((doc, idx) => (
                       <div
                         key={doc.id}
-                        className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                        className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${
                           selectedDocumentId === doc.id
-                            ? "border-blue-500 bg-blue-50"
-                            : "border-gray-200 hover:border-gray-300 bg-white"
+                            ? "border-blue-500 ring-2 ring-blue-400"
+                            : "border-gray-600 hover:border-gray-400"
                         }`}
-                        onClick={() => setSelectedDocumentId(doc.id)}
+                        onDoubleClick={() => handleDisplayDocument(doc.id)}
+                        onClick={() => setPreviewDocumentId(doc.id)}
                       >
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h4 className="font-semibold text-gray-900">{doc.title}</h4>
-                            <p className="text-sm text-gray-600">
-                              {doc.type.toUpperCase()} • Position {idx + 1}
-                            </p>
-                          </div>
-                          <div className="text-2xl">
-                            {doc.type === "pdf" && "📄"}
-                            {doc.type === "image" && "🖼️"}
-                            {doc.type === "video" && "🎬"}
+                        {/* Thumbnail Preview */}
+                        <div className="w-full aspect-video bg-gray-700 flex items-center justify-center relative">
+                          {doc.type === "image" && (
+                            <img
+                              src={doc.fileUrl}
+                              alt={doc.title}
+                              className="w-full h-full object-cover"
+                            />
+                          )}
+                          {doc.type === "pdf" && (
+                            <div className="text-center">
+                              <div className="text-2xl mb-1">📄</div>
+                              <div className="text-xs text-gray-400">PDF</div>
+                            </div>
+                          )}
+                          {doc.type === "video" && (
+                            <div className="text-center">
+                              <div className="text-2xl mb-1">🎬</div>
+                              <div className="text-xs text-gray-400">Vidéo</div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Title Overlay */}
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-2">
+                          <p className="text-xs font-semibold truncate">{idx + 1}</p>
+                        </div>
+
+                        {/* Double-click Hint */}
+                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 flex items-center justify-center transition-all">
+                          <div className="text-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <p className="text-xs font-bold">Double-clic</p>
+                            <p className="text-xs">pour afficher</p>
                           </div>
                         </div>
                       </div>
@@ -258,133 +321,151 @@ export default function PresenterControl() {
                 )}
               </CardContent>
             </Card>
-
-            {/* Preview */}
-            {selectedDocumentId && (
-              <Card className="mt-6">
-                <CardHeader>
-                  <CardTitle>Aperçu</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className={`bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center ${
-                    orientation === "portrait" ? "h-96" : "h-64"
-                  }`}>
-                    {documents.find(d => d.id === selectedDocumentId)?.type === "image" && (
-                      <img
-                        src={documents.find(d => d.id === selectedDocumentId)?.fileUrl}
-                        alt="Preview"
-                        className="max-w-full max-h-full object-contain"
-                      />
-                    )}
-                    {documents.find(d => d.id === selectedDocumentId)?.type === "pdf" && (
-                      <div className="text-center text-gray-600">
-                        <div className="text-4xl mb-2">📄</div>
-                        <p>PDF - Cliquez sur "Afficher" pour voir le rendu complet</p>
-                      </div>
-                    )}
-                    {documents.find(d => d.id === selectedDocumentId)?.type === "video" && (
-                      <div className="text-center text-gray-600">
-                        <div className="text-4xl mb-2">🎬</div>
-                        <p>Vidéo - Cliquez sur "Afficher" pour lancer la lecture</p>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
           </div>
 
-          {/* Control Panel */}
-          <div className="space-y-4">
-            {/* Upload Documents */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Ajouter un Document</CardTitle>
-                <CardDescription>Pendant la présentation</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <input
-                    id="document-upload"
-                    type="file"
-                    accept=".pdf,image/png,image/jpeg,.mp4"
-                    onChange={(e) => {
-                      if (e.target.files?.[0]) {
-                        handleUploadDocument(e.target.files[0]);
-                      }
-                    }}
-                    disabled={uploadDocumentMutation.isPending}
-                    className="hidden"
-                  />
-                  <Button
-                    onClick={() => document.getElementById('document-upload')?.click()}
-                    disabled={uploadDocumentMutation.isPending}
-                    className="w-full gap-2"
-                    variant="outline"
-                  >
-                    <Upload className="w-4 h-4" />
-                    {uploadDocumentMutation.isPending ? "Upload..." : "Télécharger"}
-                  </Button>
-                  <p className="text-xs text-gray-500">PDF, PNG, JPG, MP4 (max 100MB)</p>
+          {/* Center Panel - Main Preview */}
+          <div className="lg:col-span-2 flex flex-col gap-4">
+            {/* Main Display Area */}
+            <Card className="bg-gray-800 border-gray-700 flex-1 flex flex-col overflow-hidden">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base">
+                    {selectedDocument ? selectedDocument.title : "Aucun document affiché"}
+                  </CardTitle>
+                  {selectedDocument && (
+                    <Button
+                      onClick={handleClearDisplay}
+                      variant="ghost"
+                      size="sm"
+                      className="text-red-400 hover:text-red-300"
+                    >
+                      <Pause className="w-4 h-4" />
+                    </Button>
+                  )}
                 </div>
+              </CardHeader>
+              <CardContent className="flex-1 flex items-center justify-center overflow-hidden relative">
+                {selectedDocument ? (
+                  <div
+                    className="relative w-full h-full flex items-center justify-center"
+                    onMouseMove={handleMouseMove}
+                    onMouseEnter={() => setShowMouseCursor(true)}
+                    onMouseLeave={() => setShowMouseCursor(false)}
+                  >
+                    {selectedDocument.type === "image" && (
+                      <>
+                        <img
+                          src={selectedDocument.fileUrl}
+                          alt={selectedDocument.title}
+                          className="max-w-full max-h-full object-contain transition-transform"
+                          style={{
+                            transform: `scale(${zoom / 100})`,
+                          }}
+                        />
+                        {/* Cursor Indicator */}
+                        {showMouseCursor && zoom > 100 && (
+                          <div
+                            className="absolute w-6 h-6 border-2 border-red-500 rounded-full pointer-events-none"
+                            style={{
+                              left: `${mousePos.x}px`,
+                              top: `${mousePos.y}px`,
+                              transform: "translate(-50%, -50%)",
+                            }}
+                          >
+                            <div className="absolute inset-1 border-2 border-red-500 rounded-full opacity-50" />
+                          </div>
+                        )}
+                      </>
+                    )}
+                    {selectedDocument.type === "pdf" && (
+                      <div className="text-center">
+                        <div className="text-6xl mb-4">📄</div>
+                        <p className="text-gray-400">{selectedDocument.title}</p>
+                      </div>
+                    )}
+                    {selectedDocument.type === "video" && (
+                      <video
+                        src={selectedDocument.fileUrl}
+                        controls
+                        className="max-w-full max-h-full"
+                      />
+                    )}
+                  </div>
+                ) : (
+                  <div className="text-center text-gray-400">
+                    <p className="text-lg mb-2">Sélectionnez un document</p>
+                    <p className="text-sm">Clic simple pour aperçu</p>
+                    <p className="text-sm">Double-clic pour afficher</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
-            {/* Display Controls */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Contrôles d'Affichage</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {/* Orientation */}
-                <div>
-                  <label className="text-sm font-semibold text-gray-700 mb-2 block">
-                    Format d'Affichage
-                  </label>
-                  <Select value={orientation} onValueChange={(val) => setOrientation(val as "portrait" | "landscape")}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="portrait">📱 Portrait</SelectItem>
-                      <SelectItem value="landscape">🖥️ Paysage</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Display Button */}
+            {/* Zoom Controls */}
+            {selectedDocument?.type === "image" && (
+              <div className="flex items-center gap-2 bg-gray-800 p-3 rounded-lg border border-gray-700">
                 <Button
-                  onClick={() => selectedDocumentId && handleDisplayDocument(selectedDocumentId)}
-                  disabled={!selectedDocumentId || updateDocumentMutation.isPending}
-                  className="w-full gap-2"
-                  size="lg"
-                >
-                  <Play className="w-4 h-4" />
-                  {updateDocumentMutation.isPending ? "Affichage..." : "Afficher"}
-                </Button>
-
-                {/* Clear Display Button */}
-                <Button
-                  onClick={handleClearDisplay}
+                  onClick={() => setZoom(Math.max(50, zoom - 10))}
                   variant="outline"
-                  className="w-full gap-2"
+                  size="sm"
+                  className="bg-gray-700 border-gray-600 hover:bg-gray-600"
                 >
-                  <Pause className="w-4 h-4" />
-                  Masquer
+                  <ZoomOut className="w-4 h-4" />
                 </Button>
+                <div className="flex-1 text-center text-sm font-semibold">
+                  {zoom}%
+                </div>
+                <Button
+                  onClick={() => setZoom(Math.min(200, zoom + 10))}
+                  variant="outline"
+                  size="sm"
+                  className="bg-gray-700 border-gray-600 hover:bg-gray-600"
+                >
+                  <ZoomIn className="w-4 h-4" />
+                </Button>
+                <Button
+                  onClick={() => setZoom(100)}
+                  variant="outline"
+                  size="sm"
+                  className="bg-gray-700 border-gray-600 hover:bg-gray-600"
+                >
+                  Réinitialiser
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {/* Right Panel - Controls & Info */}
+          <div className="lg:col-span-1 flex flex-col gap-4">
+            {/* Format Controls */}
+            <Card className="bg-gray-800 border-gray-700">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm">Format</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Select value={orientation} onValueChange={(val) => setOrientation(val as "portrait" | "landscape")}>
+                  <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-700 border-gray-600">
+                    <SelectItem value="portrait">📱 Portrait</SelectItem>
+                    <SelectItem value="landscape">🖥️ Paysage</SelectItem>
+                  </SelectContent>
+                </Select>
               </CardContent>
             </Card>
 
             {/* Share Panel */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Partager</CardTitle>
+            <Card className="bg-gray-800 border-gray-700">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm">Partager</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-2">
                 <Button
                   onClick={() => copyToClipboard(getShareLink(currentSession.sessionCode))}
                   variant="outline"
-                  className="w-full gap-2"
+                  className="w-full gap-2 bg-gray-700 border-gray-600 hover:bg-gray-600 text-white"
+                  size="sm"
                 >
                   <Copy className="w-4 h-4" />
                   Copier Lien
@@ -396,7 +477,7 @@ export default function PresenterControl() {
                   rel="noopener noreferrer"
                   className="block"
                 >
-                  <Button className="w-full gap-2 bg-green-600 hover:bg-green-700">
+                  <Button className="w-full gap-2 bg-green-600 hover:bg-green-700" size="sm">
                     <Share2 className="w-4 h-4" />
                     WhatsApp
                   </Button>
@@ -405,32 +486,84 @@ export default function PresenterControl() {
             </Card>
 
             {/* Info Panel */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Infos Session</CardTitle>
+            <Card className="bg-gray-800 border-gray-700 flex-1">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm">Infos</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2 text-sm">
+              <CardContent className="space-y-3 text-xs">
                 <div>
-                  <p className="text-gray-600">Code:</p>
-                  <p className="font-mono font-bold text-gray-900">{currentSession.sessionCode}</p>
+                  <p className="text-gray-400">Code:</p>
+                  <p className="font-mono font-bold">{currentSession.sessionCode}</p>
                 </div>
                 <div>
-                  <p className="text-gray-600">Spectateurs actifs:</p>
-                  <p className="font-bold text-gray-900">{viewerCount}</p>
+                  <p className="text-gray-400">Spectateurs:</p>
+                  <p className="font-bold">{viewerCount}</p>
                 </div>
                 <div>
-                  <p className="text-gray-600">Documents:</p>
-                  <p className="font-bold text-gray-900">{documents.length}</p>
+                  <p className="text-gray-400">Documents:</p>
+                  <p className="font-bold">{documents.length}</p>
                 </div>
                 <div>
-                  <p className="text-gray-600">Titre:</p>
-                  <p className="font-bold text-gray-900 truncate">{currentSession.title}</p>
+                  <p className="text-gray-400">Titre:</p>
+                  <p className="font-bold truncate">{currentSession.title}</p>
                 </div>
               </CardContent>
             </Card>
           </div>
         </div>
       </main>
+
+      {/* Preview Modal */}
+      {previewDocument && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 rounded-lg max-w-2xl w-full max-h-[80vh] flex flex-col border border-gray-700">
+            <div className="flex items-center justify-between p-4 border-b border-gray-700">
+              <h3 className="font-bold text-lg">{previewDocument.title}</h3>
+              <Button
+                onClick={() => setPreviewDocumentId(null)}
+                variant="ghost"
+                size="sm"
+                className="text-gray-400 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </Button>
+            </div>
+            <div className="flex-1 flex items-center justify-center p-4 overflow-auto">
+              {previewDocument.type === "image" && (
+                <img
+                  src={previewDocument.fileUrl}
+                  alt={previewDocument.title}
+                  className="max-w-full max-h-full object-contain rounded"
+                />
+              )}
+              {previewDocument.type === "pdf" && (
+                <div className="text-center">
+                  <div className="text-6xl mb-4">📄</div>
+                  <p className="text-gray-400">{previewDocument.title}</p>
+                </div>
+              )}
+              {previewDocument.type === "video" && (
+                <div className="text-center">
+                  <div className="text-6xl mb-4">🎬</div>
+                  <p className="text-gray-400">{previewDocument.title}</p>
+                </div>
+              )}
+            </div>
+            <div className="p-4 border-t border-gray-700">
+              <Button
+                onClick={() => {
+                  handleDisplayDocument(previewDocument.id);
+                  setPreviewDocumentId(null);
+                }}
+                className="w-full gap-2 bg-blue-600 hover:bg-blue-700"
+              >
+                <Play className="w-4 h-4" />
+                Afficher aux spectateurs
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
