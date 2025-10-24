@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -25,4 +25,80 @@ export const users = mysqlTable("users", {
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
-// TODO: Add your tables here
+/**
+ * Presentation sessions table
+ * Stores information about each presentation session created by a presenter
+ */
+export const presentationSessions = mysqlTable("presentation_sessions", {
+  id: int("id").autoincrement().primaryKey(),
+  /** The user ID of the presenter who created this session */
+  presenterId: int("presenterId").notNull(),
+  /** Unique session code for sharing via WhatsApp link */
+  sessionCode: varchar("sessionCode", { length: 32 }).notNull().unique(),
+  /** Session title/name */
+  title: varchar("title", { length: 255 }).notNull(),
+  /** Is the session currently active/live */
+  isActive: boolean("isActive").default(true).notNull(),
+  /** Current document being displayed (document ID) */
+  currentDocumentId: int("currentDocumentId"),
+  /** Current orientation of the displayed document (portrait or landscape) */
+  currentOrientation: mysqlEnum("currentOrientation", ["portrait", "landscape"]).default("portrait").notNull(),
+  /** Timestamps */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type PresentationSession = typeof presentationSessions.$inferSelect;
+export type InsertPresentationSession = typeof presentationSessions.$inferInsert;
+
+/**
+ * Documents table
+ * Stores metadata about documents uploaded for presentations
+ */
+export const documents = mysqlTable("documents", {
+  id: int("id").autoincrement().primaryKey(),
+  /** The session this document belongs to */
+  sessionId: int("sessionId").notNull(),
+  /** Document title */
+  title: varchar("title", { length: 255 }).notNull(),
+  /** Document type: pdf, image, video */
+  type: mysqlEnum("type", ["pdf", "image", "video"]).notNull(),
+  /** S3 storage key for the file */
+  fileKey: varchar("fileKey", { length: 512 }).notNull(),
+  /** Public URL to access the document */
+  fileUrl: text("fileUrl").notNull(),
+  /** MIME type of the file */
+  mimeType: varchar("mimeType", { length: 100 }).notNull(),
+  /** File size in bytes */
+  fileSize: int("fileSize").notNull(),
+  /** Display order in the presentation */
+  displayOrder: int("displayOrder").notNull(),
+  /** Timestamps */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Document = typeof documents.$inferSelect;
+export type InsertDocument = typeof documents.$inferInsert;
+
+/**
+ * Presentation viewers table
+ * Tracks which users are viewing a presentation session
+ */
+export const presentationViewers = mysqlTable("presentation_viewers", {
+  id: int("id").autoincrement().primaryKey(),
+  /** The session being viewed */
+  sessionId: int("sessionId").notNull(),
+  /** The user viewing (null for anonymous viewers) */
+  userId: int("userId"),
+  /** Anonymous viewer identifier (for non-authenticated viewers) */
+  viewerIdentifier: varchar("viewerIdentifier", { length: 64 }),
+  /** Last activity timestamp */
+  lastActivityAt: timestamp("lastActivityAt").defaultNow().notNull(),
+  /** Timestamps */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type PresentationViewer = typeof presentationViewers.$inferSelect;
+export type InsertPresentationViewer = typeof presentationViewers.$inferInsert;
+
