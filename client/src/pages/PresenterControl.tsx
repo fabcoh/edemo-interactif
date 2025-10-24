@@ -273,6 +273,13 @@ export default function PresenterControl() {
                       selectedDocumentId === doc.id
                         ? "border-blue-500 ring-2 ring-blue-400"
                         : "border-gray-600 hover:border-gray-400"
+                    } ${
+                      doc.id % 6 === 0 ? "bg-red-600" :
+                      doc.id % 6 === 1 ? "bg-blue-600" :
+                      doc.id % 6 === 2 ? "bg-green-600" :
+                      doc.id % 6 === 3 ? "bg-yellow-600" :
+                      doc.id % 6 === 4 ? "bg-purple-600" :
+                      "bg-pink-600"
                     }`}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -282,35 +289,32 @@ export default function PresenterControl() {
                       e.stopPropagation();
                       handleDisplayDocument(doc.id);
                     }}
-                    style={{
-                      backgroundImage: `linear-gradient(135deg, hsl(${(doc.id * 60) % 360}, 70%, 50%), hsl(${(doc.id * 60 + 60) % 360}, 70%, 50%))`
-                    }}
                   >
                     {doc.type === "image" && (
                       <>
                         <img
                           src={doc.fileUrl}
                           alt={doc.title}
-                          className="w-full h-full object-cover pointer-events-none"
+                          className="w-full h-full object-cover pointer-events-none absolute"
                           onError={(e) => {
                             // Hide image on error, show fallback
                             e.currentTarget.style.display = 'none';
                           }}
                         />
-                        <div className="absolute inset-0 flex flex-col items-center justify-center text-white pointer-events-none">
+                        <div className="absolute inset-0 flex flex-col items-center justify-center text-white pointer-events-none z-10">
                           <div className="text-3xl mb-1">🖼️</div>
                           <div className="text-xs text-center px-2 font-semibold line-clamp-2">{doc.title}</div>
                         </div>
                       </>
                     )}
                     {doc.type === "pdf" && (
-                      <div className="text-center flex flex-col items-center justify-center">
+                      <div className="text-center flex flex-col items-center justify-center z-10 relative">
                         <div className="text-3xl mb-1">📄</div>
                         <div className="text-xs text-white font-semibold text-center px-2 line-clamp-2">{doc.title}</div>
                       </div>
                     )}
                     {doc.type === "video" && (
-                      <div className="text-center flex flex-col items-center justify-center">
+                      <div className="text-center flex flex-col items-center justify-center z-10 relative">
                         <div className="text-3xl mb-1">🎬</div>
                         <div className="text-xs text-white font-semibold text-center px-2 line-clamp-2">{doc.title}</div>
                       </div>
