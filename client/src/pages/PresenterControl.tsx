@@ -295,15 +295,17 @@ export default function PresenterControl() {
                         <img
                           src={doc.fileUrl}
                           alt={doc.title}
-                          className="w-full h-full object-cover pointer-events-none absolute"
+                          className="w-full h-full object-cover pointer-events-none"
                           onError={(e) => {
                             // Hide image on error, show fallback
                             e.currentTarget.style.display = 'none';
                           }}
+                          loading="lazy"
                         />
-                        <div className="absolute inset-0 flex flex-col items-center justify-center text-white pointer-events-none z-10">
-                          <div className="text-3xl mb-1">🖼️</div>
-                          <div className="text-xs text-center px-2 font-semibold line-clamp-2">{doc.title}</div>
+                        <div className="absolute inset-0 flex flex-col items-end justify-end text-white pointer-events-none z-10 p-1" style={{
+                          background: `linear-gradient(135deg, hsl(${(doc.id * 60) % 360}, 70%, 40%), hsl(${(doc.id * 60 + 60) % 360}, 70%, 40%))`
+                        }}>
+                          <div className="text-xs text-center font-semibold line-clamp-1 bg-black bg-opacity-60 px-1 rounded">{doc.title}</div>
                         </div>
                       </>
                     )}
