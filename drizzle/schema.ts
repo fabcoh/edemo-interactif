@@ -150,3 +150,26 @@ export const presenterCursors = mysqlTable("presenter_cursors", {
 export type PresenterCursor = typeof presenterCursors.$inferSelect;
 export type InsertPresenterCursor = typeof presenterCursors.$inferInsert;
 
+/**
+ * Viewer Cursors table
+ * Tracks viewer cursor positions for real-time display to the presenter
+ */
+export const viewerCursors = mysqlTable("viewer_cursors", {
+  id: int("id").autoincrement().primaryKey(),
+  /** The session this cursor data belongs to */
+  sessionId: int("sessionId").notNull(),
+  /** Unique identifier for the viewer */
+  viewerIdentifier: varchar("viewerIdentifier", { length: 64 }).notNull(),
+  /** Cursor X position as percentage (0-100) relative to the document width */
+  cursorX: float("cursorX").default(0).notNull(),
+  /** Cursor Y position as percentage (0-100) relative to the document height */
+  cursorY: float("cursorY").default(0).notNull(),
+  /** Whether the cursor should be visible */
+  cursorVisible: boolean("cursorVisible").default(false).notNull(),
+  /** Timestamps */
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ViewerCursor = typeof viewerCursors.$inferSelect;
+export type InsertViewerCursor = typeof viewerCursors.$inferInsert;
+

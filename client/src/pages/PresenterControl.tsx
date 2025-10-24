@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useParams, Link } from "wouter";
 import { ArrowLeft, Users, Copy, Share2, Upload, X, ZoomIn, ZoomOut, Check } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 
 /**
@@ -21,6 +21,7 @@ export default function PresenterControl() {
   const [orientation, setOrientation] = useState<"portrait" | "landscape">("portrait");
   const [zoom, setZoom] = useState(100);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const imageRef = useRef<HTMLImageElement>(null);
   const [showMouseCursor, setShowMouseCursor] = useState(false);
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
@@ -184,15 +185,20 @@ export default function PresenterControl() {
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const containerRect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - containerRect.left;
+    const y = e.clientY - containerRect.top;
     setMousePos({ x, y });
 
-    if (displayedDocumentId && currentSession) {
-      // Convert pixel coordinates to percentage (0-100)
-      const xPercent = (x / rect.width) * 100;
-      const yPercent = (y / rect.height) * 100;
+    if (displayedDocumentId && currentSession && imageRef.current) {
+      // Get image dimensions and position
+      const imageRect = imageRef.current.getBoundingClientRect();
+      const imageX = e.clientX - imageRect.left;
+      const imageY = e.clientY - imageRect.top;
+      
+      // Convert pixel coordinates to percentage (0-100) relative to image
+      const xPercent = (imageX / imageRect.width) * 100;
+      const yPercent = (imageY / imageRect.height) * 100;
       
       updateZoomAndCursorMutation.mutate({
         sessionId: sessionIdNum,
@@ -609,6 +615,7 @@ export default function PresenterControl() {
                     {displayedDocument.type === "image" && (
                       <>
                         <img
+                          ref={imageRef}
                           src={displayedDocument.fileUrl}
                           alt={displayedDocument.title}
                           className="max-w-full max-h-full object-contain"

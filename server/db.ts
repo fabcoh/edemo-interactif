@@ -1,6 +1,6 @@
 import { eq, and } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, presentationSessions, documents, presentationViewers, presentationCollaborators, presenterCursors, PresentationSession, Document, PresenterCursor } from "../drizzle/schema";
+import { InsertUser, users, presentationSessions, documents, presentationViewers, presentationCollaborators, presenterCursors, viewerCursors, PresentationSession, Document, PresenterCursor, ViewerCursor } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -592,5 +592,70 @@ export async function getPresenterCursor(sessionId: number): Promise<PresenterCu
     .limit(1);
 
   return result.length > 0 ? result[0] : undefined;
+}
+
+
+
+/**
+ * Update or create a viewer cursor position
+ */
+export async function updateViewerCursor(
+  sessionId: number,
+  viewerIdentifier: string,
+  cursorX: number,
+  cursorY: number,
+  cursorVisible: boolean
+): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+
+  // Check if cursor exists
+  const existing = await db
+    .select()
+    .from(viewerCursors)
+    .where(
+      and(
+        eq(viewerCursors.sessionId, sessionId),
+        eq(viewerCursors.viewerIdentifier, viewerIdentifier)
+      )
+    )
+    .limit(1);
+
+  if (existing.length > 0) {
+    // Update existing cursor
+    await db
+      .update(viewerCursors)
+      .set({
+        cursorX,
+        cursorY,
+        cursorVisible,
+        updatedAt: new Date(),
+      })
+      .where(eq(viewerCursors.id, existing[0].id));
+  } else {
+    // Insert new cursor
+    await db.insert(viewerCursors).values({
+      sessionId,
+      viewerIdentifier,
+      cursorX,
+      cursorY,
+      cursorVisible,
+    });
+  }
+}
+
+/**
+ * Get all viewer cursors for a session
+ */
+export async function getViewerCursors(sessionId: number): Promise<ViewerCursor[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  const result = await db
+    .select()
+    .from(viewerCursors)
+    .where(eq(viewerCursors.sessionId, sessionId));
+
+  return result;
 }
 

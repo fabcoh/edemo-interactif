@@ -50,6 +50,13 @@
       "when": 1761321270662,
       "tag": "0006_tiny_pandemic",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1761321893022,
+      "tag": "0007_natural_vivisector",
+      "breakpoints": true
     }
   ]
 }

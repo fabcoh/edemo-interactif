@@ -78,6 +78,12 @@ export default function Viewer() {
       setPresenterCursorX(cursorQuery.data.cursorX);
       setPresenterCursorY(cursorQuery.data.cursorY);
       setPresenterCursorVisible(cursorQuery.data.cursorVisible);
+      console.log('[Viewer] Cursor data:', {
+        zoom: cursorQuery.data.zoomLevel,
+        x: cursorQuery.data.cursorX,
+        y: cursorQuery.data.cursorY,
+        visible: cursorQuery.data.cursorVisible,
+      });
     }
   }, [cursorQuery.data]);
 
@@ -168,7 +174,7 @@ export default function Viewer() {
                   onError={() => setDocumentError("Impossible de charger l'image")}
                 />
                 {/* Presenter cursor - Red for presenter, visible for viewers */}
-                {presenterCursorVisible && presenterZoom > 100 && (
+                {presenterCursorVisible && (
                   <div
                     className="absolute w-6 h-6 border-2 border-red-500 rounded-full pointer-events-none"
                     style={{

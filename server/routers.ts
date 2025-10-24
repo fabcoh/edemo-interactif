@@ -24,6 +24,8 @@ import {
   removeCollaborator,
   updatePresenterCursor,
   getPresenterCursor,
+  updateViewerCursor,
+  getViewerCursors,
 } from "./db";
 import { storagePut, storageGet } from "./storage";
 import { TRPCError } from "@trpc/server";
@@ -463,6 +465,64 @@ export const appRouter = router({
           sessionId: session.id,
           viewerIdentifier,
         };
+      }),
+
+    /**
+     * Update viewer cursor position
+     * Public access - viewers can update their cursor
+     */
+    updateCursor: publicProcedure
+      .input(z.object({
+        sessionCode: z.string(),
+        viewerIdentifier: z.string(),
+        cursorX: z.number(),
+        cursorY: z.number(),
+        cursorVisible: z.boolean(),
+      }))
+      .mutation(async ({ input }) => {
+        const session = await getPresentationSessionByCode(input.sessionCode);
+        if (!session) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Session not found",
+          });
+        }
+
+        await updateViewerCursor(
+          session.id,
+          input.viewerIdentifier,
+          input.cursorX,
+          input.cursorY,
+          input.cursorVisible
+        );
+
+        return { success: true };
+      }),
+
+    /**
+     * Get all viewer cursors for a session (for presenter)
+     * Public access - anyone can see viewer cursors
+     */
+    getCursors: publicProcedure
+      .input(z.object({
+        sessionCode: z.string(),
+      }))
+      .query(async ({ input }) => {
+        const session = await getPresentationSessionByCode(input.sessionCode);
+        if (!session) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Session not found",
+          });
+        }
+
+        const cursors = await getViewerCursors(session.id);
+        return cursors.map(c => ({
+          viewerIdentifier: c.viewerIdentifier,
+          cursorX: c.cursorX,
+          cursorY: c.cursorY,
+          cursorVisible: c.cursorVisible,
+        }));
       }),
   }),
 
