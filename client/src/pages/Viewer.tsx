@@ -134,44 +134,8 @@ export default function Viewer() {
           </div>
         </div>
 
-        {/* Document Display - Fullscreen with zoom controls */}
+        {/* Document Display - Fullscreen */}
         <div className="flex-1 bg-black flex flex-col items-center justify-center overflow-hidden relative">
-          {/* Zoom Controls - Floating on top right */}
-          {(currentDocument.type === "image" || currentDocument.type === "pdf") && (
-            <div className="absolute top-4 right-4 flex gap-2 z-10 bg-gray-900 bg-opacity-80 rounded-lg p-2">
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={handleZoomOut}
-                className="text-gray-300 hover:text-white h-8 w-8 p-0"
-                title="Zoom out"
-              >
-                <ZoomOut className="w-4 h-4" />
-              </Button>
-              <span className="text-xs text-gray-300 flex items-center px-2 min-w-12 justify-center">
-                {presenterZoom}%
-              </span>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={handleZoomIn}
-                className="text-gray-300 hover:text-white h-8 w-8 p-0"
-                title="Zoom in"
-              >
-                <ZoomIn className="w-4 h-4" />
-              </Button>
-              <div className="w-px bg-gray-700" />
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={resetZoom}
-                className="text-gray-300 hover:text-white h-8 w-8 p-0 text-xs"
-                title="Reset zoom"
-              >
-                100%
-              </Button>
-            </div>
-          )}
 
           {/* Document Content */}
           <div className="w-full h-full flex items-center justify-center overflow-auto">
@@ -203,17 +167,17 @@ export default function Viewer() {
                   className="object-contain max-w-full max-h-full"
                   onError={() => setDocumentError("Impossible de charger l'image")}
                 />
-                {/* Presenter cursor - Green for viewer */}
+                {/* Presenter cursor - Red for presenter, visible for viewers */}
                 {presenterCursorVisible && presenterZoom > 100 && (
                   <div
-                    className="absolute w-6 h-6 border-2 border-green-500 rounded-full pointer-events-none"
+                    className="absolute w-6 h-6 border-2 border-red-500 rounded-full pointer-events-none"
                     style={{
-                      left: `${presenterCursorX}px`,
-                      top: `${presenterCursorY}px`,
+                      left: `${presenterCursorX}%`,
+                      top: `${presenterCursorY}%`,
                       transform: "translate(-50%, -50%)",
                     }}
                   >
-                    <div className="absolute inset-1 border-2 border-green-500 rounded-full opacity-50" />
+                    <div className="absolute inset-1 border-2 border-red-500 rounded-full opacity-50" />
                   </div>
                 )}
               </div>

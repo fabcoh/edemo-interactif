@@ -190,11 +190,15 @@ export default function PresenterControl() {
     setMousePos({ x, y });
 
     if (displayedDocumentId && currentSession) {
+      // Convert pixel coordinates to percentage (0-100)
+      const xPercent = (x / rect.width) * 100;
+      const yPercent = (y / rect.height) * 100;
+      
       updateZoomAndCursorMutation.mutate({
         sessionId: sessionIdNum,
         zoomLevel: zoom,
-        cursorX: x,
-        cursorY: y,
+        cursorX: xPercent,
+        cursorY: yPercent,
         cursorVisible: showMouseCursor && zoom > 100,
       });
     }
@@ -521,13 +525,16 @@ export default function PresenterControl() {
                           });
                         }
                         
-                        // Send cursor position to viewers
+                        // Send cursor position to viewers (as percentage)
                         if (displayedDocumentId && currentSession) {
+                          const xPercent = (x / rect.width) * 100;
+                          const yPercent = (y / rect.height) * 100;
+                          
                           updateZoomAndCursorMutation.mutate({
                             sessionId: sessionIdNum,
                             zoomLevel: zoom,
-                            cursorX: x,
-                            cursorY: y,
+                            cursorX: xPercent,
+                            cursorY: yPercent,
                             cursorVisible: true,
                           });
                         }
@@ -565,13 +572,16 @@ export default function PresenterControl() {
                           });
                         }
                         
-                        // Send cursor position to viewers
+                        // Send cursor position to viewers (as percentage)
                         if (displayedDocumentId && currentSession) {
+                          const xPercent = (x / rect.width) * 100;
+                          const yPercent = (y / rect.height) * 100;
+                          
                           updateZoomAndCursorMutation.mutate({
                             sessionId: sessionIdNum,
                             zoomLevel: zoom,
-                            cursorX: x,
-                            cursorY: y,
+                            cursorX: xPercent,
+                            cursorY: yPercent,
                             cursorVisible: true,
                           });
                         }

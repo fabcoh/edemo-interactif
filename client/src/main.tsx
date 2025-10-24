@@ -18,6 +18,10 @@ const redirectToLoginIfUnauthorized = (error: unknown) => {
 
   if (!isUnauthorized) return;
 
+  // Don't redirect if user is on viewer page (public access)
+  const isViewerPage = window.location.pathname.startsWith('/view') || window.location.pathname === '/viewer';
+  if (isViewerPage) return;
+
   window.location.href = getLoginUrl();
 };
 

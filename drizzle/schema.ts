@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, float } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -137,10 +137,10 @@ export const presenterCursors = mysqlTable("presenter_cursors", {
   sessionId: int("sessionId").notNull(),
   /** Current zoom level (50-200) */
   zoomLevel: int("zoomLevel").default(100).notNull(),
-  /** Cursor X position (relative to the document) */
-  cursorX: int("cursorX").default(0).notNull(),
-  /** Cursor Y position (relative to the document) */
-  cursorY: int("cursorY").default(0).notNull(),
+  /** Cursor X position as percentage (0-100) relative to the document width */
+  cursorX: float("cursorX").default(0).notNull(),
+  /** Cursor Y position as percentage (0-100) relative to the document height */
+  cursorY: float("cursorY").default(0).notNull(),
   /** Whether the cursor should be visible */
   cursorVisible: boolean("cursorVisible").default(false).notNull(),
   /** Timestamps */
