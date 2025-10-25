@@ -12,6 +12,7 @@ import { ArrowLeft, Users, X, ZoomIn, ZoomOut } from "lucide-react";
 import { useEffect } from "react";
 import { ChatViewer } from "@/components/ChatViewer";
 import { ChatNotification } from "@/components/ChatNotification";
+import { FileAttachmentViewer } from "@/components/FileAttachmentViewer";
 
 /**
  * Viewer Page - Display presentation content in real-time (fullscreen)
@@ -179,6 +180,9 @@ export default function Viewer() {
 
           {/* Chat Notification Popup */}
           {session && <ChatNotification sessionId={session.id} />}
+          
+          {/* File Attachment Viewer - Permanent thumbnail for uploaded files */}
+          {session && <FileAttachmentViewer sessionId={session.id} />}
 
           {/* Chat in Fullscreen - Directly below document, no gap */}
           {session && (

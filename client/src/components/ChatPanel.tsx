@@ -180,36 +180,24 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
                   <p className="text-xs text-white break-words">{msg.content}</p>
                 )}
                 {msg.messageType === "video_link" && (
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-1 text-xs text-white">
-                      <LinkIcon className="w-3 h-3" />
-                      <span className="font-semibold">Lien vidéo</span>
-                    </div>
-                    <a
-                      href={msg.content || "#"}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs text-blue-200 underline break-all"
-                    >
-                      {msg.content}
-                    </a>
-                  </div>
+                  <a
+                    href={msg.content || "#"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-blue-200 underline break-all"
+                  >
+                    {msg.content}
+                  </a>
                 )}
                 {msg.messageType === "document" && (
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-1 text-xs text-white">
-                      <Paperclip className="w-3 h-3" />
-                      <span className="font-semibold">Document</span>
-                    </div>
-                    <a
-                      href={msg.fileUrl || "#"}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs text-blue-200 underline break-all"
-                    >
-                      {msg.fileName}
-                    </a>
-                  </div>
+                  <a
+                    href={msg.fileUrl || "#"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-blue-200 underline break-all"
+                  >
+                    {msg.fileName}
+                  </a>
                 )}
                 <div className="text-[10px] text-gray-200 mt-1 text-right">
                   {new Date(msg.createdAt).toLocaleTimeString("fr-FR", {
