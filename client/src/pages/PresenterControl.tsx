@@ -192,7 +192,8 @@ export default function PresenterControl() {
     const y = e.clientY - containerRect.top;
     setMousePos({ x, y });
 
-    if (displayedDocumentId && currentSession && imageRef.current) {
+    // Only send cursor position if NOT panning
+    if (!isPanning && displayedDocumentId && currentSession && imageRef.current) {
       // Get image dimensions and position
       const imageRect = imageRef.current.getBoundingClientRect();
       const imageX = e.clientX - imageRect.left;

@@ -34,9 +34,9 @@ export function ChatViewer({ sessionId }: ChatViewerProps) {
       </div>
 
       {/* Messages Display */}
-      <div className="flex-1 overflow-y-auto space-y-1 flex flex-col p-1.5">
+      <div className="flex-1 overflow-y-auto space-y-1 flex flex-col-reverse justify-end p-1.5">
         {messages.length === 0 ? (
-          <p className="text-xs text-gray-400 text-center mt-4">Aucun message</p>
+          <p className="text-xs text-gray-400 text-center">Aucun message</p>
         ) : (
           [...messages].reverse().map((msg) => (
             <div

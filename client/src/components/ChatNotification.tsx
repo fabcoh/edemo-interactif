@@ -51,43 +51,31 @@ export function ChatNotification({ sessionId }: ChatNotificationProps) {
 
   return (
     <div className="fixed top-[20%] left-1/2 transform -translate-x-1/2 z-[100] animate-in fade-in slide-in-from-top-4 duration-300">
-      <div className="bg-gray-100 rounded-xl shadow-lg p-4 max-w-sm mx-4">
+      <div className="bg-white rounded-xl shadow-2xl p-4 max-w-md mx-4 border border-gray-200">
         {notification.messageType === "text" && (
-          <p className="text-gray-900 text-lg font-medium break-words">
+          <p className="text-gray-900 text-base break-words">
             {notification.content}
           </p>
         )}
         {notification.messageType === "video_link" && (
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-gray-900 text-base font-semibold">
-              <LinkIcon className="w-4 h-4" />
-              <span>Lien vidéo</span>
-            </div>
-            <a
-              href={notification.content || "#"}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 text-sm underline break-all hover:text-blue-800"
-            >
-              {notification.content}
-            </a>
-          </div>
+          <a
+            href={notification.content || "#"}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 text-base underline break-all hover:text-blue-800"
+          >
+            {notification.content}
+          </a>
         )}
         {notification.messageType === "document" && (
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-gray-900 text-base font-semibold">
-              <Paperclip className="w-4 h-4" />
-              <span>Document</span>
-            </div>
-            <a
-              href={notification.fileUrl || "#"}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 text-sm underline break-all hover:text-blue-800"
-            >
-              {notification.fileName}
-            </a>
-          </div>
+          <a
+            href={notification.fileUrl || "#"}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 text-base underline break-all hover:text-blue-800"
+          >
+            {notification.fileName}
+          </a>
         )}
       </div>
     </div>

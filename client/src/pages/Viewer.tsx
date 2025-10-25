@@ -120,7 +120,7 @@ export default function Viewer() {
         <div className="flex-1 bg-black flex flex-col overflow-auto relative">
 
           {/* Document Content */}
-          <div className="w-full flex-none flex items-center justify-center">
+          <div className="w-full flex-none flex items-start justify-center pt-4">
             {documentError && (
               <div className="text-center text-red-400 p-4">
                 <p className="text-sm">Erreur lors du chargement du document</p>
@@ -138,19 +138,20 @@ export default function Viewer() {
             )}
 
             {!documentError && currentDocument.type === "image" && (
-              <div className="flex items-center justify-center w-full h-full p-4 relative">
+              <div className="relative inline-block">
                 <img
                   src={currentDocument.fileUrl}
                   alt="Document"
                   style={{
                     transform: `scale(${presenterZoom / 100}) translate(${presenterPanOffsetX / (presenterZoom / 100)}px, ${presenterPanOffsetY / (presenterZoom / 100)}px)`,
                     transition: "transform 0.2s ease-out",
+                    transformOrigin: "center center",
                   }}
-                  className="object-contain max-w-full max-h-full"
+                  className="object-contain max-w-full"
                   onError={() => setDocumentError("Impossible de charger l'image")}
                 />
-                {/* Presenter cursor - Red for presenter, visible for viewers */}
-                {presenterCursorVisible && presenterZoom > 100 && (
+                {/* Presenter cursor - Red, visible when presenter shows it */}
+                {presenterCursorVisible && (
                   <div
                     className="absolute w-6 h-6 border-2 border-red-500 rounded-full pointer-events-none"
                     style={{
