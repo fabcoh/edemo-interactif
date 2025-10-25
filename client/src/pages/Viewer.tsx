@@ -116,28 +116,23 @@ export default function Viewer() {
   if (isJoined && isFullscreen && currentDocument) {
     return (
       <div className="fixed inset-0 bg-black flex flex-col">
-        {/* Minimal Header - Very compact */}
-        <div className="bg-gray-950 border-b border-gray-800 px-4 py-2 flex justify-between items-center h-12 flex-shrink-0">
-          <div className="flex items-center gap-3 min-w-0">
-            <h1 className="text-xs font-bold text-white truncate">{session?.title || "Présentation"}</h1>
-            <span className="text-xs text-gray-500 whitespace-nowrap">
+        {/* Minimal Header - Ultra compact */}
+        <div className="bg-gray-950 border-b border-gray-800 px-2 py-1 flex justify-between items-center h-8 flex-shrink-0">
+          <div className="flex items-center gap-2 min-w-0">
+            <h1 className="text-[10px] font-bold text-white truncate">{session?.title || "Présentation"}</h1>
+            <span className="text-[10px] text-gray-500 whitespace-nowrap">
               {session?.sessionCode}
             </span>
+            <span className="text-[10px] text-gray-500 whitespace-nowrap">• {viewerCount}</span>
           </div>
-          <div className="flex items-center gap-2 flex-shrink-0">
-            <div className="flex items-center gap-1 text-xs text-gray-400">
-              <Users className="w-3 h-3" />
-              <span className="whitespace-nowrap">{viewerCount}</span>
-            </div>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => setIsFullscreen(false)}
-              className="text-gray-400 hover:text-white h-8 w-8 p-0"
-            >
-              <X className="w-4 h-4" />
-            </Button>
-          </div>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => setIsFullscreen(false)}
+            className="text-gray-400 hover:text-white h-6 w-6 p-0"
+          >
+            <X className="w-3 h-3" />
+          </Button>
         </div>
 
         {/* Document Display - Fullscreen */}

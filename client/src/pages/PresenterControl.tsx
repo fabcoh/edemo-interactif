@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { ChatPanel } from "@/components/ChatPanel";
+import { TempDropZone } from "@/components/TempDropZone";
 
 /**
  * Presenter Control Page - Control document display during presentation
@@ -235,7 +236,7 @@ export default function PresenterControl() {
     <div className="min-h-screen bg-gray-900 text-white flex flex-col">
       {/* Header */}
       <header className="bg-black shadow-lg">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="container mx-auto px-4 py-1 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button 
               variant="ghost" 
@@ -269,10 +270,10 @@ export default function PresenterControl() {
         </div>
       </header>
 
-      <main className="flex-1 container mx-auto px-4 py-6 flex flex-col gap-4 overflow-hidden">
+      <main className="flex-1 container mx-auto px-4 py-2 flex flex-col gap-2 overflow-hidden">
         {/* Zoom Controls - Top with Slider */}
         {displayedDocument?.type === "image" && (
-          <div className="flex items-center gap-3 bg-gray-800 p-3 rounded-lg border border-gray-700">
+          <div className="flex items-center gap-2 bg-gray-800 p-2 rounded-lg border border-gray-700">
             <span className="text-xs text-gray-400 whitespace-nowrap">Zoom:</span>
             <Button
               onClick={() => {
@@ -496,6 +497,9 @@ export default function PresenterControl() {
               </div>
             ))}
           </div>
+
+          {/* Temporary Drop Zone */}
+          <TempDropZone onFileSelect={handleUploadDocument} />
         </div>
 
         {/* Main Content Area */}
