@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Upload, X } from "lucide-react";
+import { Upload, X, ArrowUp } from "lucide-react";
 
 interface TempDropZoneProps {
   onFileSelect: (file: File) => void;
@@ -59,10 +59,11 @@ export function TempDropZone({ onFileSelect }: TempDropZoneProps) {
           </button>
         </div>
       ) : (
-        <div className="flex items-center justify-center h-full">
-          <p className="text-[10px] text-gray-400 text-center">
-            Glisser un fichier temporaire ici
+        <div className="flex items-center justify-between h-full px-2">
+          <p className="text-[10px] text-gray-400 flex-1">
+            Glisser un fichier ici
           </p>
+          <ArrowUp className="w-4 h-4 text-gray-500 flex-shrink-0" />
         </div>
       )}
     </div>

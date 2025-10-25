@@ -115,28 +115,9 @@ export default function Viewer() {
   // If joined and fullscreen, show only the document
   if (isJoined && isFullscreen && currentDocument) {
     return (
-      <div className="fixed inset-0 bg-black flex flex-col">
-        {/* Minimal Header - Ultra compact */}
-        <div className="bg-gray-950 border-b border-gray-800 px-2 py-1 flex justify-between items-center h-8 flex-shrink-0">
-          <div className="flex items-center gap-2 min-w-0">
-            <h1 className="text-[10px] font-bold text-white truncate">{session?.title || "Présentation"}</h1>
-            <span className="text-[10px] text-gray-500 whitespace-nowrap">
-              {session?.sessionCode}
-            </span>
-            <span className="text-[10px] text-gray-500 whitespace-nowrap">• {viewerCount}</span>
-          </div>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => setIsFullscreen(false)}
-            className="text-gray-400 hover:text-white h-6 w-6 p-0"
-          >
-            <X className="w-3 h-3" />
-          </Button>
-        </div>
-
+      <div className="fixed inset-0 bg-black z-50 flex flex-col">
         {/* Document Display - Fullscreen */}
-        <div className="flex-1 bg-black flex flex-col items-center justify-center overflow-hidden relative">
+        <div className="flex-1 bg-black flex flex-col items-center justify-center overflow-auto relative">
 
           {/* Document Content */}
           <div className="w-full h-full flex items-center justify-center overflow-auto">

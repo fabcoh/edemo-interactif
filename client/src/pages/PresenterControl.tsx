@@ -274,7 +274,7 @@ export default function PresenterControl() {
         {/* Zoom Controls & Drop Zone - Combined Row */}
         <div className="flex items-center gap-2">
           {/* Zoom Controls */}
-          {displayedDocument?.type === "image" && (
+          {displayedDocument && (
             <div className="flex items-center gap-2 bg-gray-800 p-2 rounded-lg border border-gray-700 flex-1">
               <span className="text-[10px] text-gray-400 whitespace-nowrap">Zoom:</span>
             <Button
