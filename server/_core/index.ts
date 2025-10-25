@@ -36,6 +36,19 @@ async function startServer() {
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
   
+  // File upload endpoint
+  app.post("/api/upload", express.raw({ type: "*/*", limit: "10mb" }), async (req, res) => {
+    try {
+      const { storagePut } = await import("../storage");
+      const filename = `commercial-photos/${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
+      const result = await storagePut(filename, req.body, "image/jpeg");
+      res.json({ url: result.url });
+    } catch (error) {
+      console.error("Upload error:", error);
+      res.status(500).json({ error: "Failed to upload file" });
+    }
+  });
+
   // Image proxy endpoint to bypass CORS
   app.get("/api/image-proxy", async (req, res) => {
     try {

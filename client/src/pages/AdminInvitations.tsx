@@ -14,6 +14,7 @@ export default function AdminInvitations() {
   const [name, setName] = useState("");
   const [firstName, setFirstName] = useState("");
   const [photoUrl, setPhotoUrl] = useState("");
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
 
@@ -89,10 +90,35 @@ export default function AdminInvitations() {
       return;
     }
 
+    let uploadedPhotoUrl = photoUrl;
+
+    // Upload photo to S3 if file is selected
+    if (photoFile) {
+      try {
+        const formData = new FormData();
+        formData.append("file", photoFile);
+
+        const response = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error("Erreur lors de l'upload de la photo");
+        }
+
+        const data = await response.json();
+        uploadedPhotoUrl = data.url;
+      } catch (error) {
+        toast.error("Erreur lors de l'upload de la photo");
+        return;
+      }
+    }
+
     createLinkMutation.mutate({
       name: name.trim(),
       firstName: firstName.trim() || undefined,
-      photoUrl: photoUrl.trim() || undefined,
+      photoUrl: uploadedPhotoUrl || undefined,
       phone: phone.trim() || undefined,
       email: email.trim() || undefined,
     });
@@ -187,15 +213,30 @@ export default function AdminInvitations() {
                   </div>
 
                   <div>
-                    <Label htmlFor="photoUrl">URL de la photo (optionnel)</Label>
+                    <Label htmlFor="photo">Photo (optionnel)</Label>
                     <Input
-                      id="photoUrl"
-                      type="url"
-                      value={photoUrl}
-                      onChange={(e) => setPhotoUrl(e.target.value)}
-                      placeholder="https://example.com/photo.jpg"
+                      id="photo"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setPhotoFile(file);
+                          // Create preview URL
+                          const reader = new FileReader();
+                          reader.onloadend = () => {
+                            setPhotoUrl(reader.result as string);
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
                       className="mt-1"
                     />
+                    {photoUrl && (
+                      <div className="mt-2">
+                        <img src={photoUrl} alt="Aperçu" className="w-20 h-20 rounded-full object-cover" />
+                      </div>
+                    )}
                   </div>
 
                   <div>

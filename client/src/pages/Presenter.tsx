@@ -369,35 +369,30 @@ export default function Presenter() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      {/* Invite Form */}
-                      <div className="space-y-3 pb-4 border-b">
-                        <Label>Inviter un Collaborateur</Label>
-                        <div className="flex gap-2">
-                          <Input
-                            type="email"
-                            placeholder="Email du collaborateur"
-                            value={collaboratorEmail}
-                            onChange={(e) => setCollaboratorEmail(e.target.value)}
-                          />
-                          <Button
-                            onClick={async () => {
-                              if (collaboratorEmail && selectedSessionId) {
-                                await inviteCollaboratorMutation.mutateAsync({
-                                  sessionId: selectedSessionId,
-                                  collaboratorEmail,
-                                  permission: "control",
-                                });
-                              }
-                            }}
-                            disabled={!collaboratorEmail || inviteCollaboratorMutation.isPending}
-                          >
-                            <Plus className="w-4 h-4" />
-                            Inviter
-                          </Button>
-                        </div>
+                      <div className="p-6 bg-blue-50 rounded-lg text-center">
+                        <Users className="w-12 h-12 text-blue-600 mx-auto mb-3" />
+                        <h3 className="font-semibold text-lg mb-2">
+                          Gestion des Accès Commerciaux
+                        </h3>
+                        <p className="text-gray-600 mb-4">
+                          Créez des liens d'accès pour vos commerciaux depuis la page d'administration
+                        </p>
+                        <Button
+                          onClick={() => window.location.href = "/admin/invitations"}
+                          className="w-full"
+                        >
+                          Accéder à l'Administration
+                        </Button>
                       </div>
 
-                      {/* Collaborators List */}
+                      <div className="p-4 bg-gray-50 rounded-lg">
+                        <h4 className="font-medium text-sm mb-2">💡 Info:</h4>
+                        <p className="text-sm text-gray-600">
+                          Les collaborateurs peuvent contrôler la présentation avec le même code de session
+                        </p>
+                      </div>
+
+                      {/* Keep the collaborators list for display only */}
                       <div>
                         <Label className="mb-3 block">Collaborateurs Actuels</Label>
                         {collaboratorsQuery.isLoading ? (
@@ -423,28 +418,10 @@ export default function Presenter() {
                                     Permission: {collab.permission}
                                   </div>
                                 </div>
-                                <button
-                                  onClick={async () => {
-                                    if (selectedSessionId) {
-                                      await removeCollaboratorMutation.mutateAsync({
-                                        sessionId: selectedSessionId,
-                                        collaboratorId: collab.collaboratorId,
-                                      });
-                                    }
-                                  }}
-                                  className="p-2 hover:bg-red-100 rounded-lg transition-colors"
-                                >
-                                  <X className="w-4 h-4 text-red-600" />
-                                </button>
                               </div>
                             ))}
                           </div>
                         )}
-                      </div>
-
-                      <div className="bg-blue-50 p-3 rounded-lg text-sm text-blue-900">
-                        <p className="font-semibold mb-1">💡 Info:</p>
-                        <p>Les collaborateurs peuvent contrôler la présentation avec le même code de session</p>
                       </div>
                     </CardContent>
                   </Card>
