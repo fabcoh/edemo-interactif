@@ -250,8 +250,8 @@ export default function PresenterControl() {
               Retour
             </Button>
             <div>
-              <h1 className="text-xl font-bold">{currentSession.title}</h1>
-              <p className="text-xs text-gray-400">Code: {currentSession.sessionCode}</p>
+              <h1 className="text-sm font-bold">{currentSession.title}</h1>
+              <p className="text-[10px] text-gray-400">Code: {currentSession.sessionCode}</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
@@ -271,10 +271,12 @@ export default function PresenterControl() {
       </header>
 
       <main className="flex-1 container mx-auto px-4 py-2 flex flex-col gap-2 overflow-hidden">
-        {/* Zoom Controls - Top with Slider */}
-        {displayedDocument?.type === "image" && (
-          <div className="flex items-center gap-2 bg-gray-800 p-2 rounded-lg border border-gray-700">
-            <span className="text-xs text-gray-400 whitespace-nowrap">Zoom:</span>
+        {/* Zoom Controls & Drop Zone - Combined Row */}
+        <div className="flex items-center gap-2">
+          {/* Zoom Controls */}
+          {displayedDocument?.type === "image" && (
+            <div className="flex items-center gap-2 bg-gray-800 p-2 rounded-lg border border-gray-700 flex-1">
+              <span className="text-[10px] text-gray-400 whitespace-nowrap">Zoom:</span>
             <Button
               onClick={() => {
                 const newZoom = Math.max(50, zoom - 10);
@@ -293,7 +295,7 @@ export default function PresenterControl() {
               }}
               variant="outline"
               size="sm"
-              className="bg-gray-700 border-gray-600 hover:bg-gray-600 h-8 w-8 p-0"
+              className="bg-gray-700 border-gray-600 hover:bg-gray-600 h-6 w-6 p-0"
             >
               <ZoomOut className="w-3 h-3" />
             </Button>
@@ -323,7 +325,7 @@ export default function PresenterControl() {
                 background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((zoom - 50) / 150) * 100}%, #374151 ${((zoom - 50) / 150) * 100}%, #374151 100%)`
               }}
             />
-            <div className="text-xs font-semibold text-white w-12 text-center">
+            <div className="text-[10px] font-semibold text-white w-10 text-center">
               {zoom}%
             </div>
             <Button
@@ -344,7 +346,7 @@ export default function PresenterControl() {
               }}
               variant="outline"
               size="sm"
-              className="bg-gray-700 border-gray-600 hover:bg-gray-600 h-8 w-8 p-0"
+              className="bg-gray-700 border-gray-600 hover:bg-gray-600 h-6 w-6 p-0"
             >
               <ZoomIn className="w-3 h-3" />
             </Button>
@@ -365,12 +367,18 @@ export default function PresenterControl() {
               }}
               variant="outline"
               size="sm"
-              className="bg-gray-700 border-gray-600 hover:bg-gray-600 h-8 text-xs px-2"
+              className="bg-gray-700 border-gray-600 hover:bg-gray-600 h-6 text-[10px] px-2"
             >
               Réinit
             </Button>
+            </div>
+          )}
+          
+          {/* Temporary Drop Zone */}
+          <div className="w-64">
+            <TempDropZone onFileSelect={handleUploadDocument} />
           </div>
-        )}
+        </div>
 
         {/* Thumbnails Bar */}
         <div className="flex flex-col gap-2">
@@ -497,9 +505,6 @@ export default function PresenterControl() {
               </div>
             ))}
           </div>
-
-          {/* Temporary Drop Zone */}
-          <TempDropZone onFileSelect={handleUploadDocument} />
         </div>
 
         {/* Main Content Area */}

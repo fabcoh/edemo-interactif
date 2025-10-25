@@ -1,0 +1,20 @@
+{
+  "query": "SELECT id, title, sessionCode FROM presentation_sessions ORDER BY createdAt DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3j1v42nUZuvgHzn.root --database 8CbieS7mEqbTHNrWVL4VaZ --execute SELECT id, title, sessionCode FROM presentation_sessions ORDER BY createdAt DESC LIMIT 5;",
+  "rows": [
+    {
+      "id": "2",
+      "title": "100% SANTE",
+      "sessionCode": "AA8ZJENN"
+    },
+    {
+      "id": "1",
+      "title": "MUTUELLE - Présentation Complète",
+      "sessionCode": "5VL1HVS4"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\tsessionCode\n2\t100% SANTE\tAA8ZJENN\n1\tMUTUELLE - Présentation Complète\t5VL1HVS4\n",
+  "stderr": "",
+  "execution_time_ms": 714
+}
