@@ -1,0 +1,20 @@
+{
+  "query": "SELECT id, token, name, revoked, createdBy, lastUsedAt, createdAt, updatedAt FROM commercial_invitations LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3j1v42nUZuvgHzn.root --database 8CbieS7mEqbTHNrWVL4VaZ --execute SELECT id, token, name, revoked, createdBy, lastUsedAt, createdAt, updatedAt FROM commercial_invitations LIMIT 1;",
+  "rows": [
+    {
+      "id": "30002",
+      "token": "awm2ivn6i5cmh5wattw",
+      "name": "Fabrice",
+      "revoked": "0",
+      "createdBy": "1",
+      "lastUsedAt": "NULL",
+      "createdAt": "2025-10-25 06:24:53",
+      "updatedAt": "2025-10-25 06:27:40"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttoken\tname\trevoked\tcreatedBy\tlastUsedAt\tcreatedAt\tupdatedAt\n30002\tawm2ivn6i5cmh5wattw\tFabrice\t0\t1\tNULL\t2025-10-25 06:24:53\t2025-10-25 06:27:40\n",
+  "stderr": "",
+  "execution_time_ms": 52
+}

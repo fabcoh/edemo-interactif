@@ -1,13 +1,15 @@
 import { useEffect } from "react";
-import { useRoute, useLocation } from "wouter";
+import { useParams, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle, Loader2, CheckCircle } from "lucide-react";
 
 export default function CommercialAccess() {
-  const [, params] = useRoute("/commercial/:token");
+  const params = useParams();
   const [, setLocation] = useLocation();
-  const token = params?.token || "";
+  const token = params.token || "";
+
+  console.log("CommercialAccess loaded", { params, token });
 
   // Verify commercial link
   const linkQuery = trpc.invitation.verifyCommercialLink.useQuery(
@@ -27,7 +29,7 @@ export default function CommercialAccess() {
       
       // Redirect to dashboard after 2 seconds
       setTimeout(() => {
-        setLocation("/dashboard");
+        setLocation("/");
       }, 2000);
     }
   }, [linkQuery.data, token, setLocation]);
@@ -43,7 +45,7 @@ export default function CommercialAccess() {
               Token manquant
             </CardTitle>
             <CardDescription>
-              Le lien d'accès semble invalide.
+              Le lien d'accès semble invalide. Params: {JSON.stringify(params)}
             </CardDescription>
           </CardHeader>
         </Card>
@@ -60,7 +62,7 @@ export default function CommercialAccess() {
               <Loader2 className="w-12 h-12 text-blue-600 animate-spin" />
               <div className="text-center">
                 <p className="text-lg font-medium text-gray-900">Vérification du lien d'accès...</p>
-                <p className="text-sm text-gray-600 mt-1">Veuillez patienter</p>
+                <p className="text-sm text-gray-600 mt-1">Token: {token}</p>
               </div>
             </div>
           </CardContent>
@@ -105,7 +107,7 @@ export default function CommercialAccess() {
                   Bienvenue, {linkQuery.data.name}
                 </p>
                 <p className="text-xs text-gray-500 mt-2">
-                  Redirection vers le tableau de bord...
+                  Redirection vers la page d'accueil...
                 </p>
               </div>
             </div>
