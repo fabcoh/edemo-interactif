@@ -51,55 +51,55 @@ export function ChatNotification({ sessionId }: ChatNotificationProps) {
 
   return (
     <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[100] animate-in fade-in slide-in-from-top-4 duration-300">
-      <div className="bg-green-600 rounded-2xl shadow-2xl p-6 max-w-md mx-4 border-2 border-green-500">
+      <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-md mx-4 border border-green-500 border-opacity-30">
         <div className="flex items-start gap-3">
-          <div className="flex-shrink-0 w-10 h-10 bg-white rounded-full flex items-center justify-center">
+          <div className="flex-shrink-0 w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
             <span className="text-2xl">💬</span>
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-white font-semibold text-sm mb-1">
+            <div className="text-gray-900 font-bold text-lg mb-2">
               Nouveau message du présentateur
             </div>
-            <div className="bg-white bg-opacity-20 rounded-lg p-3">
+            <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
               {notification.messageType === "text" && (
-                <p className="text-white text-sm break-words">
+                <p className="text-gray-900 text-base break-words font-medium">
                   {notification.content}
                 </p>
               )}
               {notification.messageType === "video_link" && (
-                <div className="space-y-1">
-                  <div className="flex items-center gap-1 text-white text-xs font-semibold">
-                    <LinkIcon className="w-3 h-3" />
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-gray-900 text-sm font-semibold">
+                    <LinkIcon className="w-4 h-4" />
                     <span>Lien vidéo</span>
                   </div>
                   <a
                     href={notification.content || "#"}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-100 text-xs underline break-all"
+                    className="text-blue-600 text-sm underline break-all hover:text-blue-800"
                   >
                     {notification.content}
                   </a>
                 </div>
               )}
               {notification.messageType === "document" && (
-                <div className="space-y-1">
-                  <div className="flex items-center gap-1 text-white text-xs font-semibold">
-                    <Paperclip className="w-3 h-3" />
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-gray-900 text-sm font-semibold">
+                    <Paperclip className="w-4 h-4" />
                     <span>Document partagé</span>
                   </div>
                   <a
                     href={notification.fileUrl || "#"}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-100 text-xs underline break-all"
+                    className="text-blue-600 text-sm underline break-all hover:text-blue-800"
                   >
                     {notification.fileName}
                   </a>
                 </div>
               )}
             </div>
-            <div className="text-white text-xs mt-2 opacity-75">
+            <div className="text-gray-600 text-sm mt-2">
               Ce message restera visible dans le chat ci-dessous
             </div>
           </div>

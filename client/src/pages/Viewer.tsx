@@ -117,7 +117,7 @@ export default function Viewer() {
     return (
       <div className="fixed inset-0 bg-black z-50 flex flex-col">
         {/* Document Display - Fullscreen */}
-        <div className="flex-1 bg-black flex flex-col items-center justify-center overflow-auto relative">
+        <div className="flex-1 bg-black flex flex-col items-start justify-start overflow-auto relative pt-0">
 
           {/* Document Content */}
           <div className="w-full h-full flex items-center justify-center overflow-auto">
@@ -179,9 +179,9 @@ export default function Viewer() {
           {/* Chat Notification Popup */}
           {session && <ChatNotification sessionId={session.id} />}
 
-          {/* Chat in Fullscreen - Fixed at bottom center */}
+          {/* Chat in Fullscreen - Directly below document */}
           {session && (
-            <div className="absolute bottom-0 left-0 right-0 z-50">
+            <div className="w-full z-50 mt-0">
               <ChatViewer sessionId={session.id} />
             </div>
           )}
