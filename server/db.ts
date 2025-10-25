@@ -670,11 +670,10 @@ export async function getViewerCursors(sessionId: number): Promise<ViewerCursor[
 
 
 /**
- * Create a commercial invitation
+ * Create a commercial access link
  */
 export async function createCommercialInvitation(
-  email: string,
-  name: string | null,
+  name: string,
   createdBy: number
 ): Promise<CommercialInvitation> {
   const db = await getDb();
@@ -685,9 +684,9 @@ export async function createCommercialInvitation(
 
   const [invitation] = await db.insert(commercialInvitations).values({
     token,
-    email,
     name,
     createdBy,
+    revoked: false,
   });
 
   const [created] = await db
@@ -724,20 +723,33 @@ export async function getCommercialInvitationByToken(token: string): Promise<Com
 }
 
 /**
- * Mark invitation as used
+ * Update last used timestamp for commercial link
  */
-export async function markInvitationAsUsed(token: string, userId: number): Promise<void> {
+export async function updateCommercialLinkLastUsed(token: string): Promise<void> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
   await db
     .update(commercialInvitations)
-    .set({ used: true, userId, usedAt: new Date() })
+    .set({ lastUsedAt: new Date() })
     .where(eq(commercialInvitations.token, token));
 }
 
 /**
- * Delete a commercial invitation (revoke access)
+ * Revoke a commercial access link
+ */
+export async function revokeCommercialLink(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(commercialInvitations)
+    .set({ revoked: true })
+    .where(eq(commercialInvitations.id, id));
+}
+
+/**
+ * Delete a commercial invitation
  */
 export async function deleteCommercialInvitation(id: number): Promise<void> {
   const db = await getDb();

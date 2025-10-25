@@ -11,6 +11,7 @@ import PresenterControl from "./pages/PresenterControl";
 import Viewer from "./pages/Viewer";
 import AdminInvitations from "./pages/AdminInvitations";
 import InvitationAccept from "./pages/InvitationAccept";
+import CommercialAccess from "./pages/CommercialAccess";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -24,6 +25,7 @@ function Router() {
       <Route path={"/view/:code"} component={Viewer} />
       <Route path={"/admin/invitations"} component={AdminInvitations} />
       <Route path={"/invite/:token"} component={InvitationAccept} />
+      <Route path={"/commercial/:token"} component={CommercialAccess} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

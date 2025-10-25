@@ -6,40 +6,36 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Copy, Plus, Mail, Calendar, User, Link as LinkIcon } from "lucide-react";
+import { Trash2, Copy, Plus, Calendar, User, Link as LinkIcon } from "lucide-react";
 import { toast } from "sonner";
 
 export default function AdminInvitations() {
   const { user, loading: authLoading } = useAuth();
-  const [email, setEmail] = useState("");
   const [name, setName] = useState("");
-  const [isCreating, setIsCreating] = useState(false);
 
   // Queries
-  const invitationsQuery = trpc.admin.getCommercialInvitations.useQuery();
+  const linksQuery = trpc.admin.getCommercialInvitations.useQuery();
   
   // Mutations
-  const createInvitationMutation = trpc.admin.createCommercialInvitation.useMutation({
+  const createLinkMutation = trpc.admin.createCommercialInvitation.useMutation({
     onSuccess: (data) => {
-      toast.success("Invitation créée avec succès!");
-      setEmail("");
+      toast.success("Lien d'accès créé avec succès!");
       setName("");
-      setIsCreating(false);
-      invitationsQuery.refetch();
+      linksQuery.refetch();
       
-      // Copy invitation link to clipboard
-      navigator.clipboard.writeText(data.inviteLink);
-      toast.info("Lien d'invitation copié dans le presse-papiers");
+      // Copy access link to clipboard
+      navigator.clipboard.writeText(data.accessLink);
+      toast.info("Lien d'accès copié dans le presse-papiers");
     },
     onError: (error) => {
       toast.error(`Erreur: ${error.message}`);
     },
   });
 
-  const deleteInvitationMutation = trpc.admin.deleteCommercialInvitation.useMutation({
+  const deleteLinkMutation = trpc.admin.deleteCommercialInvitation.useMutation({
     onSuccess: () => {
-      toast.success("Invitation supprimée");
-      invitationsQuery.refetch();
+      toast.success("Lien d'accès supprimé");
+      linksQuery.refetch();
     },
     onError: (error) => {
       toast.error(`Erreur: ${error.message}`);
@@ -82,29 +78,28 @@ export default function AdminInvitations() {
     );
   }
 
-  const handleCreateInvitation = async (e: React.FormEvent) => {
+  const handleCreateLink = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim()) {
-      toast.error("L'email est requis");
+    if (!name.trim()) {
+      toast.error("Le nom est requis");
       return;
     }
 
-    createInvitationMutation.mutate({
-      email: email.trim(),
-      name: name.trim() || undefined,
+    createLinkMutation.mutate({
+      name: name.trim(),
     });
   };
 
-  const handleDeleteInvitation = (id: number) => {
-    if (confirm("Êtes-vous sûr de vouloir supprimer cette invitation ?")) {
-      deleteInvitationMutation.mutate({ id });
+  const handleDeleteLink = (id: number) => {
+    if (confirm("Êtes-vous sûr de vouloir supprimer ce lien d'accès ?")) {
+      deleteLinkMutation.mutate({ id });
     }
   };
 
-  const copyInviteLink = (token: string) => {
-    const inviteLink = `${window.location.origin}/invite/${token}`;
-    navigator.clipboard.writeText(inviteLink);
-    toast.success("Lien d'invitation copié!");
+  const copyAccessLink = (token: string) => {
+    const accessLink = `${window.location.origin}/commercial/${token}`;
+    navigator.clipboard.writeText(accessLink);
+    toast.success("Lien d'accès copié!");
   };
 
   const formatDate = (date: Date) => {
@@ -125,10 +120,10 @@ export default function AdminInvitations() {
           <div className="flex justify-between items-center py-4">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">
-                Administration - Invitations Commerciales
+                Administration - Liens d'Accès Commerciaux
               </h1>
               <p className="text-gray-600">
-                Gérez les invitations pour les comptes commerciaux
+                Gérez les liens d'accès pour les commerciaux
               </p>
             </div>
             <Button
@@ -150,35 +145,23 @@ export default function AdminInvitations() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Plus className="w-5 h-5" />
-                  Créer une Invitation
+                  Créer un Lien d'Accès
                 </CardTitle>
                 <CardDescription>
-                  Invitez un nouveau commercial à rejoindre la plateforme
+                  Générez un lien d'accès pour un commercial
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleCreateInvitation} className="space-y-4">
+                <form onSubmit={handleCreateLink} className="space-y-4">
                   <div>
-                    <Label htmlFor="email">Email du commercial *</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="commercial@exemple.com"
-                      required
-                      className="mt-1"
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="name">Nom (optionnel)</Label>
+                    <Label htmlFor="name">Nom du commercial *</Label>
                     <Input
                       id="name"
                       type="text"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="Jean Dupont"
+                      required
                       className="mt-1"
                     />
                   </div>
@@ -186,9 +169,9 @@ export default function AdminInvitations() {
                   <Button
                     type="submit"
                     className="w-full"
-                    disabled={createInvitationMutation.isPending}
+                    disabled={createLinkMutation.isPending}
                   >
-                    {createInvitationMutation.isPending ? (
+                    {createLinkMutation.isPending ? (
                       <>
                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                         Création...
@@ -196,7 +179,7 @@ export default function AdminInvitations() {
                     ) : (
                       <>
                         <Plus className="w-4 h-4 mr-2" />
-                        Créer l'Invitation
+                        Créer le Lien
                       </>
                     )}
                   </Button>
@@ -207,65 +190,65 @@ export default function AdminInvitations() {
                     Comment ça fonctionne :
                   </h4>
                   <ul className="text-sm text-blue-800 space-y-1">
-                    <li>• Un lien unique sera généré</li>
-                    <li>• Le commercial devra confirmer son email</li>
-                    <li>• Son compte sera créé automatiquement</li>
-                    <li>• Il pourra créer des présentations</li>
+                    <li>• Un lien d'accès unique sera généré</li>
+                    <li>• Le commercial accède directement via ce lien</li>
+                    <li>• Il peut créer ses propres sessions</li>
+                    <li>• Vous pouvez révoquer l'accès à tout moment</li>
                   </ul>
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Liste des invitations */}
+          {/* Liste des liens */}
           <div className="lg:col-span-2">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Mail className="w-5 h-5" />
-                  Invitations Existantes
-                  {invitationsQuery.data && (
+                  <LinkIcon className="w-5 h-5" />
+                  Liens d'Accès Existants
+                  {linksQuery.data && (
                     <Badge variant="secondary">
-                      {invitationsQuery.data.length}
+                      {linksQuery.data.length}
                     </Badge>
                   )}
                 </CardTitle>
                 <CardDescription>
-                  Liste de toutes les invitations créées
+                  Liste de tous les liens d'accès commerciaux
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {invitationsQuery.isLoading ? (
+                {linksQuery.isLoading ? (
                   <div className="flex items-center justify-center py-8">
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-                    <span className="ml-2 text-gray-600">Chargement des invitations...</span>
+                    <span className="ml-2 text-gray-600">Chargement des liens...</span>
                   </div>
-                ) : invitationsQuery.error ? (
+                ) : linksQuery.error ? (
                   <div className="text-center py-8">
                     <p className="text-red-600">
-                      Erreur lors du chargement : {invitationsQuery.error.message}
+                      Erreur lors du chargement : {linksQuery.error.message}
                     </p>
                     <Button
-                      onClick={() => invitationsQuery.refetch()}
+                      onClick={() => linksQuery.refetch()}
                       variant="outline"
                       className="mt-2"
                     >
                       Réessayer
                     </Button>
                   </div>
-                ) : !invitationsQuery.data || invitationsQuery.data.length === 0 ? (
+                ) : !linksQuery.data || linksQuery.data.length === 0 ? (
                   <div className="text-center py-8">
-                    <Mail className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600">Aucune invitation créée</p>
+                    <LinkIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-600">Aucun lien d'accès créé</p>
                     <p className="text-sm text-gray-500">
-                      Créez votre première invitation pour inviter un commercial
+                      Créez votre premier lien pour donner accès à un commercial
                     </p>
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {invitationsQuery.data.map((invitation) => (
+                    {linksQuery.data.map((link) => (
                       <div
-                        key={invitation.id}
+                        key={link.id}
                         className="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
                       >
                         <div className="flex items-start justify-between">
@@ -274,40 +257,36 @@ export default function AdminInvitations() {
                               <div className="flex items-center gap-2">
                                 <User className="w-4 h-4 text-gray-500" />
                                 <span className="font-medium">
-                                  {invitation.name || invitation.email}
+                                  {link.name}
                                 </span>
                               </div>
                               <Badge 
-                                variant={invitation.used ? "secondary" : "default"}
+                                variant={link.revoked ? "secondary" : "default"}
                               >
-                                {invitation.used ? "Utilisée" : "En attente"}
+                                {link.revoked ? "Révoqué" : "Actif"}
                               </Badge>
                             </div>
                             
                             <div className="text-sm text-gray-600 space-y-1">
                               <div className="flex items-center gap-2">
-                                <Mail className="w-3 h-3" />
-                                <span>{invitation.email}</span>
-                              </div>
-                              <div className="flex items-center gap-2">
                                 <Calendar className="w-3 h-3" />
-                                <span>Créée le {formatDate(invitation.createdAt)}</span>
+                                <span>Créé le {formatDate(link.createdAt)}</span>
                               </div>
-                              {invitation.usedAt && (
+                              {link.lastUsedAt && (
                                 <div className="flex items-center gap-2">
                                   <Calendar className="w-3 h-3" />
-                                  <span>Utilisée le {formatDate(invitation.usedAt)}</span>
+                                  <span>Dernière utilisation : {formatDate(link.lastUsedAt)}</span>
                                 </div>
                               )}
                             </div>
                           </div>
 
                           <div className="flex items-center gap-2 ml-4">
-                            {!invitation.used && (
+                            {!link.revoked && (
                               <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={() => copyInviteLink(invitation.token)}
+                                onClick={() => copyAccessLink(link.token)}
                               >
                                 <Copy className="w-4 h-4" />
                               </Button>
@@ -316,8 +295,8 @@ export default function AdminInvitations() {
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() => handleDeleteInvitation(invitation.id)}
-                              disabled={deleteInvitationMutation.isPending}
+                              onClick={() => handleDeleteLink(link.id)}
+                              disabled={deleteLinkMutation.isPending}
                               className="text-red-600 hover:text-red-700 hover:bg-red-50"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -325,9 +304,9 @@ export default function AdminInvitations() {
                           </div>
                         </div>
 
-                        {!invitation.used && (
+                        {!link.revoked && (
                           <div className="mt-3 p-2 bg-gray-100 rounded text-xs font-mono break-all">
-                            {window.location.origin}/invite/{invitation.token}
+                            {window.location.origin}/commercial/{link.token}
                           </div>
                         )}
                       </div>
@@ -342,3 +321,4 @@ export default function AdminInvitations() {
     </div>
   );
 }
+

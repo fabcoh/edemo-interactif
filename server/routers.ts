@@ -29,7 +29,8 @@ import {
   createCommercialInvitation,
   getAllCommercialInvitations,
   getCommercialInvitationByToken,
-  markInvitationAsUsed,
+  updateCommercialLinkLastUsed,
+  revokeCommercialLink,
   deleteCommercialInvitation,
 } from "./db";
 import { storagePut, storageGet } from "./storage";
@@ -661,30 +662,27 @@ export const appRouter = router({
      */
     createCommercialInvitation: protectedProcedure
       .input(z.object({
-        email: z.string().email(),
-        name: z.string().optional(),
+        name: z.string().min(1),
       }))
       .mutation(async ({ ctx, input }) => {
         // Check if user is admin
         if (ctx.user.role !== "admin") {
           throw new TRPCError({
             code: "FORBIDDEN",
-            message: "Only admins can create commercial invitations",
+            message: "Only admins can create commercial links",
           });
         }
 
-        const invitation = await createCommercialInvitation(
-          input.email,
-          input.name || null,
+        const link = await createCommercialInvitation(
+          input.name,
           ctx.user.id
         );
 
         return {
-          id: invitation.id,
-          token: invitation.token,
-          email: invitation.email,
-          name: invitation.name,
-          inviteLink: `${process.env.VITE_APP_URL || "https://3000-ih44u8onzba9v1o4wiete-6d7b15e5.manusvm.computer"}/invite/${invitation.token}`,
+          id: link.id,
+          token: link.token,
+          name: link.name,
+          accessLink: `${process.env.VITE_APP_URL || "https://3000-ih44u8onzba9v1o4wiete-6d7b15e5.manusvm.computer"}/commercial/${link.token}`,
         };
       }),
 
@@ -729,90 +727,36 @@ export const appRouter = router({
 
   invitation: router({
     /**
-     * Get invitation details by token (public)
+     * Verify commercial access link (public)
      */
-    getInvitationByToken: publicProcedure
+    verifyCommercialLink: publicProcedure
       .input(z.object({
         token: z.string(),
       }))
       .query(async ({ input }) => {
-        const invitation = await getCommercialInvitationByToken(input.token);
+        const link = await getCommercialInvitationByToken(input.token);
         
-        if (!invitation) {
+        if (!link) {
           throw new TRPCError({
             code: "NOT_FOUND",
-            message: "Invitation not found",
+            message: "Lien d'accès non trouvé",
           });
         }
 
-        if (invitation.used) {
+        if (link.revoked) {
           throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "This invitation has already been used",
+            code: "FORBIDDEN",
+            message: "Ce lien d'accès a été révoqué",
           });
         }
+
+        // Update last used timestamp
+        await updateCommercialLinkLastUsed(input.token);
 
         return {
-          email: invitation.email,
-          name: invitation.name,
-        };
-      }),
-
-    /**
-     * Accept invitation and create commercial account (public)
-     */
-    acceptInvitation: publicProcedure
-      .input(z.object({
-        token: z.string(),
-        email: z.string().email(),
-      }))
-      .mutation(async ({ input }) => {
-        const invitation = await getCommercialInvitationByToken(input.token);
-        
-        if (!invitation) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "Invitation not found",
-          });
-        }
-
-        if (invitation.used) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "This invitation has already been used",
-          });
-        }
-
-        // Verify email matches
-        if (invitation.email.toLowerCase() !== input.email.toLowerCase()) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "Email does not match the invitation",
-          });
-        }
-
-        // Create user account with commercial role
-        // Note: This is a simplified version. In production, you'd integrate with OAuth
-        const openId = `commercial-${Date.now()}-${Math.random().toString(36).substring(7)}`;
-        
-        const db = await import("./db").then(m => m.getDb());
-        if (!db) throw new Error("Database not available");
-
-        const { users } = await import("../drizzle/schema");
-        const [user] = await db.insert(users).values({
-          openId,
-          email: input.email,
-          name: invitation.name || input.email,
-          role: "commercial",
-          loginMethod: "invitation",
-        });
-
-        // Mark invitation as used
-        await markInvitationAsUsed(input.token, Number(user.insertId));
-
-        return {
-          success: true,
-          userId: Number(user.insertId),
+          name: link.name,
+          createdBy: link.createdBy,
+          valid: true,
         };
       }),
   }),
