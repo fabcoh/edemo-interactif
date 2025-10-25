@@ -23,9 +23,10 @@ export default function CommercialAccess() {
   // Redirect to dashboard after successful verification
   useEffect(() => {
     if (linkQuery.data?.valid) {
-      // Store commercial token in sessionStorage for later use
+      // Store commercial info in sessionStorage
       sessionStorage.setItem("commercialToken", token);
       sessionStorage.setItem("commercialName", linkQuery.data.name);
+      sessionStorage.setItem("commercialOwnerId", linkQuery.data.createdBy.toString());
       
       // Redirect to dashboard after 2 seconds
       setTimeout(() => {

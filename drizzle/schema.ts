@@ -190,6 +190,14 @@ export const commercialInvitations = mysqlTable("commercial_invitations", {
   token: varchar("token", { length: 64 }).notNull().unique(),
   /** Name of the commercial (for identification) */
   name: text("name").notNull(),
+  /** First name of the commercial (displayed during presentations) */
+  firstName: text("firstName"),
+  /** Photo URL of the commercial (displayed during presentations) */
+  photoUrl: text("photoUrl"),
+  /** Phone number of the commercial */
+  phone: text("phone"),
+  /** Email of the commercial */
+  email: text("email"),
   /** Whether the link has been revoked */
   revoked: boolean("revoked").default(false).notNull(),
   /** Admin who created the link */

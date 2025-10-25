@@ -87,20 +87,26 @@ export const appRouter = router({
       }),
 
     /**
-     * Get all sessions for the current presenter
+     * Get all sessions for the current presenter or specified user
      */
-    getSessions: protectedProcedure.query(async ({ ctx }) => {
-      const sessions = await getPresentationSessionsByPresenter(ctx.user.id);
-      return sessions.map(s => ({
-        id: s.id,
-        title: s.title,
-        sessionCode: s.sessionCode,
-        isActive: s.isActive,
-        currentDocumentId: s.currentDocumentId,
-        currentOrientation: s.currentOrientation,
-        createdAt: s.createdAt,
-      }));
-    }),
+    getSessions: protectedProcedure
+      .input(z.object({
+        userId: z.number().optional(),
+      }).optional())
+      .query(async ({ ctx, input }) => {
+        // Use specified userId or current user's ID
+        const targetUserId = input?.userId || ctx.user.id;
+        const sessions = await getPresentationSessionsByPresenter(targetUserId);
+        return sessions.map(s => ({
+          id: s.id,
+          title: s.title,
+          sessionCode: s.sessionCode,
+          isActive: s.isActive,
+          currentDocumentId: s.currentDocumentId,
+          currentOrientation: s.currentOrientation,
+          createdAt: s.createdAt,
+        }));
+      }),
 
     /**
      * Get a specific session by code (for viewers)
@@ -663,6 +669,10 @@ export const appRouter = router({
     createCommercialInvitation: protectedProcedure
       .input(z.object({
         name: z.string().min(1),
+        firstName: z.string().optional(),
+        photoUrl: z.string().url().optional().or(z.literal("")),
+        phone: z.string().optional(),
+        email: z.string().email().optional().or(z.literal("")),
       }))
       .mutation(async ({ ctx, input }) => {
         // Check if user is admin
@@ -675,7 +685,11 @@ export const appRouter = router({
 
         const link = await createCommercialInvitation(
           input.name,
-          ctx.user.id
+          ctx.user.id,
+          input.firstName,
+          input.photoUrl,
+          input.phone,
+          input.email
         );
 
         return {

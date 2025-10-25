@@ -47,9 +47,16 @@ const trpcClient = trpc.createClient({
       url: "/api/trpc",
       transformer: superjson,
       fetch(input, init) {
+        // Get commercial token from sessionStorage
+        const commercialToken = sessionStorage.getItem("commercialToken");
+        
         return globalThis.fetch(input, {
           ...(init ?? {}),
           credentials: "include",
+          headers: {
+            ...(init?.headers ?? {}),
+            ...(commercialToken ? { "x-commercial-token": commercialToken } : {}),
+          },
         });
       },
     }),

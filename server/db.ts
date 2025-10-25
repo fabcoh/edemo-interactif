@@ -674,7 +674,11 @@ export async function getViewerCursors(sessionId: number): Promise<ViewerCursor[
  */
 export async function createCommercialInvitation(
   name: string,
-  createdBy: number
+  createdBy: number,
+  firstName?: string,
+  photoUrl?: string,
+  phone?: string,
+  email?: string
 ): Promise<CommercialInvitation> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
@@ -685,6 +689,10 @@ export async function createCommercialInvitation(
   const [invitation] = await db.insert(commercialInvitations).values({
     token,
     name,
+    firstName: firstName || null,
+    photoUrl: photoUrl || null,
+    phone: phone || null,
+    email: email || null,
     createdBy,
     revoked: false,
   });
@@ -756,5 +764,17 @@ export async function deleteCommercialInvitation(id: number): Promise<void> {
   if (!db) throw new Error("Database not available");
 
   await db.delete(commercialInvitations).where(eq(commercialInvitations.id, id));
+}
+
+
+/**
+ * Get a user by ID
+ */
+export async function getUserById(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
+  return result[0] || null;
 }
 

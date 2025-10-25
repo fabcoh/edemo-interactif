@@ -12,6 +12,10 @@ import { toast } from "sonner";
 export default function AdminInvitations() {
   const { user, loading: authLoading } = useAuth();
   const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [photoUrl, setPhotoUrl] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
 
   // Queries
   const linksQuery = trpc.admin.getCommercialInvitations.useQuery();
@@ -87,6 +91,10 @@ export default function AdminInvitations() {
 
     createLinkMutation.mutate({
       name: name.trim(),
+      firstName: firstName.trim() || undefined,
+      photoUrl: photoUrl.trim() || undefined,
+      phone: phone.trim() || undefined,
+      email: email.trim() || undefined,
     });
   };
 
@@ -162,6 +170,54 @@ export default function AdminInvitations() {
                       onChange={(e) => setName(e.target.value)}
                       placeholder="Jean Dupont"
                       required
+                      className="mt-1"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="firstName">Prénom (affiché pendant les présentations)</Label>
+                    <Input
+                      id="firstName"
+                      type="text"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      placeholder="Jean"
+                      className="mt-1"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="photoUrl">URL de la photo (optionnel)</Label>
+                    <Input
+                      id="photoUrl"
+                      type="url"
+                      value={photoUrl}
+                      onChange={(e) => setPhotoUrl(e.target.value)}
+                      placeholder="https://example.com/photo.jpg"
+                      className="mt-1"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="phone">Téléphone (optionnel)</Label>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="+33 6 12 34 56 78"
+                      className="mt-1"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="email">Email (optionnel)</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="jean.dupont@example.com"
                       className="mt-1"
                     />
                   </div>
