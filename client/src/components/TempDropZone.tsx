@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Upload, X, ArrowUp } from "lucide-react";
 
 interface TempDropZoneProps {
@@ -8,6 +8,7 @@ interface TempDropZoneProps {
 export function TempDropZone({ onFileSelect }: TempDropZoneProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [tempFile, setTempFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -44,6 +45,18 @@ export function TempDropZone({ onFileSelect }: TempDropZoneProps) {
           : "border-gray-600 bg-gray-800 bg-opacity-50"
       } ${tempFile ? "h-16" : "h-12"}`}
     >
+      <input
+        ref={fileInputRef}
+        type="file"
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) {
+            setTempFile(file);
+            onFileSelect(file);
+          }
+        }}
+      />
       {tempFile ? (
         <div className="flex items-center justify-between h-full">
           <div className="flex items-center gap-2 flex-1 min-w-0">
@@ -59,11 +72,14 @@ export function TempDropZone({ onFileSelect }: TempDropZoneProps) {
           </button>
         </div>
       ) : (
-        <div className="flex items-center justify-between h-full px-2">
+        <div 
+          className="flex items-center justify-between h-full px-2 cursor-pointer"
+          onClick={() => fileInputRef.current?.click()}
+        >
           <p className="text-[10px] text-gray-400 flex-1">
             Glisser un fichier ici
           </p>
-          <ArrowUp className="w-4 h-4 text-gray-500 flex-shrink-0" />
+          <ArrowUp className="w-4 h-4 text-gray-500 flex-shrink-0 hover:text-gray-300 transition-colors" />
         </div>
       )}
     </div>

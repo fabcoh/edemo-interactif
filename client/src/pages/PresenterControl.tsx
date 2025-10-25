@@ -274,7 +274,7 @@ export default function PresenterControl() {
         {/* Zoom Controls & Drop Zone - Combined Row */}
         <div className="flex items-center gap-2">
           {/* Zoom Controls */}
-          {displayedDocument && (
+          {documents.length > 0 && (
             <div className="flex items-center gap-2 bg-gray-800 p-2 rounded-lg border border-gray-700 flex-1">
               <span className="text-[10px] text-gray-400 whitespace-nowrap">Zoom:</span>
             <Button
@@ -384,27 +384,20 @@ export default function PresenterControl() {
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <h2 className="text-xs font-semibold">Documents ({documents.length})</h2>
-            <input
-              id="document-upload"
-              type="file"
-              accept="*/*"
-              onChange={(e) => {
-                if (e.target.files?.[0]) {
-                  handleUploadDocument(e.target.files[0]);
-                }
-              }}
-              className="hidden"
-            />
-            <Button
-              onClick={() => document.getElementById('document-upload')?.click()}
-              size="default"
-              className="bg-blue-600 hover:bg-blue-700 h-10 text-sm font-semibold px-4 touch-manipulation"
-            >
-              <Upload className="w-4 h-4 mr-2" />
-              Ajouter Document
-            </Button>
           </div>
-
+          
+          {/* Hidden input for document upload - now handled by TempDropZone */}
+          <input
+            id="document-upload"
+            type="file"
+            accept="application/pdf,image/*,video/*"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleUploadDocument(file);
+            }}
+            className="hidden"
+          />
+          
           {/* Thumbnails Container */}
           <div className="flex gap-2 overflow-x-auto pb-2">
             {documents.map((doc, idx) => (
