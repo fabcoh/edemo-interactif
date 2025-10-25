@@ -136,6 +136,10 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
             placeholder="Message ou lien vidéo..."
             className="flex-1 h-8 text-xs bg-gray-700 border-gray-600 text-white placeholder:text-gray-400"
             disabled={isUploading}
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="off"
+            spellCheck="false"
           />
           <Button
             onClick={handleSendTextMessage}

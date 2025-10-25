@@ -31,19 +31,18 @@ export function FileAttachmentViewer({ sessionId }: FileAttachmentViewerProps) {
   useEffect(() => {
     if (messages.length === 0) return;
 
-    const latestMessage = messages[messages.length - 1];
+    // Find the latest document message
+    const latestDocumentMessage = [...messages]
+      .reverse()
+      .find((msg) => msg.messageType === "document");
+
+    if (!latestDocumentMessage) return;
 
     // If this is a new document message (different from last seen)
-    if (
-      lastMessageId !== null &&
-      latestMessage.id !== lastMessageId &&
-      latestMessage.messageType === "document"
-    ) {
-      setAttachedFile(latestMessage);
+    if (lastMessageId === null || latestDocumentMessage.id !== lastMessageId) {
+      setAttachedFile(latestDocumentMessage);
+      setLastMessageId(latestDocumentMessage.id);
     }
-
-    // Update last message ID
-    setLastMessageId(latestMessage.id);
   }, [messages, lastMessageId]);
 
   if (!attachedFile) return null;

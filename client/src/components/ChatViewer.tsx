@@ -27,6 +27,10 @@ export function ChatViewer({ sessionId }: ChatViewerProps) {
           type="text"
           placeholder="Écrire un message..."
           className="flex-1 bg-gray-700 border-gray-600 text-white text-sm h-8"
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck="false"
         />
         <Button size="sm" className="bg-green-600 hover:bg-green-700 h-8 px-3">
           <Send className="w-3.5 h-3.5" />
