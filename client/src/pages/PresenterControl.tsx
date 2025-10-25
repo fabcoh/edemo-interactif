@@ -85,6 +85,12 @@ export default function PresenterControl() {
 
   const updateZoomAndCursorMutation = trpc.presentation.updateZoomAndCursor.useMutation();
 
+  const toggleViewerUploadsMutation = trpc.viewerUploads.toggleViewerUploads.useMutation({
+    onSuccess: () => {
+      sessionsQuery.refetch();
+    },
+  });
+
   const handleUploadDocument = async (file: File) => {
     if (!file) return;
 
@@ -743,6 +749,25 @@ export default function PresenterControl() {
                     WhatsApp
                   </Button>
                 </a>
+
+                <Button
+                  onClick={() => {
+                    const newValue = !((currentSession as any).allowViewerUploads || false);
+                    toggleViewerUploadsMutation.mutate(
+                      { sessionId: sessionIdNum, allow: newValue }
+                    );
+                  }}
+                  variant="outline"
+                  className={`w-full gap-1 h-8 text-xs ${
+                    (currentSession as any).allowViewerUploads
+                      ? "bg-blue-600 border-blue-500 hover:bg-blue-700 text-white"
+                      : "bg-gray-700 border-gray-600 hover:bg-gray-600 text-white"
+                  }`}
+                  size="sm"
+                >
+                  <Upload className="w-3 h-3" />
+                  {(currentSession as any).allowViewerUploads ? "Dépôt activé" : "Activer dépôt"}
+                </Button>
               </CardContent>
             </Card>
 

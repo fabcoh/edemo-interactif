@@ -85,6 +85,13 @@
       "when": 1761337914340,
       "tag": "0011_conscious_retro_girl",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "5",
+      "when": 1761369376194,
+      "tag": "0012_first_fabian_cortez",
+      "breakpoints": true
     }
   ]
 }

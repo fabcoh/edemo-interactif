@@ -994,6 +994,62 @@ export const appRouter = router({
         return { success: true };
       }),
   }),
+
+  /**
+   * Viewer uploads management
+   */
+  viewerUploads: router({
+    /**
+     * Toggle viewer uploads for a session (presenter only)
+     */
+    toggleViewerUploads: protectedProcedure
+      .input(z.object({
+        sessionId: z.number(),
+        allow: z.boolean(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await import("./db").then(m => m.getDb());
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+
+        // Verify user owns this session
+        const sessions = await getPresentationSessionsByPresenter(ctx.user.id);
+        const session = sessions.find(s => s.id === input.sessionId);
+
+        if (!session) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You don't have permission to modify this session",
+          });
+        }
+
+        const { presentationSessions } = await import("../drizzle/schema");
+        const { eq } = await import("drizzle-orm");
+
+        // Update the session
+        await db
+          .update(presentationSessions)
+          .set({ allowViewerUploads: input.allow })
+          .where(eq(presentationSessions.id, input.sessionId));
+
+        return { success: true, allow: input.allow };
+      }),
+
+    /**
+     * Get viewer uploads status for a session
+     */
+    getViewerUploadsStatus: publicProcedure
+      .input(z.object({
+        sessionCode: z.string(),
+      }))
+      .query(async ({ input }) => {
+        const session = await getPresentationSessionByCode(input.sessionCode);
+        if (!session) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Session not found" });
+        }
+
+        return { allow: session.allowViewerUploads || false };
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

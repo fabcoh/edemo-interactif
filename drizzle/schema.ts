@@ -43,6 +43,8 @@ export const presentationSessions = mysqlTable("presentation_sessions", {
   currentDocumentId: int("currentDocumentId"),
   /** Current orientation of the displayed document (portrait or landscape) */
   currentOrientation: mysqlEnum("currentOrientation", ["portrait", "landscape"]).default("portrait").notNull(),
+  /** Allow viewers to upload documents */
+  allowViewerUploads: boolean("allowViewerUploads").default(false).notNull(),
   /** Timestamps */
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

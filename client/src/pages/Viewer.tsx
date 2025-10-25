@@ -117,10 +117,10 @@ export default function Viewer() {
     return (
       <div className="fixed inset-0 bg-black z-50 flex flex-col">
         {/* Document Display - Fullscreen */}
-        <div className="flex-1 bg-black flex flex-col items-start justify-start overflow-auto relative pt-0">
+        <div className="flex-1 bg-black flex flex-col overflow-auto relative">
 
           {/* Document Content */}
-          <div className="w-full h-full flex items-center justify-center overflow-auto">
+          <div className="w-full flex-none flex items-center justify-center">
             {documentError && (
               <div className="text-center text-red-400 p-4">
                 <p className="text-sm">Erreur lors du chargement du document</p>
@@ -179,9 +179,9 @@ export default function Viewer() {
           {/* Chat Notification Popup */}
           {session && <ChatNotification sessionId={session.id} />}
 
-          {/* Chat in Fullscreen - Directly below document */}
+          {/* Chat in Fullscreen - Directly below document, no gap */}
           {session && (
-            <div className="w-full z-50 mt-0">
+            <div className="w-full flex-none mt-0">
               <ChatViewer sessionId={session.id} />
             </div>
           )}
