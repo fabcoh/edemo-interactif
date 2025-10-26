@@ -8,7 +8,7 @@ import { ArrowLeft, Users, Copy, Share2, Upload, X, ZoomIn, ZoomOut, Check } fro
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { ChatPanel } from "@/components/ChatPanel";
+import ChatPanel from "@/components/ChatPanel";
 import { TempDropZone } from "@/components/TempDropZone";
 
 /**
@@ -721,7 +721,11 @@ export default function PresenterControl() {
           {/* Right Panel - Controls & Info */}
           <div className="lg:col-span-1 flex flex-col gap-2 overflow-y-auto">
             {/* Chat Panel */}
-            <ChatPanel sessionId={sessionIdNum} />
+            <ChatPanel 
+              sessionId={sessionIdNum} 
+              senderType="presenter"
+              senderName="Présentateur"
+            />
 
             {/* Share Panel */}
             <Card className="bg-gray-800 border-gray-700">

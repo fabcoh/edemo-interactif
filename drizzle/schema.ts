@@ -215,24 +215,22 @@ export type InsertCommercialInvitation = typeof commercialInvitations.$inferInse
 
 /**
  * Chat Messages table
- * Stores chat messages for each presentation session
+ * Stores chat messages between presenters and viewers
  */
 export const chatMessages = mysqlTable("chat_messages", {
   id: int("id").autoincrement().primaryKey(),
   /** The session this message belongs to */
   sessionId: int("sessionId").notNull(),
-  /** User ID of the sender (presenter) */
-  senderId: int("senderId").notNull(),
-  /** Message type: text, document, or video_link */
-  messageType: mysqlEnum("messageType", ["text", "document", "video_link"]).default("text").notNull(),
-  /** Text content of the message */
-  content: text("content"),
-  /** File URL for document messages */
-  fileUrl: text("fileUrl"),
-  /** File name for document messages */
-  fileName: varchar("fileName", { length: 255 }),
-  /** MIME type for document messages */
-  mimeType: varchar("mimeType", { length: 100 }),
+  /** Type of sender: presenter or viewer */
+  senderType: mysqlEnum("senderType", ["presenter", "viewer"]).notNull(),
+  /** Name of the sender */
+  senderName: varchar("senderName", { length: 255 }).notNull(),
+  /** The message content */
+  message: text("message").notNull(),
+  /** Optional video URL */
+  videoUrl: text("videoUrl"),
+  /** Type of file: text, image, video, pdf, link */
+  fileType: varchar("fileType", { length: 50 }),
   /** Timestamps */
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });

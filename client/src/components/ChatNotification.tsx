@@ -8,10 +8,11 @@ interface ChatNotificationProps {
 
 interface Message {
   id: number;
-  messageType: string;
-  content: string | null;
-  fileName: string | null;
-  fileUrl: string | null;
+  senderType: string;
+  senderName: string;
+  message: string;
+  videoUrl: string | null;
+  fileType: string | null;
   createdAt: Date;
 }
 
@@ -52,30 +53,19 @@ export function ChatNotification({ sessionId }: ChatNotificationProps) {
   return (
     <div className="fixed top-[20%] left-1/2 transform -translate-x-1/2 z-[100] animate-in fade-in slide-in-from-top-4 duration-300">
       <div className="bg-white rounded-xl shadow-2xl p-4 max-w-md mx-4 border border-gray-200">
-        {notification.messageType === "text" && (
+        {notification.videoUrl ? (
+          <a
+            href={notification.videoUrl || "#"}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 text-base underline break-all hover:text-blue-800"
+          >
+            {notification.videoUrl}
+          </a>
+        ) : (
           <p className="text-gray-900 text-base break-words">
-            {notification.content}
+            <span className="font-semibold">{notification.senderName}:</span> {notification.message}
           </p>
-        )}
-        {notification.messageType === "video_link" && (
-          <a
-            href={notification.content || "#"}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-600 text-base underline break-all hover:text-blue-800"
-          >
-            {notification.content}
-          </a>
-        )}
-        {notification.messageType === "document" && (
-          <a
-            href={notification.fileUrl || "#"}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-600 text-base underline break-all hover:text-blue-800"
-          >
-            {notification.fileName}
-          </a>
         )}
       </div>
     </div>

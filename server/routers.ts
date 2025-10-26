@@ -28,6 +28,9 @@ import {
   getViewerCursors,
   createCommercialInvitation,
   getAllCommercialInvitations,
+  sendChatMessage,
+  getChatMessages,
+  deleteAllChatMessages,
   getCommercialInvitationByToken,
   updateCommercialLinkLastUsed,
   revokeCommercialLink,
@@ -831,153 +834,62 @@ export const appRouter = router({
 
   chat: router({
     /**
-     * Send a chat message (text, document, or video link)
-     */
-    sendMessage: protectedProcedure
-      .input(z.object({
-        sessionId: z.number(),
-        messageType: z.enum(["text", "document", "video_link"]),
-        content: z.string().optional(),
-        fileData: z.string().optional(),
-        fileName: z.string().optional(),
-        mimeType: z.string().optional(),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        // Verify user owns this session
-        const sessions = await getPresentationSessionsByPresenter(ctx.user.id);
-        const sessionExists = sessions.some(s => s.id === input.sessionId);
-        
-        if (!sessionExists) {
-          throw new TRPCError({
-            code: "FORBIDDEN",
-            message: "You don't have permission to send messages in this session",
-          });
-        }
-
-        let fileUrl: string | null = null;
-
-        // Handle file upload for documents
-        if (input.messageType === "document" && input.fileData) {
-          const fileKey = generateFileKey(`chat-${input.sessionId}`);
-          const uploadResult = await storagePut(
-            fileKey,
-            input.fileData,
-            input.mimeType || "application/octet-stream"
-          );
-          fileUrl = uploadResult.url;
-        }
-
-        // Insert message into database
-        const db = await import("./db").then(m => m.getDb());
-        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
-
-        const { chatMessages } = await import("../drizzle/schema");
-        await db.insert(chatMessages).values({
-          sessionId: input.sessionId,
-          senderId: ctx.user.id,
-          messageType: input.messageType,
-          content: input.content || null,
-          fileUrl: fileUrl,
-          fileName: input.fileName || null,
-          mimeType: input.mimeType || null,
-        });
-
-        return { success: true };
-      }),
-
-    /**
      * Get all messages for a session
      */
     getMessages: publicProcedure
-      .input(z.object({
-        sessionId: z.number(),
-      }))
+      .input(z.object({ sessionId: z.number() }))
       .query(async ({ input }) => {
-        const db = await import("./db").then(m => m.getDb());
-        if (!db) return [];
-
-        const { chatMessages } = await import("../drizzle/schema");
-        const { eq } = await import("drizzle-orm");
-        
-        const messages = await db
-          .select()
-          .from(chatMessages)
-          .where(eq(chatMessages.sessionId, input.sessionId))
-          .orderBy(chatMessages.createdAt);
-
-        return messages;
+        return await getChatMessages(input.sessionId);
       }),
 
     /**
-     * Delete a single message
+     * Send a message
      */
-    deleteMessage: protectedProcedure
+    sendMessage: publicProcedure
       .input(z.object({
-        messageId: z.number(),
+        sessionId: z.number(),
+        senderType: z.enum(["presenter", "viewer"]),
+        senderName: z.string(),
+        message: z.string(),
+        videoUrl: z.string().optional(),
+        fileType: z.string().optional(),
       }))
-      .mutation(async ({ ctx, input }) => {
-        const db = await import("./db").then(m => m.getDb());
-        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
-
-        const { chatMessages } = await import("../drizzle/schema");
-        const { eq, and } = await import("drizzle-orm");
-
-        // Verify the message belongs to a session owned by the user
-        const message = await db
-          .select()
-          .from(chatMessages)
-          .where(eq(chatMessages.id, input.messageId))
-          .limit(1);
-
-        if (message.length === 0) {
-          throw new TRPCError({ code: "NOT_FOUND", message: "Message not found" });
-        }
-
-        const sessions = await getPresentationSessionsByPresenter(ctx.user.id);
-        const sessionExists = sessions.some(s => s.id === message[0].sessionId);
-
-        if (!sessionExists) {
-          throw new TRPCError({
-            code: "FORBIDDEN",
-            message: "You don't have permission to delete this message",
-          });
-        }
-
-        // Delete the message
-        await db.delete(chatMessages).where(eq(chatMessages.id, input.messageId));
-
+      .mutation(async ({ input }) => {
+        await sendChatMessage(input);
         return { success: true };
       }),
 
     /**
      * Delete all messages for a session
      */
-    deleteAllMessages: protectedProcedure
+    deleteAllMessages: publicProcedure
+      .input(z.object({ sessionId: z.number() }))
+      .mutation(async ({ input }) => {
+        await deleteAllChatMessages(input.sessionId);
+        return { success: true };
+      }),
+
+    /**
+     * Upload a file for chat
+     */
+    uploadFile: publicProcedure
       .input(z.object({
         sessionId: z.number(),
+        fileName: z.string(),
+        fileData: z.string(), // base64
+        mimeType: z.string(),
       }))
-      .mutation(async ({ ctx, input }) => {
-        const db = await import("./db").then(m => m.getDb());
-        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
-
-        // Verify user owns this session
-        const sessions = await getPresentationSessionsByPresenter(ctx.user.id);
-        const sessionExists = sessions.some(s => s.id === input.sessionId);
-
-        if (!sessionExists) {
-          throw new TRPCError({
-            code: "FORBIDDEN",
-            message: "You don't have permission to delete messages in this session",
-          });
-        }
-
-        const { chatMessages } = await import("../drizzle/schema");
-        const { eq } = await import("drizzle-orm");
-
-        // Delete all messages for this session
-        await db.delete(chatMessages).where(eq(chatMessages.sessionId, input.sessionId));
-
-        return { success: true };
+      .mutation(async ({ input }) => {
+        // Convert base64 to buffer
+        const buffer = Buffer.from(input.fileData, 'base64');
+        
+        // Generate unique file key
+        const fileKey = generateFileKey(`chat/${input.sessionId}/${input.fileName}`);
+        
+        // Upload to S3
+        const { url } = await storagePut(fileKey, buffer, input.mimeType);
+        
+        return { url, key: fileKey };
       }),
   }),
 

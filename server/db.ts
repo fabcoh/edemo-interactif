@@ -1,6 +1,6 @@
 import { eq, and } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, presentationSessions, documents, presentationViewers, presentationCollaborators, presenterCursors, viewerCursors, commercialInvitations, PresentationSession, Document, PresenterCursor, ViewerCursor, CommercialInvitation, InsertCommercialInvitation } from "../drizzle/schema";
+import { InsertUser, users, presentationSessions, documents, presentationViewers, presentationCollaborators, presenterCursors, viewerCursors, commercialInvitations, chatMessages, InsertChatMessage, PresentationSession, Document, PresenterCursor, ViewerCursor, CommercialInvitation, InsertCommercialInvitation } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -776,5 +776,47 @@ export async function getUserById(id: number) {
 
   const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
   return result[0] || null;
+}
+
+
+
+/**
+ * Chat Messages Functions
+ */
+
+/**
+ * Send a chat message
+ */
+export async function sendChatMessage(data: InsertChatMessage) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.insert(chatMessages).values(data);
+}
+
+/**
+ * Get all chat messages for a session
+ */
+export async function getChatMessages(sessionId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const result = await db
+    .select()
+    .from(chatMessages)
+    .where(eq(chatMessages.sessionId, sessionId))
+    .orderBy(chatMessages.createdAt);
+
+  return result;
+}
+
+/**
+ * Delete all chat messages for a session
+ */
+export async function deleteAllChatMessages(sessionId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.delete(chatMessages).where(eq(chatMessages.sessionId, sessionId));
 }
 
