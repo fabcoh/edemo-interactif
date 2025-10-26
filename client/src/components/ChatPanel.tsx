@@ -64,9 +64,13 @@ export default function ChatPanel({
     },
   });
 
-  // Auto-scroll to bottom
+  // Auto-scroll to bottom (désactivé pour éviter le scroll de toute la page)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+    // Scroll uniquement le conteneur parent au lieu de scrollIntoView
+    const messagesContainer = messagesEndRef.current?.parentElement;
+    if (messagesContainer) {
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
   }, [messages]);
 
   // Handle send text message

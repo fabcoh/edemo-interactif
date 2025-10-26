@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRoute } from "wouter";
-import ChatPanel from "@/components/ChatPanel";
+import ChatPanelViewer from "@/components/ChatPanelViewer";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -218,11 +218,10 @@ export default function Viewer() {
 
           {/* Chat Panel - Bottom 35% */}
           <div className="h-[35%] bg-gray-900 border-t border-gray-700 flex flex-col">
-            <ChatPanel
+            <ChatPanelViewer
               sessionId={session?.id || 0}
               senderType="viewer"
               senderName="Spectateur"
-              showDeleteButton={false}
               onLoadDocument={(url: string, name: string, type: string) => {
                 // Mettre à jour le document actuel de la session (synchronisation avec le présentateur)
                 console.log('[Viewer] onLoadDocument called', { url, name, type, enteredCode });

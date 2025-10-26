@@ -61,3 +61,24 @@ Le projet Edemo Live est maintenant complet avec :
 ### Auto-scroll du chat
 - [x] Corriger le scrollIntoView qui fait scroller toute la page au lieu du conteneur du chat uniquement
 
+
+
+
+## 🎨 Nouvelle interface spectateur
+
+### Layout chat spectateur
+- [x] Barre de saisie en haut : trombone | zone de texte | bouton envoyer (1 ligne)
+- [x] Zone principale divisée en 2 colonnes :
+  - [x] Colonne gauche (30%) : Liste des fichiers cliquables
+  - [x] Colonne droite (70%) : Messages du chat
+- [x] Clic sur un fichier → Affichage dans la zone de présentation
+- [x] Création du composant ChatPanelViewer spécifique pour le spectateur
+
+
+
+
+## 🐛 Bugs urgents corrigés
+
+- [x] Présentateur : La page scroll vers le bas automatiquement (à cause du chat) - Corrigé en utilisant scrollTop au lieu de scrollIntoView
+- [x] Spectateur : Les fichiers ne s'affichent pas sous forme de vignettes à gauche - Ajout de vignettes avec grid 2 colonnes
+
