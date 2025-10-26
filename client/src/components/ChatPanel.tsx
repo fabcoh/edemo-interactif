@@ -10,7 +10,7 @@ interface ChatPanelProps {
   senderType: "presenter" | "viewer";
   senderName: string;
   showDeleteButton?: boolean;
-  onLoadDocument?: (url: string, fileName: string) => void;
+  onLoadDocument?: (url: string, fileName: string, fileType: string) => void;
 }
 
 export default function ChatPanel({
@@ -112,9 +112,9 @@ export default function ChatPanel({
   };
 
   // Handle document click
-  const handleDocumentClick = (url: string, fileName: string) => {
+  const handleDocumentClick = (url: string, fileName: string, fileType: string) => {
     if (onLoadDocument) {
-      onLoadDocument(url, fileName);
+      onLoadDocument(url, fileName, fileType);
     }
   };
 
@@ -163,7 +163,7 @@ export default function ChatPanel({
                     
                     {isDocument ? (
                       <button
-                        onClick={() => handleDocumentClick(msg.videoUrl!, msg.message)}
+                        onClick={() => handleDocumentClick(msg.videoUrl!, msg.message, msg.fileType || 'image')}
                         className="text-left w-full hover:underline"
                       >
                         <div className="flex items-center gap-1">

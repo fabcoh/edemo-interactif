@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRoute } from "wouter";
+import ChatPanel from "@/components/ChatPanel";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,8 +11,12 @@ import { Label } from "@/components/ui/label";
 import { Link } from "wouter";
 import { ArrowLeft, Users, X, ZoomIn, ZoomOut } from "lucide-react";
 import { useEffect } from "react";
-import ChatPanel from "@/components/ChatPanel";
-import { ChatNotification } from "@/components/ChatNotification";
+import { Document, Page, pdfjs } from 'react-pdf';
+import 'react-pdf/dist/Page/AnnotationLayer.css';
+import 'react-pdf/dist/Page/TextLayer.css';
+
+// Configure PDF.js worker
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 /**
  * Viewer Page - Display presentation content in real-time (fullscreen)
@@ -66,6 +71,13 @@ export default function Viewer() {
     },
   });
 
+  const setCurrentDocumentMutation = trpc.viewer.setCurrentDocument.useMutation({
+    onSuccess: () => {
+      // Rafraîchir la session pour voir le changement
+      sessionQuery.refetch();
+    },
+  });
+
   // Get presenter's cursor and zoom in real-time
   const cursorQuery = trpc.presentation.getCursorAndZoom.useQuery(
     { sessionCode: enteredCode },
@@ -84,11 +96,20 @@ export default function Viewer() {
       setPresenterCursorVisible(cursorQuery.data.cursorVisible);
       setPresenterPanOffsetX(cursorQuery.data.panOffsetX);
       setPresenterPanOffsetY(cursorQuery.data.panOffsetY);
+      console.log('[Viewer] Cursor data:', {
+        zoom: cursorQuery.data.zoomLevel,
+        x: cursorQuery.data.cursorX,
+        y: cursorQuery.data.cursorY,
+        visible: cursorQuery.data.cursorVisible,
+        panOffsetX: cursorQuery.data.panOffsetX,
+        panOffsetY: cursorQuery.data.panOffsetY,
+      });
     }
   }, [cursorQuery.data]);
 
   const session = sessionQuery.data;
   const currentDocument = session?.currentDocument;
+  const displayDocument = currentDocument;
 
   const handleJoinSession = () => {
     if (sessionCode.trim()) {
@@ -113,14 +134,20 @@ export default function Viewer() {
   };
 
   // If joined and fullscreen, show only the document
-  if (isJoined && isFullscreen && currentDocument) {
+  if (isJoined && isFullscreen && displayDocument) {
     return (
-      <div className="fixed inset-0 bg-black z-50 flex flex-col">
-        {/* Document Display - Fullscreen */}
-        <div className="flex-1 bg-black flex flex-col overflow-auto relative">
+      <div className="fixed inset-0 bg-black flex flex-col">
+        {/* Main Content Area - Vertical Layout */}
+        <div className="h-full flex flex-col">
+          {/* Document Display - 65% of screen */}
+          <div className="h-[65%] bg-black flex flex-col items-center justify-center overflow-hidden relative">
 
           {/* Document Content */}
-          <div className="w-full flex-none flex items-start justify-center pt-4">
+          <div 
+            className="w-full h-full flex items-center justify-center overflow-auto cursor-pointer"
+            onDoubleClick={() => displayDocument && window.open(displayDocument.fileUrl, '_blank')}
+            title="Double-cliquer pour ouvrir en plein écran"
+          >
             {documentError && (
               <div className="text-center text-red-400 p-4">
                 <p className="text-sm">Erreur lors du chargement du document</p>
@@ -128,29 +155,40 @@ export default function Viewer() {
               </div>
             )}
 
-            {!documentError && currentDocument.type === "pdf" && (
-              <iframe
-                src={currentDocument.fileUrl}
-                className="w-full h-full"
-                title="PDF Document"
-                onError={() => setDocumentError("Impossible de charger le PDF")}
-              />
+            {!documentError && displayDocument.type === "pdf" && (
+              <div className="w-full h-full overflow-auto bg-gray-900">
+                <Document
+                  file={displayDocument.fileUrl}
+                  onLoadError={(error) => {
+                    console.error('PDF load error:', error);
+                    setDocumentError("Impossible de charger le PDF");
+                  }}
+                  className="flex flex-col items-center"
+                >
+                  <Page
+                    pageNumber={1}
+                    className="max-w-full"
+                    renderTextLayer={true}
+                    renderAnnotationLayer={true}
+                    width={window.innerWidth * 0.65}
+                  />
+                </Document>
+              </div>
             )}
 
-            {!documentError && currentDocument.type === "image" && (
-              <div className="relative inline-block">
+            {!documentError && displayDocument.type === "image" && (
+              <div className="flex items-center justify-center w-full h-full relative">
                 <img
-                  src={currentDocument.fileUrl}
+                  src={displayDocument.fileUrl}
                   alt="Document"
                   style={{
                     transform: `scale(${presenterZoom / 100}) translate(${presenterPanOffsetX / (presenterZoom / 100)}px, ${presenterPanOffsetY / (presenterZoom / 100)}px)`,
                     transition: "transform 0.2s ease-out",
-                    transformOrigin: "center center",
                   }}
-                  className="object-contain max-w-full"
+                  className="w-full h-full object-contain"
                   onError={() => setDocumentError("Impossible de charger l'image")}
                 />
-                {/* Presenter cursor - Red, visible when presenter shows it */}
+                {/* Presenter cursor - Red for presenter, visible for viewers */}
                 {presenterCursorVisible && (
                   <div
                     className="absolute w-6 h-6 border-2 border-red-500 rounded-full pointer-events-none"
@@ -166,9 +204,9 @@ export default function Viewer() {
               </div>
             )}
 
-            {!documentError && currentDocument.type === "video" && (
+            {!documentError && displayDocument.type === "video" && (
               <video
-                src={currentDocument.fileUrl}
+                src={displayDocument.fileUrl}
                 controls
                 autoPlay
                 className="max-w-full max-h-full object-contain"
@@ -176,22 +214,30 @@ export default function Viewer() {
               />
             )}
           </div>
+          </div>
 
-          {/* Chat Notification Popup */}
-          {session && <ChatNotification sessionId={session.id} />}
-          
-
-
-          {/* Chat in Fullscreen - Directly below document, no gap */}
-          {session && (
-            <div className="w-full flex-none mt-0">
-              <ChatPanel 
-                sessionId={session.id}
-                senderType="viewer"
-                senderName="Spectateur"
-              />
-            </div>
-          )}
+          {/* Chat Panel - Bottom 35% */}
+          <div className="h-[35%] bg-gray-900 border-t border-gray-700 flex flex-col">
+            <ChatPanel
+              sessionId={session?.id || 0}
+              senderType="viewer"
+              senderName="Spectateur"
+              showDeleteButton={false}
+              onLoadDocument={(url: string, name: string, type: string) => {
+                // Mettre à jour le document actuel de la session (synchronisation avec le présentateur)
+                console.log('[Viewer] onLoadDocument called', { url, name, type, enteredCode });
+                if (enteredCode && (type === 'image' || type === 'pdf' || type === 'video')) {
+                  console.log('[Viewer] Calling setCurrentDocumentMutation');
+                  setCurrentDocumentMutation.mutate({
+                    sessionCode: enteredCode,
+                    documentUrl: url,
+                    documentName: name,
+                    documentType: type as "image" | "pdf" | "video",
+                  });
+                }
+              }}
+            />
+          </div>
         </div>
       </div>
     );
@@ -202,7 +248,7 @@ export default function Viewer() {
     <div className="min-h-screen bg-gray-900 text-white">
       {/* Header */}
       <header className="bg-gray-800 border-b border-gray-700">
-        <div className="container mx-auto px-4 py-2 flex justify-between items-center">
+        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div>
             <h1 className="text-xl font-bold">{session?.title || "Présentation"}</h1>
             <p className="text-sm text-gray-400">
@@ -214,14 +260,16 @@ export default function Viewer() {
               <Users className="w-4 h-4" />
               <span>{viewerCount} spectateur(s)</span>
             </div>
-            <Link href="/">
-              <Button variant="outline" size="sm">Accueil</Button>
-            </Link>
+            {!isJoined && (
+              <Link href="/">
+                <Button variant="outline">Retour</Button>
+              </Link>
+            )}
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-2">
+      <main className="container mx-auto px-4 py-8">
         {!isJoined ? (
           <div className="max-w-md mx-auto">
             <Card>
@@ -255,13 +303,15 @@ export default function Viewer() {
         ) : !session ? (
           <div className="text-center py-12">
             <p className="text-gray-400">Présentation non trouvée</p>
-            <p className="text-sm text-gray-500 mt-2">Vérifiez le code de session et réessayez.</p>
+            <Link href="/">
+              <Button variant="outline" className="mt-4">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Retour
+              </Button>
+            </Link>
           </div>
         ) : (
-          <div className="space-y-2 relative">
-            {/* Chat Notification Popup */}
-            {session && <ChatNotification sessionId={session.id} />}
-
+          <div className="space-y-4">
             {/* Document Display */}
             {currentDocument ? (
               <Card className="bg-gray-800 border-gray-700">
@@ -302,15 +352,6 @@ export default function Viewer() {
                   En attente du document...
                 </CardContent>
               </Card>
-            )}
-
-            {/* Chat Messages */}
-            {session && (
-              <ChatPanel 
-                sessionId={session.id}
-                senderType="viewer"
-                senderName="Spectateur"
-              />
             )}
 
             {/* Fullscreen Button */}

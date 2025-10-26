@@ -551,6 +551,55 @@ export const appRouter = router({
       }),
 
     /**
+     * Set current document from viewer (spectateur peut changer le document affiché)
+     * Public access - viewers can change the displayed document
+     */
+    setCurrentDocument: publicProcedure
+      .input(z.object({
+        sessionCode: z.string(),
+        documentUrl: z.string(),
+        documentName: z.string(),
+        documentType: z.enum(["image", "pdf", "video"]),
+      }))
+      .mutation(async ({ input }) => {
+        const session = await getPresentationSessionByCode(input.sessionCode);
+        if (!session) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Session not found",
+          });
+        }
+
+        // Trouver le document dans la session par son URL
+        const documents = await getSessionDocuments(session.id);
+        let doc = documents.find(d => d.fileUrl === input.documentUrl);
+        
+        // Si le document n'existe pas, le créer temporairement
+        if (!doc) {
+          const newDoc = await addDocumentToSession(
+            session.id,
+            input.documentName,
+            input.documentType,
+            "chat-upload", // fileKey
+            input.documentUrl,
+            input.documentType === 'pdf' ? 'application/pdf' : input.documentType === 'video' ? 'video/mp4' : 'image/jpeg', // mimeType
+            0, // fileSize (inconnu)
+            documents.length // displayOrder
+          );
+          doc = newDoc;
+        }
+        
+        // Mettre à jour le document actuel de la session
+        await updateSessionCurrentDocument(
+          session.id,
+          doc.id,
+          "portrait" // Orientation par défaut
+        );
+
+        return { success: true };
+      }),
+
+    /**
      * Get all viewer cursors for a session (for presenter)
      * Public access - anyone can see viewer cursors
      */

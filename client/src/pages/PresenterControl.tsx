@@ -3,13 +3,12 @@
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useParams, Link, useLocation } from "wouter";
+import { useParams, Link } from "wouter";
 import { ArrowLeft, Users, Copy, Share2, Upload, X, ZoomIn, ZoomOut, Check } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import ChatPanel from "@/components/ChatPanel";
-import { TempDropZone } from "@/components/TempDropZone";
 
 /**
  * Presenter Control Page - Control document display during presentation
@@ -18,9 +17,9 @@ import { TempDropZone } from "@/components/TempDropZone";
 export default function PresenterControl() {
   const { isAuthenticated } = useAuth();
   const { sessionId } = useParams<{ sessionId: string }>();
-  const [, setLocation] = useLocation();
   const [selectedDocumentId, setSelectedDocumentId] = useState<number | null>(null);
   const [displayedDocumentId, setDisplayedDocumentId] = useState<number | null>(null);
+  const [orientation, setOrientation] = useState<"portrait" | "landscape">("portrait");
   const [zoom, setZoom] = useState(100);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const imageRef = useRef<HTMLImageElement>(null);
@@ -85,14 +84,14 @@ export default function PresenterControl() {
 
   const updateZoomAndCursorMutation = trpc.presentation.updateZoomAndCursor.useMutation();
 
-  const toggleViewerUploadsMutation = trpc.viewerUploads.toggleViewerUploads.useMutation({
-    onSuccess: () => {
-      sessionsQuery.refetch();
-    },
-  });
-
   const handleUploadDocument = async (file: File) => {
     if (!file) return;
+
+    const validTypes = ['application/pdf', 'image/png', 'image/jpeg', 'video/mp4'];
+    if (!validTypes.includes(file.type)) {
+      alert('Format de fichier non supporté. Veuillez utiliser PDF, PNG, JPG ou MP4.');
+      return;
+    }
 
     if (file.size > 100 * 1024 * 1024) {
       alert('Le fichier est trop volumineux. Maximum 100MB.');
@@ -124,8 +123,8 @@ export default function PresenterControl() {
             <CardTitle>Accès Refusé</CardTitle>
           </CardHeader>
           <CardContent>
-            <Link href="/presenter">
-              <Button className="w-full">Retour au Tableau de Bord</Button>
+            <Link href="/">
+              <Button className="w-full">Retour à l'accueil</Button>
             </Link>
           </CardContent>
         </Card>
@@ -145,7 +144,7 @@ export default function PresenterControl() {
     await updateDocumentMutation.mutateAsync({
       sessionId: sessionIdNum,
       documentId: docId,
-      orientation: "portrait",
+      orientation,
     });
     setDisplayedDocumentId(docId);
     setSelectedDocumentId(docId);
@@ -157,7 +156,7 @@ export default function PresenterControl() {
     await updateDocumentMutation.mutateAsync({
       sessionId: sessionIdNum,
       documentId: null,
-      orientation: "portrait",
+      orientation,
     });
     setDisplayedDocumentId(null);
   };
@@ -192,8 +191,7 @@ export default function PresenterControl() {
     const y = e.clientY - containerRect.top;
     setMousePos({ x, y });
 
-    // Only send cursor position if NOT panning
-    if (!isPanning && displayedDocumentId && currentSession && imageRef.current) {
+    if (displayedDocumentId && currentSession && imageRef.current) {
       // Get image dimensions and position
       const imageRect = imageRef.current.getBoundingClientRect();
       const imageX = e.clientX - imageRect.left;
@@ -243,22 +241,17 @@ export default function PresenterControl() {
     <div className="min-h-screen bg-gray-900 text-white flex flex-col">
       {/* Header */}
       <header className="bg-black shadow-lg">
-        <div className="container mx-auto px-4 py-1 flex items-center justify-between">
+        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="gap-2 text-white hover:bg-gray-800"
-              onClick={() => {
-                window.location.href = "/presenter";
-              }}
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Retour
-            </Button>
+            <Link href="/presenter">
+              <Button variant="ghost" size="sm" className="gap-2 text-white hover:bg-gray-800">
+                <ArrowLeft className="w-4 h-4" />
+                Retour
+              </Button>
+            </Link>
             <div>
-              <h1 className="text-sm font-bold">{currentSession.title}</h1>
-              <p className="text-[10px] text-gray-400">Code: {currentSession.sessionCode}</p>
+              <h1 className="text-xl font-bold">{currentSession.title}</h1>
+              <p className="text-xs text-gray-400">Code: {currentSession.sessionCode}</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
@@ -277,13 +270,11 @@ export default function PresenterControl() {
         </div>
       </header>
 
-      <main className="flex-1 container mx-auto px-4 py-2 flex flex-col gap-2 overflow-hidden">
-        {/* Zoom Controls & Drop Zone - Combined Row */}
-        <div className="flex items-center gap-2">
-          {/* Zoom Controls */}
-          {documents.length > 0 && (
-            <div className="flex items-center gap-2 bg-gray-800 p-2 rounded-lg border border-gray-700 flex-1">
-              <span className="text-[10px] text-gray-400 whitespace-nowrap">Zoom:</span>
+      <main className="flex-1 container mx-auto px-4 py-6 flex flex-col gap-4 overflow-hidden">
+        {/* Zoom Controls - Top with Slider */}
+        {displayedDocument?.type === "image" && (
+          <div className="flex items-center gap-3 bg-gray-800 p-3 rounded-lg border border-gray-700">
+            <span className="text-xs text-gray-400 whitespace-nowrap">Zoom:</span>
             <Button
               onClick={() => {
                 const newZoom = Math.max(50, zoom - 10);
@@ -302,7 +293,7 @@ export default function PresenterControl() {
               }}
               variant="outline"
               size="sm"
-              className="bg-gray-700 border-gray-600 hover:bg-gray-600 h-6 w-6 p-0"
+              className="bg-gray-700 border-gray-600 hover:bg-gray-600 h-8 w-8 p-0"
             >
               <ZoomOut className="w-3 h-3" />
             </Button>
@@ -332,7 +323,7 @@ export default function PresenterControl() {
                 background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((zoom - 50) / 150) * 100}%, #374151 ${((zoom - 50) / 150) * 100}%, #374151 100%)`
               }}
             />
-            <div className="text-[10px] font-semibold text-white w-10 text-center">
+            <div className="text-xs font-semibold text-white w-12 text-center">
               {zoom}%
             </div>
             <Button
@@ -353,7 +344,7 @@ export default function PresenterControl() {
               }}
               variant="outline"
               size="sm"
-              className="bg-gray-700 border-gray-600 hover:bg-gray-600 h-6 w-6 p-0"
+              className="bg-gray-700 border-gray-600 hover:bg-gray-600 h-8 w-8 p-0"
             >
               <ZoomIn className="w-3 h-3" />
             </Button>
@@ -374,37 +365,39 @@ export default function PresenterControl() {
               }}
               variant="outline"
               size="sm"
-              className="bg-gray-700 border-gray-600 hover:bg-gray-600 h-6 text-[10px] px-2"
+              className="bg-gray-700 border-gray-600 hover:bg-gray-600 h-8 text-xs px-2"
             >
               Réinit
             </Button>
-            </div>
-          )}
-          
-          {/* Temporary Drop Zone */}
-          <div className="w-64">
-            <TempDropZone onFileSelect={handleUploadDocument} />
           </div>
-        </div>
+        )}
 
         {/* Thumbnails Bar */}
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <h2 className="text-xs font-semibold">Documents ({documents.length})</h2>
+            <input
+              id="document-upload"
+              type="file"
+              accept=".pdf,image/png,image/jpeg,image/jpg,.mp4"
+              capture="environment"
+              onChange={(e) => {
+                if (e.target.files?.[0]) {
+                  handleUploadDocument(e.target.files[0]);
+                }
+              }}
+              className="hidden"
+            />
+            <Button
+              onClick={() => document.getElementById('document-upload')?.click()}
+              size="default"
+              className="bg-blue-600 hover:bg-blue-700 h-10 text-sm font-semibold px-4 touch-manipulation"
+            >
+              <Upload className="w-4 h-4 mr-2" />
+              Ajouter Document
+            </Button>
           </div>
-          
-          {/* Hidden input for document upload - now handled by TempDropZone */}
-          <input
-            id="document-upload"
-            type="file"
-            accept="application/pdf,image/*,video/*"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) handleUploadDocument(file);
-            }}
-            className="hidden"
-          />
-          
+
           {/* Thumbnails Container */}
           <div className="flex gap-2 overflow-x-auto pb-2">
             {documents.map((doc, idx) => (
@@ -449,44 +442,16 @@ export default function PresenterControl() {
                   </>
                 )}
                 {doc.type === "pdf" && (
-                  <>
-                    <div className="text-center flex flex-col items-center justify-center z-10 relative">
-                      <div className="text-2xl mb-1">📄</div>
-                      <div className="text-xs text-white font-semibold text-center px-2 line-clamp-2">{doc.title}</div>
-                    </div>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (confirm('Êtes-vous sûr de vouloir supprimer ce document ?')) {
-                          deleteDocumentMutation.mutate({ documentId: doc.id, sessionId: sessionIdNum });
-                        }
-                      }}
-                      className="absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white rounded-full p-1 z-30 transition-colors"
-                      title="Supprimer ce document"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  </>
+                  <div className="text-center flex flex-col items-center justify-center z-10 relative">
+                    <div className="text-2xl mb-1">📄</div>
+                    <div className="text-xs text-white font-semibold text-center px-2 line-clamp-2">{doc.title}</div>
+                  </div>
                 )}
                 {doc.type === "video" && (
-                  <>
-                    <div className="text-center flex flex-col items-center justify-center z-10 relative">
-                      <div className="text-2xl mb-1">🎬</div>
-                      <div className="text-xs text-white font-semibold text-center px-2 line-clamp-2">{doc.title}</div>
-                    </div>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (confirm('Êtes-vous sûr de vouloir supprimer ce document ?')) {
-                          deleteDocumentMutation.mutate({ documentId: doc.id, sessionId: sessionIdNum });
-                        }
-                      }}
-                      className="absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white rounded-full p-1 z-30 transition-colors"
-                      title="Supprimer ce document"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  </>
+                  <div className="text-center flex flex-col items-center justify-center z-10 relative">
+                    <div className="text-2xl mb-1">🎬</div>
+                    <div className="text-xs text-white font-semibold text-center px-2 line-clamp-2">{doc.title}</div>
+                  </div>
                 )}
 
                 {/* Checkmark if Displayed */}
@@ -720,12 +685,23 @@ export default function PresenterControl() {
 
           {/* Right Panel - Controls & Info */}
           <div className="lg:col-span-1 flex flex-col gap-2 overflow-y-auto">
-            {/* Chat Panel */}
-            <ChatPanel 
-              sessionId={sessionIdNum} 
-              senderType="presenter"
-              senderName="Présentateur"
-            />
+            {/* Format Controls */}
+            <Card className="bg-gray-800 border-gray-700">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xs">Format</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <Select value={orientation} onValueChange={(val) => setOrientation(val as "portrait" | "landscape")}>
+                  <SelectTrigger className="bg-gray-700 border-gray-600 text-white h-8 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-700 border-gray-600">
+                    <SelectItem value="portrait">📱 Portrait</SelectItem>
+                    <SelectItem value="landscape">🖥️ Paysage</SelectItem>
+                  </SelectContent>
+                </Select>
+              </CardContent>
+            </Card>
 
             {/* Share Panel */}
             <Card className="bg-gray-800 border-gray-700">
@@ -754,30 +730,31 @@ export default function PresenterControl() {
                     WhatsApp
                   </Button>
                 </a>
+              </CardContent>
+            </Card>
 
-                <Button
-                  onClick={() => {
-                    const newValue = !((currentSession as any).allowViewerUploads || false);
-                    toggleViewerUploadsMutation.mutate(
-                      { sessionId: sessionIdNum, allow: newValue }
-                    );
+            {/* Chat Panel */}
+            <Card className="bg-gray-800 border-gray-700 flex-1 flex flex-col overflow-hidden">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xs">Chat</CardTitle>
+              </CardHeader>
+              <CardContent className="p-0 flex-1 overflow-hidden">
+                <ChatPanel
+                  sessionId={sessionIdNum}
+                  senderType="presenter"
+                  senderName={currentSession.title}
+                  showDeleteButton={true}
+                  onLoadDocument={(url, name, type) => {
+                    // Charger le document dans le visualisateur
+                    // Pour l'instant, on ne fait rien car le présentateur gère déjà ses documents
+                    console.log('Load document:', url, name, type);
                   }}
-                  variant="outline"
-                  className={`w-full gap-1 h-8 text-xs ${
-                    (currentSession as any).allowViewerUploads
-                      ? "bg-blue-600 border-blue-500 hover:bg-blue-700 text-white"
-                      : "bg-gray-700 border-gray-600 hover:bg-gray-600 text-white"
-                  }`}
-                  size="sm"
-                >
-                  <Upload className="w-3 h-3" />
-                  {(currentSession as any).allowViewerUploads ? "Dépôt activé" : "Activer dépôt"}
-                </Button>
+                />
               </CardContent>
             </Card>
 
             {/* Info Panel */}
-            <Card className="bg-gray-800 border-gray-700 flex-1">
+            <Card className="bg-gray-800 border-gray-700">
               <CardHeader className="pb-2">
                 <CardTitle className="text-xs">Infos</CardTitle>
               </CardHeader>
