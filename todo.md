@@ -53,3 +53,11 @@ Le projet Edemo Live est maintenant complet avec :
 - ✅ Upload automatique sans vignettes
 - ✅ Interface simplifiée et intuitive
 
+
+
+
+## 🐛 Bugs corrigés
+
+### Auto-scroll du chat
+- [x] Corriger le scrollIntoView qui fait scroller toute la page au lieu du conteneur du chat uniquement
+
