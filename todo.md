@@ -82,3 +82,13 @@ Le projet Edemo Live est maintenant complet avec :
 - [x] Présentateur : La page scroll vers le bas automatiquement (à cause du chat) - Corrigé en utilisant scrollTop au lieu de scrollIntoView
 - [x] Spectateur : Les fichiers ne s'affichent pas sous forme de vignettes à gauche - Ajout de vignettes avec grid 2 colonnes
 
+
+
+
+## 🎨 Modifications interface présentateur
+
+- [x] Réduire les bordures du chat au minimum (bordure simple)
+- [x] Utiliser ChatPanelViewer pour le présentateur (même layout que spectateur)
+- [x] Retirer le sélecteur Portrait/Paysage du panel de partage
+- [x] Garder uniquement Copier/Coller et WhatsApp dans le panel de partage
+
