@@ -74,6 +74,12 @@ export default function Presenter() {
     },
   });
 
+  const toggleSessionActiveMutation = trpc.presentation.toggleSessionActive.useMutation({
+    onSuccess: () => {
+      sessionsQuery.refetch();
+    },
+  });
+
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -259,9 +265,18 @@ export default function Presenter() {
                                 <div className="text-xs text-gray-600 mt-1">
                                   Code: {session.sessionCode}
                                 </div>
-                                <div className={`text-xs mt-1 ${session.isActive ? "text-green-600" : "text-red-600"}`}>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    toggleSessionActiveMutation.mutate({ sessionId: session.id });
+                                  }}
+                                  className={`text-xs mt-1 px-2 py-1 rounded hover:opacity-80 transition-opacity cursor-pointer ${
+                                    session.isActive ? "text-green-600 hover:bg-green-50" : "text-red-600 hover:bg-red-50"
+                                  }`}
+                                  title="Cliquer pour activer/désactiver"
+                                >
                                   {session.isActive ? "🟢 Active" : "🔴 Inactive"}
-                                </div>
+                                </button>
                               </div>
                               <button
                                 onClick={(e) => {

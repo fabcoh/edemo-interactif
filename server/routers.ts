@@ -200,6 +200,34 @@ export const appRouter = router({
       }),
 
     /**
+     * Toggle session active status
+     */
+    toggleSessionActive: protectedProcedure
+      .input(z.object({
+        sessionId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const sessions = await getPresentationSessionsByPresenter(ctx.user.id);
+        const session = sessions.find(s => s.id === input.sessionId);
+        
+        if (!session) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You don't have permission to update this session",
+          });
+        }
+
+        // Toggle the current status
+        const newStatus = !session.isActive;
+        await updateSessionActiveStatus(input.sessionId, newStatus);
+        
+        return { 
+          success: true,
+          isActive: newStatus,
+        };
+      }),
+
+    /**
      * Get viewer count for a session
      */
     getViewerCount: protectedProcedure
