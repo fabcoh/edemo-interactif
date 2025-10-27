@@ -8,7 +8,7 @@ import { ArrowLeft, Users, Copy, Share2, Upload, X, ZoomIn, ZoomOut, Check } fro
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
-import ChatPanelViewer from "@/components/ChatPanelViewer";
+import ChatPanel from "@/components/ChatPanel";
 
 /**
  * Presenter Control Page - Control document display during presentation
@@ -685,6 +685,24 @@ export default function PresenterControl() {
 
           {/* Right Panel - Controls & Info */}
           <div className="lg:col-span-1 flex flex-col gap-2 overflow-y-auto">
+            {/* Format Panel */}
+            <Card className="bg-gray-800 border-gray-700">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xs">Format</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <Select value={orientation} onValueChange={(val) => setOrientation(val as "portrait" | "landscape")}>
+                  <SelectTrigger className="bg-gray-700 border-gray-600 text-white h-8 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-700 border-gray-600">
+                    <SelectItem value="portrait">📱 Portrait</SelectItem>
+                    <SelectItem value="landscape">🖥️ Paysage</SelectItem>
+                  </SelectContent>
+                </Select>
+              </CardContent>
+            </Card>
+
             {/* Share Panel */}
             <Card className="bg-gray-800 border-gray-700">
               <CardHeader className="pb-2">
@@ -716,17 +734,23 @@ export default function PresenterControl() {
             </Card>
 
             {/* Chat Panel */}
-            <div className="flex-1 flex flex-col overflow-hidden border border-gray-700 rounded-lg">
-              <ChatPanelViewer
-                sessionId={sessionIdNum}
-                senderType="presenter"
-                senderName={currentSession.title}
-                onLoadDocument={(url, name, type) => {
-                  // Charger le document dans le visualisateur
-                  console.log('Load document:', url, name, type);
-                }}
-              />
-            </div>
+            <Card className="bg-gray-800 border-gray-700 flex-1 flex flex-col overflow-hidden">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xs">Chat</CardTitle>
+              </CardHeader>
+              <CardContent className="p-0 flex-1 overflow-hidden">
+                <ChatPanel
+                  sessionId={sessionIdNum}
+                  senderType="presenter"
+                  senderName={currentSession.title}
+                  showDeleteButton={true}
+                  onLoadDocument={(url, name, type) => {
+                    // Charger le document dans le visualisateur
+                    console.log('Load document:', url, name, type);
+                  }}
+                />
+              </CardContent>
+            </Card>
 
             {/* Info Panel */}
             <Card className="bg-gray-800 border-gray-700">

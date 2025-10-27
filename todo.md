@@ -92,3 +92,12 @@ Le projet Edemo Live est maintenant complet avec :
 - [x] Retirer le sélecteur Portrait/Paysage du panel de partage
 - [x] Garder uniquement Copier/Coller et WhatsApp dans le panel de partage
 
+
+
+
+## 🐛 Bug critique corrigé
+
+- [x] Chat présentateur (production) : Les messages ne s'envoient pas (clic sur Envoyer ne fait rien) - Restauration de ChatPanel
+- [x] Restaurer l'interface présentateur de production (sans ChatPanelViewer) - Interface restaurée avec Format Panel
+- [x] ChatPanel utilise déjà le bon schéma (senderType, senderName, message)
+
