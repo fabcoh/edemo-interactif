@@ -3,7 +3,6 @@ import { trpc } from "@/lib/trpc";
 import { Paperclip, Send, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface ChatPanelProps {
   sessionId: number;
@@ -23,6 +22,7 @@ export default function ChatPanel({
   const [messageText, setMessageText] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const utils = trpc.useUtils();
 
   // Query messages
@@ -64,16 +64,14 @@ export default function ChatPanel({
     },
   });
 
-  // Auto-scroll to bottom (désactivé pour éviter le scroll de toute la page)
+  // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
-    // Scroll uniquement le conteneur parent au lieu de scrollIntoView
-    const messagesContainer = messagesEndRef.current?.parentElement;
-    if (messagesContainer) {
-      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
     }
   }, [messages]);
 
-  // Handle send text message
+  // Handle send message
   const handleSendMessage = () => {
     if (!messageText.trim()) return;
 
@@ -93,19 +91,19 @@ export default function ChatPanel({
     const reader = new FileReader();
     reader.onloadend = () => {
       const base64 = reader.result as string;
-      const base64Data = base64.split(",")[1];
-
       uploadFileMutation.mutate({
         sessionId,
         fileName: file.name,
-        fileData: base64Data,
+        fileData: base64,
         mimeType: file.type,
       });
     };
     reader.readAsDataURL(file);
 
-    // Reset input
-    e.target.value = "";
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   // Handle delete all messages
@@ -123,120 +121,125 @@ export default function ChatPanel({
   };
 
   return (
-    <Card className="bg-gray-800 border-gray-700 flex flex-col h-full">
-      <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-white text-sm">Chat</CardTitle>
-          {showDeleteButton && (
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={handleDeleteAll}
-              className="text-red-400 hover:text-red-300 hover:bg-red-900/20 h-6 px-2"
-            >
-              <X className="w-3 h-3 mr-1" />
-              <span className="text-xs">Tout supprimer</span>
-            </Button>
-          )}
-        </div>
-      </CardHeader>
+    <div className="flex flex-col h-full bg-gray-800 rounded-lg overflow-hidden" style={{border: '1px solid rgb(55, 65, 81)'}}>
+      {/* Input Area - EN HAUT */}
+      <div className="flex items-center gap-2 p-2" style={{borderBottom: '1px solid rgb(55, 65, 81)'}}>
+        <input
+          ref={fileInputRef}
+          type="file"
+          className="hidden"
+          accept="image/*,video/*,application/pdf"
+          onChange={handleFileUpload}
+        />
 
-      <CardContent className="flex-1 flex flex-col p-2 space-y-2 overflow-hidden">
-        {/* Messages Area (3/4 height) */}
-        <div className="flex-[3] overflow-y-auto space-y-2 p-2 bg-gray-900 rounded">
-          {messages.length === 0 ? (
-            <p className="text-xs text-gray-400 text-center py-4">Aucun message</p>
-          ) : (
-            messages.map((msg) => {
-              const isPresenter = msg.senderType === "presenter";
-              const isDocument = msg.videoUrl && msg.fileType;
+        {/* Text Input */}
+        <Input
+          type="text"
+          placeholder="Écrire un message..."
+          value={messageText}
+          onChange={(e) => setMessageText(e.target.value)}
+          onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+          className="flex-1 bg-gray-700 border-gray-600 text-white h-10"
+          autoComplete="off"
+        />
 
-              return (
-                <div
-                  key={msg.id}
-                  className={`flex ${isPresenter ? "justify-end" : "justify-start"}`}
-                >
-                  <div
-                    className={`max-w-[80%] rounded-lg p-2 ${
-                      isPresenter
-                        ? "bg-blue-600 text-white"
-                        : "bg-gray-700 text-white"
-                    }`}
-                  >
-                    <p className="text-[10px] font-semibold mb-1">{msg.senderName}</p>
-                    
-                    {isDocument ? (
-                      <button
-                        onClick={() => handleDocumentClick(msg.videoUrl!, msg.message, msg.fileType || 'image')}
-                        className="text-left w-full hover:underline"
-                      >
-                        <div className="flex items-center gap-1">
-                          <Paperclip className="w-3 h-3" />
-                          <span className="text-sm break-all">{msg.message}</span>
-                        </div>
-                      </button>
-                    ) : (
-                      <p className="text-sm break-words">{msg.message}</p>
-                    )}
+        {/* Send Button */}
+        <Button
+          size="sm"
+          onClick={handleSendMessage}
+          disabled={!messageText.trim()}
+          className="bg-green-600 hover:bg-green-700 h-10 px-4 flex-shrink-0"
+        >
+          <Send className="w-5 h-5" />
+        </Button>
 
-                    <p className="text-[9px] text-gray-300 mt-1 text-right">
-                      {new Date(msg.createdAt).toLocaleTimeString("fr-FR", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </p>
-                  </div>
-                </div>
-              );
-            })
-          )}
-          <div ref={messagesEndRef} />
-        </div>
-
-        {/* Input Area (1/4 height) */}
-        <div className="flex-[1] flex items-center gap-2">
-          {/* File Upload Button (Trombone) */}
+        {/* Delete All Button */}
+        {showDeleteButton && (
           <Button
             size="sm"
             variant="ghost"
-            onClick={() => fileInputRef.current?.click()}
-            className="text-gray-400 hover:text-white hover:bg-gray-700 h-8 w-8 p-0"
-            title="Joindre un fichier"
+            onClick={handleDeleteAll}
+            className="text-red-400 hover:text-red-300 hover:bg-red-900/20 h-10 px-3 flex-shrink-0"
+            title="Tout supprimer"
           >
-            <Paperclip className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </Button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            className="hidden"
-            accept="image/*,video/*,application/pdf"
-            onChange={handleFileUpload}
-          />
+        )}
+      </div>
 
-          {/* Text Input */}
-          <Input
-            type="text"
-            placeholder="Écrire un message..."
-            value={messageText}
-            onChange={(e) => setMessageText(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-            className="flex-1 bg-gray-700 border-gray-600 text-white text-sm h-8"
-            autoComplete="off"
-          />
+      {/* Messages Area - EN BAS */}
+      <div 
+        ref={messagesContainerRef}
+        className="flex-1 overflow-y-auto space-y-2 p-3 bg-gray-900"
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={(e) => {
+          e.preventDefault();
+          const files = e.dataTransfer.files;
+          if (files.length > 0) {
+            const file = files[0];
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              const base64 = reader.result as string;
+              uploadFileMutation.mutate({
+                sessionId,
+                fileName: file.name,
+                fileData: base64,
+                mimeType: file.type,
+              });
+            };
+            reader.readAsDataURL(file);
+          }
+        }}
+      >
+        {messages.length === 0 ? (
+          <p className="text-sm text-gray-400 text-center py-8">Glisser un fichier ici</p>
+        ) : (
+          [...messages].reverse().map((msg) => {
+            const isPresenter = msg.senderType === "presenter";
+            const isDocument = msg.videoUrl && msg.fileType;
 
-          {/* Send Button */}
-          <Button
-            size="sm"
-            onClick={handleSendMessage}
-            disabled={!messageText.trim()}
-            className="bg-green-600 hover:bg-green-700 h-8 w-8 p-0"
-            title="Envoyer"
-          >
-            <Send className="w-4 h-4" />
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+            return (
+              <div
+                key={msg.id}
+                className={`flex ${isPresenter ? "justify-end" : "justify-start"}`}
+              >
+                <div
+                  className={`max-w-[80%] rounded-lg p-2 ${
+                    isPresenter
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-700 text-white"
+                  }`}
+                >
+                  <p className="text-[10px] font-semibold mb-1">{msg.senderName}</p>
+                  
+                  {isDocument ? (
+                    <button
+                      onClick={() => handleDocumentClick(msg.videoUrl!, msg.message, msg.fileType || 'image')}
+                      className="text-left w-full hover:underline"
+                    >
+                      <div className="flex items-center gap-1">
+                        <Paperclip className="w-3 h-3" />
+                        <span className="text-sm break-all">{msg.message}</span>
+                      </div>
+                    </button>
+                  ) : (
+                    <p className="text-sm break-words">{msg.message}</p>
+                  )}
+
+                  <p className="text-[9px] text-gray-300 mt-1 text-right">
+                    {new Date(msg.createdAt).toLocaleTimeString("fr-FR", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                </div>
+              </div>
+            );
+          })
+        )}
+        <div ref={messagesEndRef} />
+      </div>
+    </div>
   );
 }
 

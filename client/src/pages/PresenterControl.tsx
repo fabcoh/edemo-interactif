@@ -271,131 +271,136 @@ export default function PresenterControl() {
       </header>
 
       <main className="flex-1 container mx-auto px-4 py-6 flex flex-col gap-4 overflow-hidden">
-        {/* Zoom Controls - Top with Slider */}
-        {displayedDocument?.type === "image" && (
-          <div className="flex items-center gap-3 bg-gray-800 p-3 rounded-lg border border-gray-700">
-            <span className="text-xs text-gray-400 whitespace-nowrap">Zoom:</span>
-            <Button
-              onClick={() => {
-                const newZoom = Math.max(50, zoom - 10);
-                setZoom(newZoom);
-                if (currentSession) {
-                  updateZoomAndCursorMutation.mutate({
-                    sessionId: sessionIdNum,
-                    zoomLevel: newZoom,
-                    cursorX: mousePos.x,
-                    cursorY: mousePos.y,
-                    cursorVisible: showMouseCursor && newZoom > 100,
-                    panOffsetX: panOffset.x,
-                    panOffsetY: panOffset.y,
-                  });
-                }
-              }}
-              variant="outline"
-              size="sm"
-              className="bg-gray-700 border-gray-600 hover:bg-gray-600 h-8 w-8 p-0"
-            >
-              <ZoomOut className="w-3 h-3" />
-            </Button>
-            <input
-              type="range"
-              min="50"
-              max="200"
-              step="5"
-              value={zoom}
-              onChange={(e) => {
-                const newZoom = parseInt(e.target.value);
-                setZoom(newZoom);
-                if (currentSession) {
-                  updateZoomAndCursorMutation.mutate({
-                    sessionId: sessionIdNum,
-                    zoomLevel: newZoom,
-                    cursorX: mousePos.x,
-                    cursorY: mousePos.y,
-                    cursorVisible: showMouseCursor && newZoom > 100,
-                    panOffsetX: panOffset.x,
-                    panOffsetY: panOffset.y,
-                  });
-                }
-              }}
-              className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
-              style={{
-                background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((zoom - 50) / 150) * 100}%, #374151 ${((zoom - 50) / 150) * 100}%, #374151 100%)`
-              }}
-            />
-            <div className="text-xs font-semibold text-white w-12 text-center">
-              {zoom}%
-            </div>
-            <Button
-              onClick={() => {
-                const newZoom = Math.min(200, zoom + 10);
-                setZoom(newZoom);
-                if (currentSession) {
-                  updateZoomAndCursorMutation.mutate({
-                    sessionId: sessionIdNum,
-                    zoomLevel: newZoom,
-                    cursorX: mousePos.x,
-                    cursorY: mousePos.y,
-                    cursorVisible: showMouseCursor && newZoom > 100,
-                    panOffsetX: panOffset.x,
-                    panOffsetY: panOffset.y,
-                  });
-                }
-              }}
-              variant="outline"
-              size="sm"
-              className="bg-gray-700 border-gray-600 hover:bg-gray-600 h-8 w-8 p-0"
-            >
-              <ZoomIn className="w-3 h-3" />
-            </Button>
-            <Button
-              onClick={() => {
-                setZoom(100);
-                if (currentSession) {
-                  updateZoomAndCursorMutation.mutate({
-                    sessionId: sessionIdNum,
-                    zoomLevel: 100,
-                    cursorX: mousePos.x,
-                    cursorY: mousePos.y,
-                    cursorVisible: false,
-                    panOffsetX: panOffset.x,
-                    panOffsetY: panOffset.y,
-                  });
-                }
-              }}
-              variant="outline"
-              size="sm"
-              className="bg-gray-700 border-gray-600 hover:bg-gray-600 h-8 text-xs px-2"
-            >
-              Réinit
-            </Button>
+        {/* Zoom Controls + Upload - Sur la même ligne */}
+        <div className="flex items-center gap-3 bg-gray-800 p-1.5 rounded-lg border border-gray-700">
+          <span className="text-xs text-gray-400 whitespace-nowrap">Zoom:</span>
+          <Button
+            onClick={() => {
+              const newZoom = Math.max(50, zoom - 10);
+              setZoom(newZoom);
+              if (currentSession) {
+                updateZoomAndCursorMutation.mutate({
+                  sessionId: sessionIdNum,
+                  zoomLevel: newZoom,
+                  cursorX: mousePos.x,
+                  cursorY: mousePos.y,
+                  cursorVisible: showMouseCursor && newZoom > 100,
+                  panOffsetX: panOffset.x,
+                  panOffsetY: panOffset.y,
+                });
+              }
+            }}
+            variant="outline"
+            size="sm"
+            className="bg-gray-700 border-gray-600 hover:bg-gray-600 h-8 w-8 p-0"
+          >
+            <ZoomOut className="w-3 h-3" />
+          </Button>
+          <input
+            type="range"
+            min="50"
+            max="200"
+            step="5"
+            value={zoom}
+            onChange={(e) => {
+              const newZoom = parseInt(e.target.value);
+              setZoom(newZoom);
+              if (currentSession) {
+                updateZoomAndCursorMutation.mutate({
+                  sessionId: sessionIdNum,
+                  zoomLevel: newZoom,
+                  cursorX: mousePos.x,
+                  cursorY: mousePos.y,
+                  cursorVisible: showMouseCursor && newZoom > 100,
+                  panOffsetX: panOffset.x,
+                  panOffsetY: panOffset.y,
+                });
+              }
+            }}
+            className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+            style={{
+              background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((zoom - 50) / 150) * 100}%, #374151 ${((zoom - 50) / 150) * 100}%, #374151 100%)`
+            }}
+          />
+          <div className="text-xs font-semibold text-white w-12 text-center">
+            {zoom}%
           </div>
-        )}
+          <Button
+            onClick={() => {
+              const newZoom = Math.min(200, zoom + 10);
+              setZoom(newZoom);
+              if (currentSession) {
+                updateZoomAndCursorMutation.mutate({
+                  sessionId: sessionIdNum,
+                  zoomLevel: newZoom,
+                  cursorX: mousePos.x,
+                  cursorY: mousePos.y,
+                  cursorVisible: showMouseCursor && newZoom > 100,
+                  panOffsetX: panOffset.x,
+                  panOffsetY: panOffset.y,
+                });
+              }
+            }}
+            variant="outline"
+            size="sm"
+            className="bg-gray-700 border-gray-600 hover:bg-gray-600 h-8 w-8 p-0"
+          >
+            <ZoomIn className="w-3 h-3" />
+          </Button>
+          <Button
+            onClick={() => {
+              setZoom(100);
+              if (currentSession) {
+                updateZoomAndCursorMutation.mutate({
+                  sessionId: sessionIdNum,
+                  zoomLevel: 100,
+                  cursorX: mousePos.x,
+                  cursorY: mousePos.y,
+                  cursorVisible: false,
+                  panOffsetX: panOffset.x,
+                  panOffsetY: panOffset.y,
+                });
+              }
+            }}
+            variant="outline"
+            size="sm"
+            className="bg-gray-700 border-gray-600 hover:bg-gray-600 h-8 text-xs px-2"
+          >
+            Réinit
+          </Button>
+          {/* Upload Zone */}
+          <input
+            id="document-upload"
+            type="file"
+            accept=".pdf,image/png,image/jpeg,image/jpg,.mp4"
+            capture="environment"
+            onChange={(e) => {
+              if (e.target.files?.[0]) {
+                handleUploadDocument(e.target.files[0]);
+              }
+            }}
+            className="hidden"
+          />
+          <div
+            onClick={() => document.getElementById('document-upload')?.click()}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => {
+              e.preventDefault();
+              const files = e.dataTransfer.files;
+              if (files.length > 0) {
+                handleUploadDocument(files[0]);
+              }
+            }}
+            className="border-2 border-dashed border-gray-600 rounded-lg px-4 py-1.5 text-center cursor-pointer hover:border-gray-500 transition-colors whitespace-nowrap"
+          >
+            <p className="text-xs text-gray-400">Glisser un fichier ici</p>
+          </div>
+        </div>
 
         {/* Thumbnails Bar */}
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <h2 className="text-xs font-semibold">Documents ({documents.length})</h2>
-            <input
-              id="document-upload"
-              type="file"
-              accept=".pdf,image/png,image/jpeg,image/jpg,.mp4"
-              capture="environment"
-              onChange={(e) => {
-                if (e.target.files?.[0]) {
-                  handleUploadDocument(e.target.files[0]);
-                }
-              }}
-              className="hidden"
-            />
-            <Button
-              onClick={() => document.getElementById('document-upload')?.click()}
-              size="default"
-              className="bg-blue-600 hover:bg-blue-700 h-10 text-sm font-semibold px-4 touch-manipulation"
-            >
-              <Upload className="w-4 h-4 mr-2" />
-              Ajouter Document
-            </Button>
           </div>
 
           {/* Thumbnails Container */}
@@ -685,72 +690,44 @@ export default function PresenterControl() {
 
           {/* Right Panel - Controls & Info */}
           <div className="lg:col-span-1 flex flex-col gap-2 overflow-y-auto">
-            {/* Format Panel */}
-            <Card className="bg-gray-800 border-gray-700">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-xs">Format</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <Select value={orientation} onValueChange={(val) => setOrientation(val as "portrait" | "landscape")}>
-                  <SelectTrigger className="bg-gray-700 border-gray-600 text-white h-8 text-xs">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-gray-700 border-gray-600">
-                    <SelectItem value="portrait">📱 Portrait</SelectItem>
-                    <SelectItem value="landscape">🖥️ Paysage</SelectItem>
-                  </SelectContent>
-                </Select>
-              </CardContent>
-            </Card>
+            {/* Chat Panel - Sans Card, juste le composant */}
+            <div className="flex-1 flex flex-col overflow-hidden">
+              <ChatPanel
+                sessionId={sessionIdNum}
+                senderType="presenter"
+                senderName={currentSession.title}
+                showDeleteButton={true}
+                onLoadDocument={(url, name, type) => {
+                  // Charger le document dans le visualisateur
+                  console.log('Load document:', url, name, type);
+                }}
+              />
+            </div>
 
-            {/* Share Panel */}
-            <Card className="bg-gray-800 border-gray-700">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-xs">Partager</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <Button
-                  onClick={() => copyToClipboard(getShareLink(currentSession.sessionCode))}
-                  variant="outline"
-                  className="w-full gap-1 bg-gray-700 border-gray-600 hover:bg-gray-600 text-white h-8 text-xs"
-                  size="sm"
-                >
-                  <Copy className="w-3 h-3" />
-                  Copier
+            {/* Share Buttons - Sans Card */}
+            <div className="space-y-2">
+              <Button
+                onClick={() => copyToClipboard(getShareLink(currentSession.sessionCode))}
+                variant="outline"
+                className="w-full gap-1 bg-gray-700 border-gray-600 hover:bg-gray-600 text-white h-10"
+                size="sm"
+              >
+                <Copy className="w-4 h-4" />
+                Copier
+              </Button>
+
+              <a
+                href={generateWhatsAppLink(currentSession.sessionCode)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block"
+              >
+                <Button className="w-full gap-1 bg-green-600 hover:bg-green-700 h-10" size="sm">
+                  <Share2 className="w-4 h-4" />
+                  WhatsApp
                 </Button>
-
-                <a
-                  href={generateWhatsAppLink(currentSession.sessionCode)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block"
-                >
-                  <Button className="w-full gap-1 bg-green-600 hover:bg-green-700 h-8 text-xs" size="sm">
-                    <Share2 className="w-3 h-3" />
-                    WhatsApp
-                  </Button>
-                </a>
-              </CardContent>
-            </Card>
-
-            {/* Chat Panel */}
-            <Card className="bg-gray-800 border-gray-700 flex-1 flex flex-col overflow-hidden">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-xs">Chat</CardTitle>
-              </CardHeader>
-              <CardContent className="p-0 flex-1 overflow-hidden">
-                <ChatPanel
-                  sessionId={sessionIdNum}
-                  senderType="presenter"
-                  senderName={currentSession.title}
-                  showDeleteButton={true}
-                  onLoadDocument={(url, name, type) => {
-                    // Charger le document dans le visualisateur
-                    console.log('Load document:', url, name, type);
-                  }}
-                />
-              </CardContent>
-            </Card>
+              </a>
+            </div>
 
             {/* Info Panel */}
             <Card className="bg-gray-800 border-gray-700">

@@ -101,3 +101,57 @@ Le projet Edemo Live est maintenant complet avec :
 - [x] Restaurer l'interface présentateur de production (sans ChatPanelViewer) - Interface restaurée avec Format Panel
 - [x] ChatPanel utilise déjà le bon schéma (senderType, senderName, message)
 
+
+
+
+## 🎨 Restructuration interface présentateur (d'après capture production)
+
+- [x] Supprimer la Card autour du chat (pas de titre "Chat")
+- [x] Chat simple : barre de saisie en haut (trombone + texte + envoyer vert)
+- [x] Messages en dessous avec "Aucun message. Commencez la conversation !"
+- [x] Boutons Copier + WhatsApp en bas de la colonne droite
+- [x] Garder la structure 3 colonnes : vignettes gauche, preview centre, contrôles droite
+- [x] Suppression des panels Format et Info (non visibles dans la production)
+
+
+
+
+## 🎨 Ajustements finaux interface présentateur
+
+- [x] Mettre la barre de rédaction du chat tout en haut de la colonne droite
+- [x] Réduire les bordures au minimum (1px solid)
+- [x] Garder le bouton "Tout supprimer" (X) dans la barre de saisie
+
+
+
+
+## 🐛 Corrections chat
+
+- [x] Remplacer le bouton trombone par "Glisser un fichier ici" dans la zone de chat
+- [x] Inverser l'ordre des messages : les plus récents en haut
+- [x] Ajouter le drag & drop pour uploader des fichiers
+
+
+
+
+## 🎨 Corrections interface présentateur
+
+- [x] Retirer le bouton "Ajouter Document" (bleu)
+- [x] Ajouter une zone "Glisser un fichier ici" avec drag & drop en haut à droite
+
+
+
+
+## 🐛 Correction barre de zoom
+
+- [x] Afficher la barre de zoom en permanence (même sans document)
+- [x] Réduire la largeur de la barre de zoom (max-w-md)
+
+
+
+
+## 🎨 Ajustements finaux
+
+- [x] Mettre le zoom et l'upload sur la même ligne
+- [x] Réduire l'épaisseur de la barre de zoom (p-1.5 au lieu de p-2)
+
