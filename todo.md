@@ -154,4 +154,100 @@ Le projet Edemo Live est maintenant complet avec :
 
 - [x] Mettre le zoom et l'upload sur la même ligne
 - [x] Réduire l'épaisseur de la barre de zoom (p-1.5 au lieu de p-2)
+- [x] Mettre les boutons WhatsApp et Copier sur la même ligne que Zoom et Upload
+- [x] Réduire l'épaisseur des boutons WhatsApp et Copier (h-8 au lieu de h-10, icônes w-3 h-3)
+
+
+- [x] Retirer le nom "Présentation XXX" du chat (afficher juste le message)
+- [x] Différencier les fonds des messages : présentateur (gris) vs spectateur (vert)
+
+
+- [x] Réduire la taille des infos de la première ligne (code session + spectateurs)
+- [x] Mettre le nombre de spectateurs en gras (text-[10px] avec nombre en font-bold)
+
+
+- [x] Réduire le bouton "Terminer" (h-6 px-2 text-[10px])
+- [x] Allonger le chat vers le bas (flex-[2] au lieu de flex-1)
+- [x] Réduire au maximum le titre du document (text-[10px], py-0.5, px-2)
+- [x] Ajouter une très fine bordure autour du document (border border-gray-700)
+- [x] Coller le document au titre (p-1 au lieu de p-4, border-b border-gray-600)
+
+
+- [x] Supprimer le panneau "Infos" en bas pour allonger le chat
+
+
+- [x] Réduire le bouton supprimer (X) sur les vignettes (w-2.5 h-2.5, p-0.5)
+- [x] Ajouter une icône "Envoyer" sur les vignettes pour intégrer le document dans le chat (bouton bleu avec Send)
+
+
+- [x] Agrandir légèrement l'icône d'envoi (w-3 h-3)
+- [x] Modifier l'envoi pour afficher un aperçu type vignette dans le chat (images avec aperçu, PDF/vidéo avec icônes)
+
+
+- [x] Déplacer l'icône d'envoi en bas à droite de la vignette (bottom-0.5 right-0.5)
+- [x] Changer la couleur de l'icône d'envoi en vert (bg-green-600)
+- [x] Retirer les infos en bas du document (titre supprimé)
+- [x] Retirer les contours des vignettes (border-2 remplacé par ring-2 sur sélection uniquement)
+
+
+- [x] Inverser les couleurs du chat : lecteur (bleu) et présentateur (vert)
+- [x] Inverser l'ordre des messages côté lecteur (derniers en haut) - déjà en place avec .reverse()
+- [ ] Corriger les vignettes noires vides dans le chat - à investiguer (problème d'URL ou CORS)
+
+
+- [x] Clic sur document dans le chat = affichage pour tous les viewers (présentateur + spectateurs)
+- [x] Coller le document en haut du viewer du présentateur (items-start au lieu de items-center)
+
+
+- [x] Afficher le pointeur rouge dès 100% de zoom (zoom >= 100 au lieu de zoom > 100)
+
+
+- [x] Corriger le décalage du pointeur rouge (revenir à containerRect pour mousePos, garder imageRect pour sync)
+
+
+- [x] Corriger le décalage vertical du pointeur rouge (calculer position relative à l'image puis convertir en coordonnées conteneur)
+
+
+- [x] Ajouter décalage manuel du pointeur rouge (offsetX, offsetY) pour ajustement guidé
+
+
+- [x] Corriger le décalage du pointeur rouge côté spectateur (conversion % → pixels avec imageRect)
+
+
+- [x] Copier la logique de calcul du pointeur du présentateur vers le spectateur (conversion % → pixels)
+- [x] Chat déjà en dessous du viewer côté spectateur (65% viewer, 35% chat)
+
+
+- [x] Remplacer ChatPanelViewer par ChatPanel côté spectateur (même structure que présentateur)
+- [x] Garder les couleurs différenciées (présentateur vert, spectateur bleu) - déjà implémenté dans ChatPanel
+- [x] Clic sur document dans le chat affiche dans le viewer pour tous (onLoadDocument avec setCurrentDocumentMutation)
+
+
+- [x] Retirer les contours des documents dans le viewer présentateur (border-0, p-0)
+- [x] Retirer le titre du document côté présentateur (suppression de la Title Bar)
+- [x] Retirer les contours et titre côté spectateur (déjà sans contours ni titre)
+
+
+- [x] Retirer les contours des vignettes de documents (présentateur) - déjà sans bordure par défaut
+- [x] Retirer les titres des vignettes PDF et vidéo (icônes agrandies à text-4xl)
+- [x] Retirer les noms de fichiers des documents dans le chat (images sans texte, PDF/vidéo avec icônes agrandies)
+
+
+- [x] Retirer toutes les bordures des documents dans le chat (images sans border, PDF/vidéos sans bg-gray-600)
+
+
+- [x] Retirer la bulle colorée pour les documents (documents sans bg, messages texte avec bg vert/bleu)
+- [x] Configurer le scroll du chat (garder .reverse() + scrollTop = 0 pour derniers messages en haut)
+- [x] Changer le pointeur rouge en icône de main avec doigt pointé (👆 avec ombre rouge)
+
+
+- [x] Utiliser toute la largeur de la ligne du chat (w-full au lieu de max-w-[80%])
+- [x] Diminuer la taille du texte des messages (text-xs au lieu de text-sm)
+- [x] Sortir l'heure de la bulle (text-[8px] en dessous, alignée selon expéditeur)
+
+
+- [x] Ajouter le pointeur main avec doigt côté spectateur (👆 avec ombre rouge)
+
+
+- [x] Cacher le curseur système côté présentateur (cursor: none quand zoom >= 100)
 

@@ -4,7 +4,7 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useParams, Link } from "wouter";
-import { ArrowLeft, Users, Copy, Share2, Upload, X, ZoomIn, ZoomOut, Check } from "lucide-react";
+import { ArrowLeft, Users, Copy, Share2, Upload, X, ZoomIn, ZoomOut, Check, Send } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -83,6 +83,8 @@ export default function PresenterControl() {
   });
 
   const updateZoomAndCursorMutation = trpc.presentation.updateZoomAndCursor.useMutation();
+
+  const sendMessageMutation = trpc.chat.sendMessage.useMutation();
 
   const handleUploadDocument = async (file: File) => {
     if (!file) return;
@@ -186,16 +188,19 @@ export default function PresenterControl() {
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const containerRect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - containerRect.left;
-    const y = e.clientY - containerRect.top;
-    setMousePos({ x, y });
-
     if (displayedDocumentId && currentSession && imageRef.current) {
-      // Get image dimensions and position
+      // Get container and image dimensions
+      const containerRect = e.currentTarget.getBoundingClientRect();
       const imageRect = imageRef.current.getBoundingClientRect();
+      
+      // Position relative to image
       const imageX = e.clientX - imageRect.left;
       const imageY = e.clientY - imageRect.top;
+      
+      // Position for cursor display (relative to container, but accounting for image position)
+      const cursorX = imageRect.left - containerRect.left + imageX;
+      const cursorY = imageRect.top - containerRect.top + imageY;
+      setMousePos({ x: cursorX, y: cursorY });
       
       // Convert pixel coordinates to percentage (0-100) relative to image
       const xPercent = (imageX / imageRect.width) * 100;
@@ -206,7 +211,7 @@ export default function PresenterControl() {
         zoomLevel: zoom,
         cursorX: xPercent,
         cursorY: yPercent,
-        cursorVisible: showMouseCursor && zoom > 100,
+        cursorVisible: showMouseCursor && zoom >= 100,
         panOffsetX: panOffset.x,
         panOffsetY: panOffset.y,
       });
@@ -250,19 +255,19 @@ export default function PresenterControl() {
               </Button>
             </Link>
             <div>
-              <h1 className="text-xl font-bold">{currentSession.title}</h1>
-              <p className="text-xs text-gray-400">Code: {currentSession.sessionCode}</p>
+              <h1 className="text-sm font-bold">{currentSession.title}</h1>
+              <p className="text-[10px] text-gray-400">Code: {currentSession.sessionCode}</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 px-3 py-2 bg-blue-900 rounded-lg">
-              <Users className="w-4 h-4" />
-              <span className="font-semibold text-sm">{viewerCount} spectateur{viewerCount !== 1 ? "s" : ""}</span>
+            <div className="flex items-center gap-2 px-2 py-1 bg-blue-900 rounded-lg">
+              <Users className="w-3 h-3" />
+              <span className="text-[10px] text-gray-300">Spectateurs: <span className="font-bold">{viewerCount}</span></span>
             </div>
             <Button
               onClick={handleEndSession}
               variant="destructive"
-              size="sm"
+              className="h-6 px-2 text-[10px]"
             >
               Terminer
             </Button>
@@ -395,6 +400,28 @@ export default function PresenterControl() {
           >
             <p className="text-xs text-gray-400">Glisser un fichier ici</p>
           </div>
+
+          {/* Share Buttons - Copier et WhatsApp */}
+          <Button
+            onClick={() => copyToClipboard(getShareLink(currentSession.sessionCode))}
+            variant="outline"
+            className="gap-1 bg-gray-700 border-gray-600 hover:bg-gray-600 text-white h-8 px-3"
+            size="sm"
+          >
+            <Copy className="w-3 h-3" />
+            Copier
+          </Button>
+
+          <a
+            href={generateWhatsAppLink(currentSession.sessionCode)}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button className="gap-1 bg-green-600 hover:bg-green-700 h-8 px-3" size="sm">
+              <Share2 className="w-3 h-3" />
+              WhatsApp
+            </Button>
+          </a>
         </div>
 
         {/* Thumbnails Bar */}
@@ -410,10 +437,10 @@ export default function PresenterControl() {
                 key={doc.id}
                 onClick={() => setSelectedDocumentId(doc.id)}
                 onDoubleClick={() => handleDisplayDocument(doc.id)}
-                className={`flex-shrink-0 w-24 h-24 rounded-lg border-2 cursor-pointer transition-all group relative overflow-hidden ${
+                className={`flex-shrink-0 w-24 h-24 rounded-lg cursor-pointer transition-all group relative overflow-hidden ${
                   selectedDocumentId === doc.id
-                    ? "border-blue-500 bg-blue-900 bg-opacity-30"
-                    : "border-gray-600 hover:border-gray-500"
+                    ? "ring-2 ring-blue-500"
+                    : ""
                 }`}
               >
                 {doc.type === "image" && (
@@ -429,9 +456,7 @@ export default function PresenterControl() {
                       alt={doc.title}
                       className="w-full h-full object-cover pointer-events-none relative z-10"
                     />
-                    <div className="absolute inset-0 flex flex-col items-end justify-end text-white pointer-events-none z-20 p-1">
-                      <div className="text-xs text-center font-semibold line-clamp-1 bg-black bg-opacity-60 px-1 rounded">{doc.title}</div>
-                    </div>
+                    {/* Bouton Supprimer en haut à droite */}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -439,23 +464,40 @@ export default function PresenterControl() {
                           deleteDocumentMutation.mutate({ documentId: doc.id, sessionId: sessionIdNum });
                         }
                       }}
-                      className="absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white rounded-full p-1 z-30 transition-colors"
+                      className="absolute top-0.5 right-0.5 bg-red-600 hover:bg-red-700 text-white rounded-full p-0.5 transition-colors z-30"
                       title="Supprimer ce document"
                     >
-                      <X className="w-3 h-3" />
+                      <X className="w-2.5 h-2.5" />
+                    </button>
+                    {/* Bouton Envoyer en bas à droite - VERT */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // Envoyer le document dans le chat
+                        sendMessageMutation.mutate({
+                          sessionId: sessionIdNum,
+                          senderType: "presenter",
+                          senderName: currentSession.title,
+                          message: doc.title,
+                          videoUrl: doc.fileUrl,
+                          fileType: doc.type,
+                        });
+                      }}
+                      className="absolute bottom-0.5 right-0.5 bg-green-600 hover:bg-green-700 text-white rounded-full p-0.5 transition-colors z-30"
+                      title="Envoyer dans le chat"
+                    >
+                      <Send className="w-3 h-3" />
                     </button>
                   </>
                 )}
                 {doc.type === "pdf" && (
                   <div className="text-center flex flex-col items-center justify-center z-10 relative">
-                    <div className="text-2xl mb-1">📄</div>
-                    <div className="text-xs text-white font-semibold text-center px-2 line-clamp-2">{doc.title}</div>
+                    <div className="text-4xl">📄</div>
                   </div>
                 )}
                 {doc.type === "video" && (
                   <div className="text-center flex flex-col items-center justify-center z-10 relative">
-                    <div className="text-2xl mb-1">🎬</div>
-                    <div className="text-xs text-white font-semibold text-center px-2 line-clamp-2">{doc.title}</div>
+                    <div className="text-4xl">🎬</div>
                   </div>
                 )}
 
@@ -481,36 +523,20 @@ export default function PresenterControl() {
         <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-4 overflow-hidden">
           {/* Center - Preview Area */}
           <div className="lg:col-span-3 flex flex-col gap-2 overflow-hidden">
-            <Card className="bg-gray-800 border-gray-700 flex-1 flex flex-col overflow-hidden">
-              {/* Title Bar */}
-              {displayedDocument && (
-                <div className="bg-gray-700 px-4 py-2 flex items-center justify-between border-b border-gray-600">
-                  <div className="text-xs font-semibold text-white truncate">
-                    {displayedDocument.title}
-                  </div>
-                  <Button
-                    onClick={handleClearDisplay}
-                    variant="ghost"
-                    size="sm"
-                    className="text-red-400 hover:text-red-300 h-6 w-6 p-0"
-                  >
-                    <X className="w-3 h-3" />
-                  </Button>
-                </div>
-              )}
-              <CardContent className="flex-1 flex items-center justify-center overflow-hidden relative p-4">
+            <Card className="bg-gray-800 border-0 flex-1 flex flex-col overflow-hidden">
+              <CardContent className="flex-1 flex items-start justify-center overflow-hidden relative p-0">
                 {displayedDocument ? (
                   <div
-                    className="relative w-full h-full flex items-center justify-center overflow-hidden"
-                    style={{ cursor: isPanning ? 'grabbing' : (zoom > 100 ? 'grab' : 'crosshair') }}
+                    className="relative w-full h-full flex items-start justify-center overflow-hidden"
+                    style={{ cursor: zoom >= 100 ? 'none' : 'default' }}
                     onMouseDown={(e) => {
-                      if (zoom > 100) {
+                      if (zoom >= 100) {
                         setIsPanning(true);
                         setPanStart({ x: e.clientX - panOffset.x, y: e.clientY - panOffset.y });
                       }
                     }}
                     onMouseMove={(e) => {
-                      if (isPanning && zoom > 100) {
+                      if (isPanning && zoom >= 100) {
                         setPanOffset({
                           x: e.clientX - panStart.x,
                           y: e.clientY - panStart.y,
@@ -533,13 +559,18 @@ export default function PresenterControl() {
                         setIsPanning(false);
                       } else if (e.touches.length === 1) {
                         // Single finger: show cursor and pan if zoomed
-                        const rect = e.currentTarget.getBoundingClientRect();
-                        const x = e.touches[0].clientX - rect.left;
-                        const y = e.touches[0].clientY - rect.top;
-                        setMousePos({ x, y });
+                        if (imageRef.current) {
+                          const containerRect = e.currentTarget.getBoundingClientRect();
+                          const imageRect = imageRef.current.getBoundingClientRect();
+                          const imageX = e.touches[0].clientX - imageRect.left;
+                          const imageY = e.touches[0].clientY - imageRect.top;
+                          const cursorX = imageRect.left - containerRect.left + imageX;
+                          const cursorY = imageRect.top - containerRect.top + imageY;
+                          setMousePos({ x: cursorX, y: cursorY });
+                        }
                         setShowMouseCursor(true);
                         
-                        if (zoom > 100) {
+                        if (zoom >= 100) {
                           setIsPanning(true);
                           setPanStart({
                             x: e.touches[0].clientX - panOffset.x,
@@ -586,32 +617,37 @@ export default function PresenterControl() {
                         }
                       } else if (e.touches.length === 1) {
                         // Single finger: update cursor position and pan
-                        const rect = e.currentTarget.getBoundingClientRect();
-                        const x = e.touches[0].clientX - rect.left;
-                        const y = e.touches[0].clientY - rect.top;
-                        setMousePos({ x, y });
+                        if (imageRef.current) {
+                          const containerRect = e.currentTarget.getBoundingClientRect();
+                          const imageRect = imageRef.current.getBoundingClientRect();
+                          const imageX = e.touches[0].clientX - imageRect.left;
+                          const imageY = e.touches[0].clientY - imageRect.top;
+                          const cursorX = imageRect.left - containerRect.left + imageX;
+                          const cursorY = imageRect.top - containerRect.top + imageY;
+                          setMousePos({ x: cursorX, y: cursorY });
                         
-                        if (isPanning && zoom > 100) {
-                          setPanOffset({
-                            x: e.touches[0].clientX - panStart.x,
-                            y: e.touches[0].clientY - panStart.y,
-                          });
-                        }
-                        
-                        // Send cursor position to viewers (as percentage)
-                        if (displayedDocumentId && currentSession) {
-                          const xPercent = (x / rect.width) * 100;
-                          const yPercent = (y / rect.height) * 100;
+                          if (isPanning && zoom >= 100) {
+                            setPanOffset({
+                              x: e.touches[0].clientX - panStart.x,
+                              y: e.touches[0].clientY - panStart.y,
+                            });
+                          }
                           
-                          updateZoomAndCursorMutation.mutate({
-                            sessionId: sessionIdNum,
-                            zoomLevel: zoom,
-                            cursorX: xPercent,
-                            cursorY: yPercent,
-                            cursorVisible: true,
-                            panOffsetX: panOffset.x,
-                            panOffsetY: panOffset.y,
-                          });
+                          // Send cursor position to viewers (as percentage)
+                          if (displayedDocumentId && currentSession) {
+                            const xPercent = (imageX / imageRect.width) * 100;
+                            const yPercent = (imageY / imageRect.height) * 100;
+                          
+                            updateZoomAndCursorMutation.mutate({
+                              sessionId: sessionIdNum,
+                              zoomLevel: zoom,
+                              cursorX: xPercent,
+                              cursorY: yPercent,
+                              cursorVisible: true,
+                              panOffsetX: panOffset.x,
+                              panOffsetY: panOffset.y,
+                            });
+                          }
                         }
                       }
                     }}
@@ -649,16 +685,19 @@ export default function PresenterControl() {
                           }}
                         />
                         {/* Cursor Indicator - Red for Presenter */}
-                        {showMouseCursor && zoom > 100 && (
+                        {/* Pointeur main avec doigt */}
+                        {showMouseCursor && zoom >= 100 && (
                           <div
-                            className="absolute w-6 h-6 border-2 border-red-500 rounded-full pointer-events-none"
+                            className="absolute pointer-events-none"
                             style={{
-                              left: `${mousePos.x}px`,
-                              top: `${mousePos.y}px`,
+                              left: `${mousePos.x + 0}px`,
+                              top: `${mousePos.y + 0}px`,
                               transform: "translate(-50%, -50%)",
                             }}
                           >
-                            <div className="absolute inset-1 border-2 border-red-500 rounded-full opacity-50" />
+                            <div className="text-3xl" style={{ filter: 'drop-shadow(0 0 3px rgba(255, 0, 0, 0.8))' }}>
+                              👆
+                            </div>
                           </div>
                         )}
                       </>
@@ -690,65 +729,23 @@ export default function PresenterControl() {
 
           {/* Right Panel - Controls & Info */}
           <div className="lg:col-span-1 flex flex-col gap-2 overflow-y-auto">
-            {/* Chat Panel - Sans Card, juste le composant */}
-            <div className="flex-1 flex flex-col overflow-hidden">
+            {/* Chat Panel - Allongé vers le bas */}
+            <div className="flex-[2] flex flex-col overflow-hidden">
               <ChatPanel
                 sessionId={sessionIdNum}
                 senderType="presenter"
                 senderName={currentSession.title}
                 showDeleteButton={true}
-                onLoadDocument={(url, name, type) => {
-                  // Charger le document dans le visualisateur
-                  console.log('Load document:', url, name, type);
+                onLoadDocument={async (url, name, type) => {
+                  // Trouver le document correspondant dans la liste
+                  const doc = documents.find(d => d.fileUrl === url);
+                  if (doc) {
+                    // Afficher le document pour tous les viewers
+                    await handleDisplayDocument(doc.id);
+                  }
                 }}
               />
             </div>
-
-            {/* Share Buttons - Sans Card */}
-            <div className="space-y-2">
-              <Button
-                onClick={() => copyToClipboard(getShareLink(currentSession.sessionCode))}
-                variant="outline"
-                className="w-full gap-1 bg-gray-700 border-gray-600 hover:bg-gray-600 text-white h-10"
-                size="sm"
-              >
-                <Copy className="w-4 h-4" />
-                Copier
-              </Button>
-
-              <a
-                href={generateWhatsAppLink(currentSession.sessionCode)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block"
-              >
-                <Button className="w-full gap-1 bg-green-600 hover:bg-green-700 h-10" size="sm">
-                  <Share2 className="w-4 h-4" />
-                  WhatsApp
-                </Button>
-              </a>
-            </div>
-
-            {/* Info Panel */}
-            <Card className="bg-gray-800 border-gray-700">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-xs">Infos</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-xs">
-                <div>
-                  <p className="text-gray-400 text-xs">Code:</p>
-                  <p className="font-mono font-bold text-xs">{currentSession.sessionCode}</p>
-                </div>
-                <div>
-                  <p className="text-gray-400 text-xs">Spectateurs:</p>
-                  <p className="font-bold text-xs">{viewerCount}</p>
-                </div>
-                <div>
-                  <p className="text-gray-400 text-xs">Documents:</p>
-                  <p className="font-bold text-xs">{documents.length}</p>
-                </div>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </main>

@@ -64,10 +64,10 @@ export default function ChatPanel({
     },
   });
 
-  // Auto-scroll to bottom when new messages arrive
+  // Auto-scroll to top when new messages arrive (derniers messages en haut)
   useEffect(() => {
     if (messagesContainerRef.current) {
-      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+      messagesContainerRef.current.scrollTop = 0;
     }
   }, [messages]);
 
@@ -201,38 +201,60 @@ export default function ChatPanel({
             return (
               <div
                 key={msg.id}
-                className={`flex ${isPresenter ? "justify-end" : "justify-start"}`}
+                className="flex flex-col w-full"
               >
-                <div
-                  className={`max-w-[80%] rounded-lg p-2 ${
-                    isPresenter
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-700 text-white"
-                  }`}
-                >
-                  <p className="text-[10px] font-semibold mb-1">{msg.senderName}</p>
-                  
-                  {isDocument ? (
+                {isDocument ? (
+                  // Documents sans bulle
+                  <div className={`flex ${isPresenter ? "justify-end" : "justify-start"}`}>
                     <button
                       onClick={() => handleDocumentClick(msg.videoUrl!, msg.message, msg.fileType || 'image')}
-                      className="text-left w-full hover:underline"
+                      className="text-left"
                     >
-                      <div className="flex items-center gap-1">
-                        <Paperclip className="w-3 h-3" />
-                        <span className="text-sm break-all">{msg.message}</span>
-                      </div>
+                      {/* Aperçu vignette pour images */}
+                      {msg.fileType === 'image' && (
+                        <div>
+                          <img 
+                            src={msg.videoUrl} 
+                            alt={msg.message}
+                            className="w-full max-w-[200px] hover:opacity-80 transition-opacity"
+                          />
+                        </div>
+                      )}
+                      {/* Icône pour PDF */}
+                      {msg.fileType === 'pdf' && (
+                        <div className="flex items-center justify-center p-3 hover:opacity-80 transition-opacity">
+                          <div className="text-4xl">📄</div>
+                        </div>
+                      )}
+                      {/* Icône pour vidéo */}
+                      {msg.fileType === 'video' && (
+                        <div className="flex items-center justify-center p-3 hover:opacity-80 transition-opacity">
+                          <div className="text-4xl">🎬</div>
+                        </div>
+                      )}
                     </button>
-                  ) : (
-                    <p className="text-sm break-words">{msg.message}</p>
-                  )}
-
-                  <p className="text-[9px] text-gray-300 mt-1 text-right">
-                    {new Date(msg.createdAt).toLocaleTimeString("fr-FR", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </p>
-                </div>
+                  </div>
+                ) : (
+                  // Messages texte avec bulle
+                  <div className={`flex ${isPresenter ? "justify-end" : "justify-start"}`}>
+                    <div
+                      className={`rounded-lg px-3 py-1.5 ${
+                        isPresenter
+                          ? "bg-green-600 text-white"
+                          : "bg-blue-600 text-white"
+                      }`}
+                    >
+                      <p className="text-xs break-words">{msg.message}</p>
+                    </div>
+                  </div>
+                )}
+                {/* Heure en dessous, alignée selon l'expéditeur */}
+                <p className={`text-[8px] text-gray-400 mt-0.5 ${isPresenter ? "text-right" : "text-left"}`}>
+                  {new Date(msg.createdAt).toLocaleTimeString("fr-FR", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </p>
               </div>
             );
           })

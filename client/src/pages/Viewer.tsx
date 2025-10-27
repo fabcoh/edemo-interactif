@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRoute } from "wouter";
-import ChatPanelViewer from "@/components/ChatPanelViewer";
+import ChatPanel from "@/components/ChatPanel";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,6 +36,7 @@ export default function Viewer() {
   const [presenterPanOffsetX, setPresenterPanOffsetX] = useState(0);
   const [presenterPanOffsetY, setPresenterPanOffsetY] = useState(0);
   const [documentError, setDocumentError] = useState<string | null>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
 
   // Extract session code from URL if present
   useEffect(() => {
@@ -179,28 +180,42 @@ export default function Viewer() {
             {!documentError && displayDocument.type === "image" && (
               <div className="flex items-center justify-center w-full h-full relative">
                 <img
+                  ref={imageRef}
                   src={displayDocument.fileUrl}
                   alt="Document"
                   style={{
                     transform: `scale(${presenterZoom / 100}) translate(${presenterPanOffsetX / (presenterZoom / 100)}px, ${presenterPanOffsetY / (presenterZoom / 100)}px)`,
                     transition: "transform 0.2s ease-out",
                   }}
-                  className="w-full h-full object-contain"
+                  className="max-w-full max-h-full object-contain"
                   onError={() => setDocumentError("Impossible de charger l'image")}
                 />
-                {/* Presenter cursor - Red for presenter, visible for viewers */}
-                {presenterCursorVisible && (
-                  <div
-                    className="absolute w-6 h-6 border-2 border-red-500 rounded-full pointer-events-none"
-                    style={{
-                      left: `${presenterCursorX}%`,
-                      top: `${presenterCursorY}%`,
-                      transform: "translate(-50%, -50%)",
-                    }}
-                  >
-                    <div className="absolute inset-1 border-2 border-red-500 rounded-full opacity-50" />
-                  </div>
-                )}
+                {/* Pointeur main du présentateur visible pour les spectateurs */}
+                {/* Convert percentage to pixels based on actual image position */}
+                {presenterCursorVisible && imageRef.current && (() => {
+                  const imageRect = imageRef.current.getBoundingClientRect();
+                  const containerRect = imageRef.current.parentElement?.getBoundingClientRect();
+                  if (!containerRect) return null;
+                  
+                  // Calculate cursor position in pixels
+                  const cursorX = (presenterCursorX / 100) * imageRect.width + (imageRect.left - containerRect.left);
+                  const cursorY = (presenterCursorY / 100) * imageRect.height + (imageRect.top - containerRect.top);
+                  
+                  return (
+                    <div
+                      className="absolute pointer-events-none"
+                      style={{
+                        left: `${cursorX}px`,
+                        top: `${cursorY}px`,
+                        transform: "translate(-50%, -50%)",
+                      }}
+                    >
+                      <div className="text-3xl" style={{ filter: 'drop-shadow(0 0 3px rgba(255, 0, 0, 0.8))' }}>
+                        👆
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             )}
 
@@ -218,11 +233,12 @@ export default function Viewer() {
 
           {/* Chat Panel - Bottom 35% */}
           <div className="h-[35%] bg-gray-900 border-t border-gray-700 flex flex-col">
-            <ChatPanelViewer
+            <ChatPanel
               sessionId={session?.id || 0}
               senderType="viewer"
               senderName="Spectateur"
-              onLoadDocument={(url: string, name: string, type: string) => {
+              showDeleteButton={false}
+              onLoadDocument={async (url: string, name: string, type: string) => {
                 // Mettre à jour le document actuel de la session (synchronisation avec le présentateur)
                 console.log('[Viewer] onLoadDocument called', { url, name, type, enteredCode });
                 if (enteredCode && (type === 'image' || type === 'pdf' || type === 'video')) {
