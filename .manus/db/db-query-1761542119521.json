@@ -1,0 +1,20 @@
+{
+  "query": "SELECT * FROM chat_messages LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3j1v42nUZuvgHzn.root --database 8CbieS7mEqbTHNrWVL4VaZ --execute SELECT * FROM chat_messages LIMIT 1;",
+  "rows": [
+    {
+      "id": "60008",
+      "sessionId": "1",
+      "senderType": "presenter",
+      "senderName": "Présentation",
+      "message": "szzz",
+      "videoUrl": "NULL",
+      "fileType": "NULL",
+      "createdAt": "2025-10-27 05:03:15"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tsessionId\tsenderType\tsenderName\tmessage\tvideoUrl\tfileType\tcreatedAt\n60008\t1\tpresenter\tPrésentation\tszzz\tNULL\tNULL\t2025-10-27 05:03:15\n",
+  "stderr": "",
+  "execution_time_ms": 50
+}

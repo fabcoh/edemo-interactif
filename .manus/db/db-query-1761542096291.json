@@ -1,0 +1,46 @@
+{
+  "query": "SHOW TABLES;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3j1v42nUZuvgHzn.root --database 8CbieS7mEqbTHNrWVL4VaZ --execute SHOW TABLES;",
+  "rows": [
+    {
+      "Tables_in_8CbieS7mEqbTHNrWVL4VaZ": "__drizzle_migrations"
+    },
+    {
+      "Tables_in_8CbieS7mEqbTHNrWVL4VaZ": "chat_messages"
+    },
+    {
+      "Tables_in_8CbieS7mEqbTHNrWVL4VaZ": "commercial_invitations"
+    },
+    {
+      "Tables_in_8CbieS7mEqbTHNrWVL4VaZ": "documents"
+    },
+    {
+      "Tables_in_8CbieS7mEqbTHNrWVL4VaZ": "presentation_collaborators"
+    },
+    {
+      "Tables_in_8CbieS7mEqbTHNrWVL4VaZ": "presentation_sessions"
+    },
+    {
+      "Tables_in_8CbieS7mEqbTHNrWVL4VaZ": "presentation_shares"
+    },
+    {
+      "Tables_in_8CbieS7mEqbTHNrWVL4VaZ": "presentation_viewers"
+    },
+    {
+      "Tables_in_8CbieS7mEqbTHNrWVL4VaZ": "presenter_cursors"
+    },
+    {
+      "Tables_in_8CbieS7mEqbTHNrWVL4VaZ": "session_instances"
+    },
+    {
+      "Tables_in_8CbieS7mEqbTHNrWVL4VaZ": "users"
+    },
+    {
+      "Tables_in_8CbieS7mEqbTHNrWVL4VaZ": "viewer_cursors"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_8CbieS7mEqbTHNrWVL4VaZ\n__drizzle_migrations\nchat_messages\ncommercial_invitations\ndocuments\npresentation_collaborators\npresentation_sessions\npresentation_shares\npresentation_viewers\npresenter_cursors\nsession_instances\nusers\nviewer_cursors\n",
+  "stderr": "",
+  "execution_time_ms": 50
+}
