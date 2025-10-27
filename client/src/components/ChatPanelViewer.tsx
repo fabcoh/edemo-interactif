@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
+// Version: 2025-01-27 - Interface chat avec vignettes
+
 interface ChatPanelViewerProps {
   sessionId: number;
   senderType: "presenter" | "viewer";
