@@ -108,9 +108,7 @@ export default function ChatPanel({
 
   // Handle delete all messages
   const handleDeleteAll = () => {
-    if (confirm("Supprimer tous les messages ?")) {
-      deleteAllMessagesMutation.mutate({ sessionId });
-    }
+    deleteAllMessagesMutation.mutate({ sessionId });
   };
 
   // Handle document click
@@ -131,6 +129,17 @@ export default function ChatPanel({
           accept="image/*,video/*,application/pdf"
           onChange={handleFileUpload}
         />
+
+        {/* Paperclip Button */}
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={() => fileInputRef.current?.click()}
+          className="text-gray-400 hover:text-gray-300 hover:bg-gray-700 h-10 px-3 flex-shrink-0"
+          title="Joindre un fichier"
+        >
+          <Paperclip className="w-5 h-5" />
+        </Button>
 
         {/* Text Input */}
         <Input
@@ -214,7 +223,7 @@ export default function ChatPanel({
                       {msg.fileType === 'image' && (
                         <div>
                           <img 
-                            src={msg.videoUrl} 
+                            src={msg.videoUrl || ''} 
                             alt={msg.message}
                             className="w-full max-w-[200px] hover:opacity-80 transition-opacity"
                           />

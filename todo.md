@@ -251,3 +251,110 @@ Le projet Edemo Live est maintenant complet avec :
 
 - [x] Cacher le curseur système côté présentateur (cursor: none quand zoom >= 100)
 
+
+
+
+## 🐛 Bugs critiques à corriger
+
+- [x] **Erreur SQL chat.getMessages** : Incompatibilité entre le schéma de la table et la requête (colonnes 'fileName', 'mimeType' inexistantes)
+- [x] **Viewer ne charge pas les documents** : Erreur "Impossible de charger l'image" côté spectateur quand le présentateur double-clique - Système S3 restauré
+- [x] Synchroniser le schéma de la base de données avec `pnpm db:push`
+
+
+
+
+## 🐛 Bug urgent à corriger
+
+- [x] **Bouton trombone (📎) manquant dans le chat** : Le bouton pour uploader des fichiers dans le chat a disparu - Rajouté
+
+
+
+- [x] **Vignettes ne s'affichent pas après upload** : Lors du téléchargement d'un document, il affiche "vignette" au lieu de l'image - Système S3 restauré
+
+
+
+
+## 🔧 Refactorisation technique
+
+- [x] **Centraliser la logique d'upload** : Créer une fonction commune pour tous les uploads (documents, chat, etc.) pour faciliter la maintenance - uploadFileToStorage() implémentée
+
+
+
+- [ ] **Vignettes ne s'affichent pas après upload** : Problème à investiguer plus tard (route /api/files fonctionne, S3 configuré, mais affichage frontend ne fonctionne pas)
+
+
+
+
+## 🎨 Nouvelle fonctionnalité - Réorganisation interface spectateur
+
+- [x] **Zone upload côté spectateur** : Créer une zone d'upload visible sous la barre d'écriture
+- [x] **Layout 2 colonnes** : Upload (1/3) + Chat (2/3) côte à côte
+- [x] **Technologie présentateur** : Réutiliser le système d'upload du présentateur (clic → affichage immédiat)
+- [x] **Affichage synchronisé** : Les uploads apparaissent des 2 côtés (présentateur + spectateur)
+- [x] **Fil temporaire** : Tout reste dans le fil de discussion temporairement
+
+
+
+- [x] **Clic sur vignette spectateur ne fonctionne pas** : Le document ne s'affiche pas en grand quand on clique sur une vignette - Corrigé : upload sur S3 avant affichage
+- [ ] **Vignettes PDF ne s'affichent pas** : Les PDF montrent juste une icône au lieu d'une preview
+
+
+
+- [x] **Document spectateur ne s'affiche pas côté présentateur** : Quand le spectateur uploade, le document apparaît côté spectateur mais pas côté présentateur - Corrigé : refetchInterval ajouté
+- [x] **Inverser l'ordre des vignettes** : Afficher le plus récent en haut, le plus ancien en bas - Corrigé : reverse() appliqué
+
+
+
+- [x] **Document spectateur ne s'affiche pas côté présentateur en temps réel** : Quand le spectateur clique sur une vignette, le document ne s'affiche pas immédiatement côté présentateur - Corrigé : useEffect + refetchInterval
+
+
+
+- [x] **Afficher preview PDF dans toutes les vignettes** : Utiliser react-pdf pour afficher la première page du PDF dans les vignettes (spectateur, présentateur)
+- [x] **PDF ne s'affiche pas en grand côté présentateur** : Le viewer du présentateur ne lit pas les PDF uploadés par le spectateur - Corrigé : react-pdf implémenté
+
+
+
+- [x] **Erreur 500 lors du chargement des PDF depuis S3** : Ajouter une gestion d'erreur pour afficher un fallback au lieu de crasher - Corrigé : fallback avec icône + message d'erreur
+
+
+
+- [ ] **Upload spectateur affiche une ancienne image** : Lors de l'ajout d'un document, une image précédente s'affiche au lieu du nouveau document - En investigation
+- [x] **Navigation PDF manquante côté spectateur** : Le spectateur ne peut pas changer de page dans les PDF, seulement le présentateur - Corrigé : boutons ← → ajoutés
+
+
+
+- [x] **Bouton suppression dans la zone Upload spectateur** : Permettre au spectateur de supprimer les fichiers qu'il a uploadés - Corrigé : bouton × ajouté (visible au survol)
+
+
+
+- [ ] **Suppression des documents spectateur côté présentateur** : Le bouton ❌ sur les vignettes du présentateur ne supprime pas les documents uploadés par le spectateur - En investigation
+
+
+
+- [x] **Vignettes noires côté présentateur** : Les documents uploadés par le spectateur apparaissent en noir (pas de preview) - Corrigé : gradient de fond visible si image ne charge pas
+- [x] **Croix rouge invisible** : Le bouton de suppression n'apparaît pas sur les vignettes côté présentateur - Corrigé : z-40 + shadow-lg pour meilleure visibilité
+
+
+
+- [x] **Améliorer les vignettes PDF** : Afficher une vraie preview de la première page du PDF (comme pour les images) au lieu d'une petite icône
+
+
+
+- [x] **Bug suppression en iframe** : La suppression de documents ne fonctionne pas quand le site est en production dans un iframe (confirm() bloqué) - Remplacé par AlertDialog
+
+
+
+- [x] **Retirer le popup de validation** : Supprimer la confirmation pour le bouton "Tout supprimer" (X rouge) dans le chat
+
+
+
+- [x] **Un seul clic pour afficher** : Remplacer le double-clic par un simple clic sur les vignettes
+- [x] **Augmenter la vitesse d'affichage** : Réduire l'intervalle de polling pour une synchronisation plus rapide (500ms au lieu de 2000ms)
+- [x] **Ajouter icône télécharger** : Mini icône bleue en bas à gauche des vignettes pour télécharger l'image
+- [x] **Ajouter icône WhatsApp** : Mini icône verte en haut à gauche des vignettes pour partager sur WhatsApp
+
+
+
+- [x] **Modifier bouton Copier** : Copier uniquement le lien du salon (sans iframe) - Déjà fonctionnel
+- [x] **Modifier bouton WhatsApp** : Envoyer le message "Santéo présentation : [lien]"
+

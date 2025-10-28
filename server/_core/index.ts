@@ -49,6 +49,24 @@ async function startServer() {
     }
   });
 
+  // Serve uploaded files from local storage
+  app.get("/api/files/:filename", (req, res) => {
+    const { filename } = req.params;
+    const filePath = `/home/ubuntu/edemo-interactif/uploads/${filename}`;
+    
+    // Security: prevent directory traversal
+    if (filename.includes("..") || filename.includes("/")) {
+      return res.status(400).json({ error: "Invalid filename" });
+    }
+    
+    res.sendFile(filePath, (err) => {
+      if (err) {
+        console.error("File serve error:", err);
+        res.status(404).json({ error: "File not found" });
+      }
+    });
+  });
+
   // Image proxy endpoint to bypass CORS
   app.get("/api/image-proxy", async (req, res) => {
     try {

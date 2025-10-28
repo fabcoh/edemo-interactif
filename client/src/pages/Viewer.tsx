@@ -36,6 +36,9 @@ export default function Viewer() {
   const [presenterPanOffsetX, setPresenterPanOffsetX] = useState(0);
   const [presenterPanOffsetY, setPresenterPanOffsetY] = useState(0);
   const [documentError, setDocumentError] = useState<string | null>(null);
+  const [viewerDocuments, setViewerDocuments] = useState<Array<{id: string, url: string, name: string, type: string}>>([]);
+  const [numPages, setNumPages] = useState<number | null>(null);
+  const [pageNumber, setPageNumber] = useState(1);
   const imageRef = useRef<HTMLImageElement>(null);
 
   // Extract session code from URL if present
@@ -134,6 +137,71 @@ export default function Viewer() {
     setZoom(presenterZoom);
   };
 
+  // Upload file mutation (using chat upload to S3)
+  const uploadFileMutation = trpc.chat.uploadFile.useMutation();
+
+  // Handle viewer document upload
+  const handleViewerUpload = async (file: File) => {
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const base64Data = e.target?.result as string;
+      const fileType = file.type.startsWith('image/') ? 'image' : file.type === 'application/pdf' ? 'pdf' : 'video';
+      
+      try {
+        // Upload to S3 first
+        const uploadResult = await uploadFileMutation.mutateAsync({
+          sessionId: session?.id || 0,
+          fileName: file.name,
+          fileData: base64Data.split(',')[1], // Remove data URL prefix
+          mimeType: file.type,
+        });
+        
+        // Create document object with S3 URL
+        const newDoc = {
+          id: `viewer-${Date.now()}`,
+          url: uploadResult.url,
+          name: file.name,
+          type: fileType
+        };
+        
+        // Add to viewer documents list
+        setViewerDocuments(prev => [...prev, newDoc]);
+        
+        // Automatically display the document for everyone
+        if (enteredCode) {
+          setCurrentDocumentMutation.mutate({
+            sessionCode: enteredCode,
+            documentUrl: uploadResult.url,
+            documentName: file.name,
+            documentType: fileType as "image" | "pdf" | "video",
+          });
+        }
+      } catch (error) {
+        console.error('Upload error:', error);
+        alert('Erreur lors de l\'upload du fichier');
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Handle viewer document deletion
+  const handleViewerDocumentDelete = (docId: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent triggering the click to display
+    setViewerDocuments(prev => prev.filter(d => d.id !== docId));
+  };
+
+  // Handle viewer document click to display
+  const handleViewerDocumentClick = (doc: {id: string, url: string, name: string, type: string}) => {
+    if (enteredCode) {
+      setCurrentDocumentMutation.mutate({
+        sessionCode: enteredCode,
+        documentUrl: doc.url,
+        documentName: doc.name,
+        documentType: doc.type as "image" | "pdf" | "video",
+      });
+    }
+  };
+
   // If joined and fullscreen, show only the document
   if (isJoined && isFullscreen && displayDocument) {
     return (
@@ -157,23 +225,57 @@ export default function Viewer() {
             )}
 
             {!documentError && displayDocument.type === "pdf" && (
-              <div className="w-full h-full overflow-auto bg-gray-900">
+              <div className="w-full h-full overflow-auto bg-gray-900 relative">
                 <Document
                   file={displayDocument.fileUrl}
+                  onLoadSuccess={({ numPages }) => setNumPages(numPages)}
                   onLoadError={(error) => {
                     console.error('PDF load error:', error);
                     setDocumentError("Impossible de charger le PDF");
                   }}
+                  loading={
+                    <div className="text-center p-8">
+                      <div className="text-6xl mb-4">📄</div>
+                      <p className="text-gray-400">Chargement du PDF...</p>
+                    </div>
+                  }
+                  error={
+                    <div className="text-center p-8">
+                      <div className="text-6xl mb-4">📄</div>
+                      <p className="text-red-400">Impossible de charger le PDF</p>
+                    </div>
+                  }
                   className="flex flex-col items-center"
                 >
                   <Page
-                    pageNumber={1}
+                    pageNumber={pageNumber}
                     className="max-w-full"
                     renderTextLayer={true}
                     renderAnnotationLayer={true}
                     width={window.innerWidth * 0.65}
                   />
                 </Document>
+                {numPages && numPages > 1 && (
+                  <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/70 px-4 py-2 rounded-lg flex items-center gap-2 z-10">
+                    <button
+                      className="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={() => setPageNumber(prev => Math.max(1, prev - 1))}
+                      disabled={pageNumber <= 1}
+                    >
+                      ←
+                    </button>
+                    <span className="text-white text-sm">
+                      Page {pageNumber} / {numPages}
+                    </span>
+                    <button
+                      className="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={() => setPageNumber(prev => Math.min(numPages, prev + 1))}
+                      disabled={pageNumber >= numPages}
+                    >
+                      →
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 
@@ -231,27 +333,128 @@ export default function Viewer() {
           </div>
           </div>
 
-          {/* Chat Panel - Bottom 35% */}
-          <div className="h-[35%] bg-gray-900 border-t border-gray-700 flex flex-col">
-            <ChatPanel
-              sessionId={session?.id || 0}
-              senderType="viewer"
-              senderName="Spectateur"
-              showDeleteButton={false}
-              onLoadDocument={async (url: string, name: string, type: string) => {
-                // Mettre à jour le document actuel de la session (synchronisation avec le présentateur)
-                console.log('[Viewer] onLoadDocument called', { url, name, type, enteredCode });
-                if (enteredCode && (type === 'image' || type === 'pdf' || type === 'video')) {
-                  console.log('[Viewer] Calling setCurrentDocumentMutation');
-                  setCurrentDocumentMutation.mutate({
-                    sessionCode: enteredCode,
-                    documentUrl: url,
-                    documentName: name,
-                    documentType: type as "image" | "pdf" | "video",
-                  });
-                }
-              }}
-            />
+          {/* Upload + Chat Panel - Bottom 35% - Layout 2 colonnes */}
+          <div className="h-[35%] bg-gray-900 border-t border-gray-700 flex flex-row">
+            {/* Zone Upload - 1/3 gauche */}
+            <div className="w-1/3 border-r border-gray-700 flex flex-col p-4 overflow-y-auto">
+              <h3 className="text-sm font-semibold text-gray-300 mb-3">Mes Documents</h3>
+              
+              {/* Zone glisser-déposer */}
+              <input
+                type="file"
+                id="viewer-document-upload"
+                accept="image/*,application/pdf,video/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleViewerUpload(file);
+                }}
+                className="hidden"
+              />
+              <div
+                onClick={() => document.getElementById('viewer-document-upload')?.click()}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  const files = e.dataTransfer.files;
+                  if (files.length > 0) {
+                    handleViewerUpload(files[0]);
+                  }
+                }}
+                className="border-2 border-dashed border-gray-600 rounded-lg p-4 text-center cursor-pointer hover:border-gray-500 transition-colors mb-4"
+              >
+                <p className="text-xs text-gray-400">Glisser un fichier ici</p>
+                <p className="text-xs text-gray-500 mt-1">ou cliquer pour sélectionner</p>
+              </div>
+
+              {/* Liste des vignettes uploadées */}
+              <div className="space-y-2 flex-1 overflow-y-auto">
+                {viewerDocuments.length === 0 ? (
+                  <p className="text-xs text-gray-500 text-center">Aucun document uploadé</p>
+                ) : (
+                  [...viewerDocuments].reverse().map((doc) => (
+                    <div
+                      key={doc.id}
+                      onClick={() => handleViewerDocumentClick(doc)}
+                      className="relative bg-gray-800 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-blue-500 transition-all group"
+                      style={{ aspectRatio: '16/9' }}
+                    >
+                      {doc.type === 'image' && (
+                        <img
+                          src={doc.url}
+                          alt={doc.name}
+                          className="w-full h-full object-cover"
+                        />
+                      )}
+                      {doc.type === 'pdf' && (
+                        <div className="w-full h-full flex items-center justify-center bg-red-900/20 overflow-hidden">
+                          <Document
+                            file={doc.url}
+                            onLoadError={(error) => console.error('PDF thumbnail error:', error)}
+                            loading={
+                              <div className="text-center">
+                                <div className="text-2xl">📄</div>
+                              </div>
+                            }
+                            error={
+                              <div className="text-center">
+                                <div className="text-2xl">📄</div>
+                                <p className="text-xs text-red-400 mt-1">Erreur</p>
+                              </div>
+                            }
+                          >
+                            <Page
+                              pageNumber={1}
+                              width={120}
+                              renderTextLayer={false}
+                              renderAnnotationLayer={false}
+                            />
+                          </Document>
+                        </div>
+                      )}
+                      {doc.type === 'video' && (
+                        <div className="w-full h-full flex items-center justify-center bg-purple-900/20">
+                          <span className="text-4xl">🎥</span>
+                        </div>
+                      )}
+                      <div className="absolute bottom-0 left-0 right-0 bg-black/70 p-1">
+                        <p className="text-xs text-white truncate">{doc.name}</p>
+                      </div>
+                      {/* Bouton de suppression */}
+                      <button
+                        onClick={(e) => handleViewerDocumentDelete(doc.id, e)}
+                        className="absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                        title="Supprimer"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+
+            {/* Zone Chat - 2/3 droite */}
+            <div className="w-2/3 flex flex-col">
+              <ChatPanel
+                sessionId={session?.id || 0}
+                senderType="viewer"
+                senderName="Spectateur"
+                showDeleteButton={false}
+                onLoadDocument={async (url: string, name: string, type: string) => {
+                  // Mettre à jour le document actuel de la session (synchronisation avec le présentateur)
+                  console.log('[Viewer] onLoadDocument called', { url, name, type, enteredCode });
+                  if (enteredCode && (type === 'image' || type === 'pdf' || type === 'video')) {
+                    console.log('[Viewer] Calling setCurrentDocumentMutation');
+                    setCurrentDocumentMutation.mutate({
+                      sessionCode: enteredCode,
+                      documentUrl: url,
+                      documentName: name,
+                      documentType: type as "image" | "pdf" | "video",
+                    });
+                  }
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>

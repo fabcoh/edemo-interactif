@@ -49,6 +49,38 @@ function generateFileKey(prefix: string): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).substring(7)}`;
 }
 
+/**
+ * Centralized file upload utility
+ * Handles base64 conversion and storage upload
+ * Use this for ALL file uploads (documents, chat, etc.)
+ * @param fileData - Base64 encoded file data (with or without data URL prefix)
+ * @param fileName - Original file name
+ * @param mimeType - File MIME type
+ * @param prefix - Storage path prefix (e.g., 'presentations/123', 'chat/456')
+ * @returns Object with file key and public URL
+ */
+async function uploadFileToStorage(
+  fileData: string,
+  fileName: string,
+  mimeType: string,
+  prefix: string
+): Promise<{ key: string; url: string; size: number }> {
+  // Convert base64 to buffer
+  // Remove data URL prefix if present (e.g., "data:image/jpeg;base64,")
+  const base64Data = fileData.includes('base64,') 
+    ? fileData.split('base64,')[1] 
+    : fileData;
+  const buffer = Buffer.from(base64Data, 'base64');
+  
+  // Generate unique file key
+  const fileKey = generateFileKey(`${prefix}/${fileName}`);
+  
+  // Upload to storage (S3)
+  const { url } = await storagePut(fileKey, buffer, mimeType);
+  
+  return { key: fileKey, url, size: buffer.length };
+}
+
 export const appRouter = router({
   system: systemRouter,
 
@@ -351,18 +383,13 @@ export const appRouter = router({
         }
 
         try {
-          // Convert base64 to buffer
-          // Remove data URL prefix if present (e.g., "data:image/jpeg;base64,")
-          const base64Data = input.fileData.includes('base64,') 
-            ? input.fileData.split('base64,')[1] 
-            : input.fileData;
-          const buffer = Buffer.from(base64Data, "base64");
-          
-          // Generate unique file key
-          const fileKey = generateFileKey(`presentations/${input.sessionId}/${input.type}`);
-          
-          // Upload to S3
-          const { url } = await storagePut(fileKey, buffer, input.mimeType);
+          // Upload file using centralized utility
+          const { key: fileKey, url, size } = await uploadFileToStorage(
+            input.fileData,
+            input.fileName,
+            input.mimeType,
+            `presentations/${input.sessionId}/${input.type}`
+          );
           
           // Get existing documents count to determine display order
           const existingDocs = await getSessionDocuments(input.sessionId);
@@ -376,7 +403,7 @@ export const appRouter = router({
             fileKey,
             url,
             input.mimeType,
-            buffer.length,
+            size,
             displayOrder
           );
 
@@ -929,14 +956,13 @@ export const appRouter = router({
         mimeType: z.string(),
       }))
       .mutation(async ({ input }) => {
-        // Convert base64 to buffer
-        const buffer = Buffer.from(input.fileData, 'base64');
-        
-        // Generate unique file key
-        const fileKey = generateFileKey(`chat/${input.sessionId}/${input.fileName}`);
-        
-        // Upload to S3
-        const { url } = await storagePut(fileKey, buffer, input.mimeType);
+        // Upload file using centralized utility
+        const { key: fileKey, url } = await uploadFileToStorage(
+          input.fileData,
+          input.fileName,
+          input.mimeType,
+          `chat/${input.sessionId}`
+        );
         
         return { url, key: fileKey };
       }),

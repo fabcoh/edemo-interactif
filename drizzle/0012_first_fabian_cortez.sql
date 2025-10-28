@@ -1,1 +1,0 @@
-ALTER TABLE `presentation_sessions` ADD `allowViewerUploads` boolean DEFAULT false NOT NULL;

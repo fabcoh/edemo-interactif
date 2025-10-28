@@ -4,11 +4,27 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useParams, Link } from "wouter";
-import { ArrowLeft, Users, Copy, Share2, Upload, X, ZoomIn, ZoomOut, Check, Send } from "lucide-react";
+import { ArrowLeft, Users, Copy, Share2, Upload, X, ZoomIn, ZoomOut, Check, Send, Download, MessageCircle } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import ChatPanel from "@/components/ChatPanel";
+import { Document, Page, pdfjs } from 'react-pdf';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import 'react-pdf/dist/Page/AnnotationLayer.css';
+import 'react-pdf/dist/Page/TextLayer.css';
+
+// Configure PDF.js worker
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 /**
  * Presenter Control Page - Control document display during presentation
@@ -27,26 +43,34 @@ export default function PresenterControl() {
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
+  const [numPages, setNumPages] = useState<number | null>(null);
+  const [pageNumber, setPageNumber] = useState(1);
   const [initialPinchDistance, setInitialPinchDistance] = useState<number | null>(null);
   const [initialZoom, setInitialZoom] = useState(100);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [documentToDelete, setDocumentToDelete] = useState<number | null>(null);
 
   const sessionIdNum = sessionId ? parseInt(sessionId) : 0;
 
   // Queries
   const sessionsQuery = trpc.presentation.getSessions.useQuery(undefined, {
     enabled: isAuthenticated,
+    refetchInterval: 500, // Poll every 500ms for faster synchronization
   });
 
   const documentsQuery = trpc.documents.getSessionDocuments.useQuery(
     { sessionId: sessionIdNum },
-    { enabled: !!sessionIdNum && isAuthenticated }
+    { 
+      enabled: !!sessionIdNum && isAuthenticated,
+      refetchInterval: 500, // Poll every 500ms for faster synchronization
+    }
   );
 
   const viewerCountQuery = trpc.presentation.getViewerCount.useQuery(
     { sessionId: sessionIdNum },
     { 
       enabled: !!sessionIdNum && isAuthenticated,
-      refetchInterval: 2000,
+      refetchInterval: 500, // Poll every 500ms for faster synchronization
     }
   );
 
@@ -85,6 +109,19 @@ export default function PresenterControl() {
   const updateZoomAndCursorMutation = trpc.presentation.updateZoomAndCursor.useMutation();
 
   const sendMessageMutation = trpc.chat.sendMessage.useMutation();
+
+  // Synchronize displayed document with session's current document (for viewer uploads)
+  // MUST be before any conditional returns to respect Rules of Hooks
+  const sessions = sessionsQuery.data || [];
+  const currentSession = sessions.find(s => s.id === sessionIdNum);
+  
+  useEffect(() => {
+    if (currentSession?.currentDocumentId && currentSession.currentDocumentId !== displayedDocumentId) {
+      console.log('[Presenter] Syncing displayed document from session:', currentSession.currentDocumentId);
+      setDisplayedDocumentId(currentSession.currentDocumentId);
+      setSelectedDocumentId(currentSession.currentDocumentId);
+    }
+  }, [currentSession?.currentDocumentId, displayedDocumentId]);
 
   const handleUploadDocument = async (file: File) => {
     if (!file) return;
@@ -134,8 +171,6 @@ export default function PresenterControl() {
     );
   }
 
-  const sessions = sessionsQuery.data || [];
-  const currentSession = sessions.find(s => s.id === sessionIdNum);
   const documents = documentsQuery.data || [];
   const viewerCount = viewerCountQuery.data?.count || 0;
   const selectedDocument = documents.find(d => d.id === selectedDocumentId);
@@ -152,6 +187,7 @@ export default function PresenterControl() {
     setSelectedDocumentId(docId);
     setZoom(100); // Reset zoom when displaying new document
     setPanOffset({ x: 0, y: 0 }); // Reset pan offset
+    setPageNumber(1); // Reset PDF page number
   };
 
   const handleClearDisplay = async () => {
@@ -183,7 +219,7 @@ export default function PresenterControl() {
 
   const generateWhatsAppLink = (sessionCode: string) => {
     const shareLink = getShareLink(sessionCode);
-    const message = `Rejoignez ma présentation en direct! ${shareLink}`;
+    const message = `Santéo présentation : ${shareLink}`;
     return `https://wa.me/?text=${encodeURIComponent(message)}`;
   };
 
@@ -435,8 +471,10 @@ export default function PresenterControl() {
             {documents.map((doc, idx) => (
               <div
                 key={doc.id}
-                onClick={() => setSelectedDocumentId(doc.id)}
-                onDoubleClick={() => handleDisplayDocument(doc.id)}
+                onClick={() => {
+                  setSelectedDocumentId(doc.id);
+                  handleDisplayDocument(doc.id);
+                }}
                 className={`flex-shrink-0 w-24 h-24 rounded-lg cursor-pointer transition-all group relative overflow-hidden ${
                   selectedDocumentId === doc.id
                     ? "ring-2 ring-blue-500"
@@ -455,19 +493,53 @@ export default function PresenterControl() {
                       src={doc.fileUrl}
                       alt={doc.title}
                       className="w-full h-full object-cover pointer-events-none relative z-10"
+                      onError={(e) => {
+                        console.error('Image load error:', doc.fileUrl);
+                        // Masquer l'image et afficher le gradient de fond
+                        e.currentTarget.style.display = 'none';
+                      }}
                     />
-                    {/* Bouton Supprimer en haut à droite */}
+                    {/* Bouton WhatsApp en haut à gauche */}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (confirm('Êtes-vous sûr de vouloir supprimer ce document ?')) {
-                          deleteDocumentMutation.mutate({ documentId: doc.id, sessionId: sessionIdNum });
-                        }
+                        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent('Regardez ce document : ' + doc.fileUrl)}`;
+                        window.open(whatsappUrl, '_blank');
                       }}
-                      className="absolute top-0.5 right-0.5 bg-red-600 hover:bg-red-700 text-white rounded-full p-0.5 transition-colors z-30"
+                      className="absolute top-0.5 left-0.5 bg-green-500 hover:bg-green-600 text-white rounded-full p-0.5 transition-colors z-40 shadow-lg"
+                      title="Partager sur WhatsApp"
+                    >
+                      <MessageCircle className="w-2.5 h-2.5" />
+                    </button>
+                    {/* Bouton Supprimer en haut à droite - TOUJOURS VISIBLE */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        console.log('Tentative de suppression du document:', { id: doc.id, type: typeof doc.id, sessionId: sessionIdNum });
+                        setDocumentToDelete(doc.id);
+                        setDeleteDialogOpen(true);
+                      }}
+                      className="absolute top-0.5 right-0.5 bg-red-600 hover:bg-red-700 text-white rounded-full p-0.5 transition-colors z-40 shadow-lg"
                       title="Supprimer ce document"
                     >
                       <X className="w-2.5 h-2.5" />
+                    </button>
+                    {/* Bouton Télécharger en bas à gauche */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const link = document.createElement('a');
+                        link.href = doc.fileUrl;
+                        link.download = doc.title || 'document';
+                        link.target = '_blank';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                      }}
+                      className="absolute bottom-0.5 left-0.5 bg-blue-600 hover:bg-blue-700 text-white rounded-full p-0.5 transition-colors z-30 shadow-lg"
+                      title="Télécharger"
+                    >
+                      <Download className="w-2.5 h-2.5" />
                     </button>
                     {/* Bouton Envoyer en bas à droite - VERT */}
                     <button
@@ -491,14 +563,112 @@ export default function PresenterControl() {
                   </>
                 )}
                 {doc.type === "pdf" && (
-                  <div className="text-center flex flex-col items-center justify-center z-10 relative">
-                    <div className="text-4xl">📄</div>
-                  </div>
+                  <>
+                    {/* Fond gradient comme pour les images */}
+                    <div 
+                      className="absolute inset-0"
+                      style={{
+                        background: `linear-gradient(135deg, hsl(${(doc.id * 60) % 360}, 70%, 40%), hsl(${(doc.id * 60 + 60) % 360}, 70%, 40%))`
+                      }}
+                    />
+                    {/* Preview PDF par-dessus le gradient */}
+                    <div className="w-full h-full flex items-center justify-center overflow-hidden relative z-10 bg-white/90">
+                      <Document
+                        file={doc.fileUrl}
+                        onLoadError={(error) => {
+                          console.error('PDF thumbnail error:', error);
+                        }}
+                        loading={
+                          <div className="text-center">
+                            <div className="text-2xl">📄</div>
+                            <p className="text-xs text-gray-500 mt-1">Chargement...</p>
+                          </div>
+                        }
+                        error={
+                          <div className="text-center">
+                            <div className="text-2xl">📄</div>
+                            <p className="text-xs text-red-600 mt-1">Erreur</p>
+                          </div>
+                        }
+                      >
+                        <Page
+                          pageNumber={1}
+                          width={96}
+                          renderTextLayer={false}
+                          renderAnnotationLayer={false}
+                        />
+                      </Document>
+                    </div>
+                    {/* Bouton Supprimer en haut à droite - TOUJOURS VISIBLE */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        console.log('Tentative de suppression du document:', { id: doc.id, type: typeof doc.id, sessionId: sessionIdNum });
+                        setDocumentToDelete(doc.id);
+                        setDeleteDialogOpen(true);
+                      }}
+                      className="absolute top-0.5 right-0.5 bg-red-600 hover:bg-red-700 text-white rounded-full p-0.5 transition-colors z-40 shadow-lg"
+                      title="Supprimer ce document"
+                    >
+                      <X className="w-2.5 h-2.5" />
+                    </button>
+                    {/* Bouton Envoyer en bas à droite - VERT */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        sendMessageMutation.mutate({
+                          sessionId: sessionIdNum,
+                          senderType: "presenter",
+                          senderName: currentSession.title,
+                          message: doc.title,
+                          videoUrl: doc.fileUrl,
+                          fileType: doc.type,
+                        });
+                      }}
+                      className="absolute bottom-0.5 right-0.5 bg-green-600 hover:bg-green-700 text-white rounded-full p-0.5 transition-colors z-40 shadow-lg"
+                      title="Envoyer dans le chat"
+                    >
+                      <Send className="w-3 h-3" />
+                    </button>
+                  </>
                 )}
                 {doc.type === "video" && (
-                  <div className="text-center flex flex-col items-center justify-center z-10 relative">
-                    <div className="text-4xl">🎬</div>
-                  </div>
+                  <>
+                    <div className="text-center flex flex-col items-center justify-center z-10 relative">
+                      <div className="text-4xl">🎬</div>
+                    </div>
+                    {/* Bouton Supprimer en haut à droite - TOUJOURS VISIBLE */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        console.log('Tentative de suppression du document:', { id: doc.id, type: typeof doc.id, sessionId: sessionIdNum });
+                        setDocumentToDelete(doc.id);
+                        setDeleteDialogOpen(true);
+                      }}
+                      className="absolute top-0.5 right-0.5 bg-red-600 hover:bg-red-700 text-white rounded-full p-0.5 transition-colors z-40 shadow-lg"
+                      title="Supprimer ce document"
+                    >
+                      <X className="w-2.5 h-2.5" />
+                    </button>
+                    {/* Bouton Envoyer en bas à droite - VERT */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        sendMessageMutation.mutate({
+                          sessionId: sessionIdNum,
+                          senderType: "presenter",
+                          senderName: currentSession.title,
+                          message: doc.title,
+                          videoUrl: doc.fileUrl,
+                          fileType: doc.type,
+                        });
+                      }}
+                      className="absolute bottom-0.5 right-0.5 bg-green-600 hover:bg-green-700 text-white rounded-full p-0.5 transition-colors z-40 shadow-lg"
+                      title="Envoyer dans le chat"
+                    >
+                      <Send className="w-3 h-3" />
+                    </button>
+                  </>
                 )}
 
                 {/* Checkmark if Displayed */}
@@ -579,9 +749,12 @@ export default function PresenterControl() {
                         }
                         
                         // Send cursor position to viewers (as percentage)
-                        if (displayedDocumentId && currentSession) {
-                          const xPercent = (x / rect.width) * 100;
-                          const yPercent = (y / rect.height) * 100;
+                        if (displayedDocumentId && currentSession && imageRef.current) {
+                          const imageRect = imageRef.current.getBoundingClientRect();
+                          const imageX = e.touches[0].clientX - imageRect.left;
+                          const imageY = e.touches[0].clientY - imageRect.top;
+                          const xPercent = (imageX / imageRect.width) * 100;
+                          const yPercent = (imageY / imageRect.height) * 100;
                           
                           updateZoomAndCursorMutation.mutate({
                             sessionId: sessionIdNum,
@@ -703,9 +876,56 @@ export default function PresenterControl() {
                       </>
                     )}
                     {displayedDocument.type === "pdf" && (
-                      <div className="text-center">
-                        <div className="text-6xl mb-4">📄</div>
-                        <p className="text-gray-400 text-sm">{displayedDocument.title}</p>
+                      <div className="w-full h-full flex flex-col items-center justify-center">
+                        <Document
+                          file={displayedDocument.fileUrl}
+                          onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+                          onLoadError={(error) => console.error('PDF load error:', error)}
+                          loading={
+                            <div className="text-center">
+                              <div className="text-6xl mb-4">📄</div>
+                              <p className="text-gray-400">Chargement du PDF...</p>
+                            </div>
+                          }
+                          error={
+                            <div className="text-center">
+                              <div className="text-6xl mb-4">📄</div>
+                              <p className="text-red-400">Impossible de charger le PDF</p>
+                              <p className="text-gray-500 text-sm mt-2">{displayedDocument.title}</p>
+                            </div>
+                          }
+                          className="max-w-full max-h-full"
+                        >
+                          <Page
+                            pageNumber={pageNumber}
+                            scale={zoom / 100}
+                            renderTextLayer={true}
+                            renderAnnotationLayer={true}
+                          />
+                        </Document>
+                        {numPages && numPages > 1 && (
+                          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/70 px-4 py-2 rounded-lg flex items-center gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setPageNumber(prev => Math.max(1, prev - 1))}
+                              disabled={pageNumber <= 1}
+                            >
+                              ←
+                            </Button>
+                            <span className="text-white text-sm">
+                              Page {pageNumber} / {numPages}
+                            </span>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setPageNumber(prev => Math.min(numPages, prev + 1))}
+                              disabled={pageNumber >= numPages}
+                            >
+                              →
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     )}
                     {displayedDocument.type === "video" && (
@@ -749,6 +969,44 @@ export default function PresenterControl() {
           </div>
         </div>
       </main>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
+            <AlertDialogDescription>
+              Êtes-vous sûr de vouloir supprimer ce document ? Cette action est irréversible.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (documentToDelete !== null) {
+                  console.log('Suppression confirmée du document:', documentToDelete);
+                  deleteDocumentMutation.mutate(
+                    { documentId: documentToDelete, sessionId: sessionIdNum },
+                    {
+                      onSuccess: () => {
+                        console.log('Document supprimé avec succès');
+                        setDocumentToDelete(null);
+                      },
+                      onError: (error) => {
+                        console.error('Erreur de suppression:', error);
+                        setDocumentToDelete(null);
+                      }
+                    }
+                  );
+                }
+              }}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Supprimer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -1,0 +1,50 @@
+{
+  "query": "SELECT id, sessionId, title, type, fileUrl, createdAt FROM documents ORDER BY createdAt DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3j1v42nUZuvgHzn.root --database 8CbieS7mEqbTHNrWVL4VaZ --execute SELECT id, sessionId, title, type, fileUrl, createdAt FROM documents ORDER BY createdAt DESC LIMIT 5;",
+  "rows": [
+    {
+      "id": "480001",
+      "sessionId": "1",
+      "title": "Réseau de soins Kalixia.png",
+      "type": "image",
+      "fileUrl": "/api/files/1-1761596320827-6bl8c.png",
+      "createdAt": "2025-10-27 20:18:40"
+    },
+    {
+      "id": "390002",
+      "sessionId": "60003",
+      "title": "Capture d’écran 2025-10-09 à 20.00.26",
+      "type": "image",
+      "fileUrl": "https://forge.manus.ai/v1/storage/download/hkBY76QRVhLUMwUNtTWmmg/presentations/60003/image-1761568691848-26x6jw",
+      "createdAt": "2025-10-27 12:38:12"
+    },
+    {
+      "id": "270010",
+      "sessionId": "90002",
+      "title": "Résiliation infra annuelle ",
+      "type": "image",
+      "fileUrl": "https://forge.manus.ai/v1/storage/download/7cvQ9e3VGc7cn6yofaVVUB/presentations/90002/image-1761481908486-zsofdn",
+      "createdAt": "2025-10-26 12:31:48"
+    },
+    {
+      "id": "270009",
+      "sessionId": "90002",
+      "title": "Kalixia",
+      "type": "image",
+      "fileUrl": "https://forge.manus.ai/v1/storage/download/fXeUCjUKqa4PJGcivP8JPF/presentations/90002/image-1761481906240-bu1t5",
+      "createdAt": "2025-10-26 12:31:47"
+    },
+    {
+      "id": "270003",
+      "sessionId": "90002",
+      "title": "Dentaire",
+      "type": "image",
+      "fileUrl": "https://forge.manus.ai/v1/storage/download/Jviwf2CiiRoWFxwRyB75sH/presentations/90002/image-1761481906232-8orrxi",
+      "createdAt": "2025-10-26 12:31:46"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tsessionId\ttitle\ttype\tfileUrl\tcreatedAt\n480001\t1\tRéseau de soins Kalixia.png\timage\t/api/files/1-1761596320827-6bl8c.png\t2025-10-27 20:18:40\n390002\t60003\tCapture d’écran 2025-10-09 à 20.00.26\timage\thttps://forge.manus.ai/v1/storage/download/hkBY76QRVhLUMwUNtTWmmg/presentations/60003/image-1761568691848-26x6jw\t2025-10-27 12:38:12\n270010\t90002\tRésiliation infra annuelle \timage\thttps://forge.manus.ai/v1/storage/download/7cvQ9e3VGc7cn6yofaVVUB/presentations/90002/image-1761481908486-zsofdn\t2025-10-26 12:31:48\n270009\t90002\tKalixia\timage\thttps://forge.manus.ai/v1/storage/download/fXeUCjUKqa4PJGcivP8JPF/presentations/90002/image-1761481906240-bu1t5\t2025-10-26 12:31:47\n270003\t90002\tDentaire\timage\thttps://forge.manus.ai/v1/storage/download/Jviwf2CiiRoWFxwRyB75sH/presentations/90002/image-1761481906232-8orrxi\t2025-10-26 12:31:46\n",
+  "stderr": "",
+  "execution_time_ms": 545
+}

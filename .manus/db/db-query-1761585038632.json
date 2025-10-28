@@ -1,0 +1,9 @@
+{
+  "query": "DROP TABLE IF EXISTS chat_messages;\n\nCREATE TABLE `chat_messages` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`sessionId` int NOT NULL,\n\t`senderType` enum('presenter','viewer') NOT NULL,\n\t`senderName` varchar(255) NOT NULL,\n\t`message` text NOT NULL,\n\t`videoUrl` text,\n\t`fileType` varchar(50),\n\t`createdAt` timestamp NOT NULL DEFAULT (now()),\n\tCONSTRAINT `chat_messages_id` PRIMARY KEY(`id`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3j1v42nUZuvgHzn.root --database 8CbieS7mEqbTHNrWVL4VaZ --execute DROP TABLE IF EXISTS chat_messages;\n\nCREATE TABLE `chat_messages` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`sessionId` int NOT NULL,\n\t`senderType` enum('presenter','viewer') NOT NULL,\n\t`senderName` varchar(255) NOT NULL,\n\t`message` text NOT NULL,\n\t`videoUrl` text,\n\t`fileType` varchar(50),\n\t`createdAt` timestamp NOT NULL DEFAULT (now()),\n\tCONSTRAINT `chat_messages_id` PRIMARY KEY(`id`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 930
+}
