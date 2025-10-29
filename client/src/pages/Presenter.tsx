@@ -99,27 +99,9 @@ export default function Presenter() {
     setPinValidated(true);
   };
   
-  // Show loading or PIN dialog while not validated
+  // Show PIN dialog while not validated (only authentication needed for presenter)
   if (!pinValidated) {
     return <PinAuthDialog open={showPinDialog} onSuccess={handlePinSuccess} />;
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle>Accès Refusé</CardTitle>
-            <CardDescription>
-              Vous devez être connecté pour accéder au tableau de bord du présentateur
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-gray-600">Veuillez vous connecter pour accéder au tableau de bord.</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
   }
 
   const sessions = sessionsQuery.data || [];
