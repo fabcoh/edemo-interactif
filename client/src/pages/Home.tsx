@@ -1,14 +1,31 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Presentation, Users } from "lucide-react";
+import { PinAuthDialog, isPinValidated } from "@/components/PinAuthDialog";
+import { useState } from "react";
 
 /**
  * Home page - Landing page with options to present or view
  */
 export default function Home() {
   const { user, isAuthenticated } = useAuth();
+  const [, setLocation] = useLocation();
+  const [showPinDialog, setShowPinDialog] = useState(false);
+  
+  const handlePresenterAccess = () => {
+    if (isPinValidated()) {
+      setLocation("/presenter");
+    } else {
+      setShowPinDialog(true);
+    }
+  };
+  
+  const handlePinSuccess = () => {
+    setShowPinDialog(false);
+    setLocation("/presenter");
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -83,19 +100,9 @@ export default function Home() {
                 </li>
               </ul>
             </div>
-            {isAuthenticated ? (
-              <Link href="/presenter" className="block mt-6">
-                <Button className="w-full" size="lg">
-                  Accéder au Tableau de Bord
-                </Button>
-              </Link>
-            ) : (
-              <a href={getLoginUrl()} className="block mt-6">
-                <Button className="w-full" size="lg">
-                  Se Connecter pour Présenter
-                </Button>
-              </a>
-            )}
+            <Button className="w-full" size="lg" onClick={handlePresenterAccess}>
+              Se Connecter pour Présenter
+            </Button>
           </div>
 
           {/* Viewer Card */}
@@ -166,6 +173,9 @@ export default function Home() {
         </div>
       </main>
 
+      {/* PIN Auth Dialog */}
+      <PinAuthDialog open={showPinDialog} onSuccess={handlePinSuccess} />
+      
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-8 mt-12">
         <div className="container mx-auto px-4 text-center">

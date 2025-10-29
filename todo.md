@@ -358,3 +358,14 @@ Le projet Edemo Live est maintenant complet avec :
 - [x] **Modifier bouton Copier** : Copier uniquement le lien du salon (sans iframe) - Déjà fonctionnel
 - [x] **Modifier bouton WhatsApp** : Envoyer le message "Santéo présentation : [lien]"
 
+
+
+
+## 🔐 Authentification par code PIN pour Railway
+
+- [ ] Créer un système d'authentification par code PIN (5656)
+- [ ] Popup de connexion pour accéder aux fonctions présentateur
+- [ ] Stocker le PIN validé en sessionStorage
+- [ ] Permettre l'accès aux routes protégées après validation du PIN
+- [ ] Les spectateurs n'ont pas besoin de PIN (accès public maintenu)
+

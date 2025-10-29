@@ -22,7 +22,9 @@ const redirectToLoginIfUnauthorized = (error: unknown) => {
   const isViewerPage = window.location.pathname.startsWith('/view') || window.location.pathname === '/viewer';
   if (isViewerPage) return;
 
-  window.location.href = getLoginUrl();
+  // TEMPORARY: Disable auto-redirect to allow access without authentication
+  // window.location.href = getLoginUrl();
+  console.log('[Auth] Authentication required but auto-redirect disabled');
 };
 
 queryClient.getQueryCache().subscribe(event => {

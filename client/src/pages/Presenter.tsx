@@ -9,19 +9,43 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Copy, Share2, Trash2, Eye, FileText, Image, Video, Users, Mail, X, Play, Edit2, Check } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
+import { PinAuthDialog, isPinValidated } from "@/components/PinAuthDialog";
+import { useEffect } from "react";
 
 /**
  * Presenter Dashboard - Manage presentation sessions and documents
  */
 export default function Presenter() {
   const { user, isAuthenticated } = useAuth();
+  const [, setLocation] = useLocation();
+  const [showPinDialog, setShowPinDialog] = useState(false);
+  const [pinValidated, setPinValidated] = useState(false);
   const [newSessionTitle, setNewSessionTitle] = useState("");
   const [selectedSessionId, setSelectedSessionId] = useState<number | null>(null);
   const [collaboratorEmail, setCollaboratorEmail] = useState("");
   const [showCollaboratorDialog, setShowCollaboratorDialog] = useState(false);
   const [editingSessionId, setEditingSessionId] = useState<number | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
+  
+  // Check PIN validation on mount
+  useEffect(() => {
+    if (!isPinValidated()) {
+      setShowPinDialog(true);
+    } else {
+      setPinValidated(true);
+    }
+  }, []);
+  
+  const handlePinSuccess = () => {
+    setShowPinDialog(false);
+    setPinValidated(true);
+  };
+  
+  // Show loading or PIN dialog while not validated
+  if (!pinValidated) {
+    return <PinAuthDialog open={showPinDialog} onSuccess={handlePinSuccess} />;
+  }
 
   // Queries
   const sessionsQuery = trpc.presentation.getSessions.useQuery(undefined, {
