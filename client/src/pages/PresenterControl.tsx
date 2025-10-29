@@ -904,7 +904,7 @@ export default function PresenterControl() {
                           />
                         </Document>
                         {numPages && numPages > 1 && (
-                          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/70 px-4 py-2 rounded-lg flex items-center gap-2">
+                          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-black/70 px-4 py-2 rounded-lg flex items-center gap-2 z-10">
                             <Button
                               size="sm"
                               variant="outline"
