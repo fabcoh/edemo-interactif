@@ -28,36 +28,22 @@ export default function Presenter() {
   const [editingSessionId, setEditingSessionId] = useState<number | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
   
-  // Check PIN validation on mount
-  useEffect(() => {
-    if (!isPinValidated()) {
-      setShowPinDialog(true);
-    } else {
-      setPinValidated(true);
-    }
-  }, []);
-  
-  const handlePinSuccess = () => {
-    setShowPinDialog(false);
-    setPinValidated(true);
-  };
-  
-  // Show loading or PIN dialog while not validated
-  if (!pinValidated) {
-    return <PinAuthDialog open={showPinDialog} onSuccess={handlePinSuccess} />;
-  }
-
-  // Queries
+  // Queries - MUST be called before any conditional returns
   const sessionsQuery = trpc.presentation.getSessions.useQuery(undefined, {
-    enabled: isAuthenticated,
+    enabled: isAuthenticated && pinValidated,
   });
 
   const documentsQuery = trpc.documents.getSessionDocuments.useQuery(
     { sessionId: selectedSessionId || 0 },
-    { enabled: !!selectedSessionId }
+    { enabled: !!selectedSessionId && pinValidated }
   );
 
-  // Mutations
+  const collaboratorsQuery = trpc.collaboration.getCollaborators.useQuery(
+    { sessionId: selectedSessionId || 0 },
+    { enabled: !!selectedSessionId && pinValidated }
+  );
+
+  // Mutations - MUST be called before any conditional returns
   const createSessionMutation = trpc.presentation.createSession.useMutation({
     onSuccess: () => {
       setNewSessionTitle("");
@@ -70,11 +56,6 @@ export default function Presenter() {
       documentsQuery.refetch();
     },
   });
-
-  const collaboratorsQuery = trpc.collaboration.getCollaborators.useQuery(
-    { sessionId: selectedSessionId || 0 },
-    { enabled: !!selectedSessionId }
-  );
 
   const inviteCollaboratorMutation = trpc.collaboration.inviteCollaborator.useMutation({
     onSuccess: () => {
@@ -103,6 +84,25 @@ export default function Presenter() {
       sessionsQuery.refetch();
     },
   });
+  
+  // Check PIN validation on mount
+  useEffect(() => {
+    if (!isPinValidated()) {
+      setShowPinDialog(true);
+    } else {
+      setPinValidated(true);
+    }
+  }, []);
+  
+  const handlePinSuccess = () => {
+    setShowPinDialog(false);
+    setPinValidated(true);
+  };
+  
+  // Show loading or PIN dialog while not validated
+  if (!pinValidated) {
+    return <PinAuthDialog open={showPinDialog} onSuccess={handlePinSuccess} />;
+  }
 
   if (!isAuthenticated) {
     return (
