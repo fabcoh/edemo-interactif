@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
 import { Link, useLocation } from "wouter";
 import { Presentation, Users } from "lucide-react";
-import { PinAuthDialog, isPinValidated } from "@/components/PinAuthDialog";
+import { PinAuthDialog, isPinValidated, getStoredEmail } from "@/components/PinAuthDialog";
 import { useState } from "react";
 
 /**
@@ -22,7 +22,7 @@ export default function Home() {
     }
   };
   
-  const handlePinSuccess = () => {
+  const handlePinSuccess = (email: string) => {
     setShowPinDialog(false);
     setLocation("/presenter");
   };

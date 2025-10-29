@@ -10,8 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Copy, Share2, Trash2, Eye, FileText, Image, Video, Users, Mail, X, Play, Edit2, Check } from "lucide-react";
 import { Link, useLocation } from "wouter";
-import { PinAuthDialog, isPinValidated } from "@/components/PinAuthDialog";
-import { EmailAuthDialog, getStoredEmail } from "@/components/EmailAuthDialog";
+import { PinAuthDialog, isPinValidated, getStoredEmail } from "@/components/PinAuthDialog";
 import { useEffect } from "react";
 
 /**
@@ -20,9 +19,7 @@ import { useEffect } from "react";
 export default function Presenter() {
   const { user, isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
-  const [showPinDialog, setShowPinDialog] = useState(false);
-  const [pinValidated, setPinValidated] = useState(false);
-  const [showEmailDialog, setShowEmailDialog] = useState(false);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [newSessionTitle, setNewSessionTitle] = useState("");
   const [selectedSessionId, setSelectedSessionId] = useState<number | null>(null);
@@ -88,45 +85,24 @@ export default function Presenter() {
     },
   });
   
-  // Check PIN and Email validation on mount
+  // Check authentication on mount
   useEffect(() => {
     const storedEmail = getStoredEmail();
-    if (!isPinValidated()) {
-      setShowPinDialog(true);
-    } else if (!storedEmail) {
-      setPinValidated(true);
-      setShowEmailDialog(true);
+    if (!isPinValidated() || !storedEmail) {
+      setShowAuthDialog(true);
     } else {
-      setPinValidated(true);
       setUserEmail(storedEmail);
     }
   }, []);
   
-  const handlePinSuccess = () => {
-    setShowPinDialog(false);
-    setPinValidated(true);
-    // Check if email is already stored
-    const storedEmail = getStoredEmail();
-    if (!storedEmail) {
-      setShowEmailDialog(true);
-    } else {
-      setUserEmail(storedEmail);
-    }
-  };
-  
-  const handleEmailSuccess = (email: string) => {
-    setShowEmailDialog(false);
+  const handleAuthSuccess = (email: string) => {
+    setShowAuthDialog(false);
     setUserEmail(email);
   };
   
-  // Show PIN dialog while not validated
-  if (!pinValidated) {
-    return <PinAuthDialog open={showPinDialog} onSuccess={handlePinSuccess} />;
-  }
-  
-  // Show Email dialog while email not provided
+  // Show authentication dialog while not authenticated
   if (!userEmail) {
-    return <EmailAuthDialog open={showEmailDialog} onSuccess={handleEmailSuccess} />;
+    return <PinAuthDialog open={showAuthDialog} onSuccess={handleAuthSuccess} />;
   }
 
   const sessions = sessionsQuery.data || [];

@@ -9,18 +9,21 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Lock } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Lock, Mail } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 
 interface PinAuthDialogProps {
   open: boolean;
-  onSuccess: () => void;
+  onSuccess: (email: string) => void;
 }
 
 const PIN_STORAGE_KEY = "presenter_pin_validated";
+const EMAIL_STORAGE_KEY = "presenter_email";
 
 export function PinAuthDialog({ open, onSuccess }: PinAuthDialogProps) {
   const [pin, setPin] = useState("");
+  const [email, setEmail] = useState("");
   const [error, setError] = useState("");
 
   // Fetch the correct PIN from the database
@@ -38,17 +41,27 @@ export function PinAuthDialog({ open, onSuccess }: PinAuthDialogProps) {
       return;
     }
     
-    if (pin === correctPin) {
-      // Store validation in sessionStorage
-      if (typeof window !== "undefined") {
-        sessionStorage.setItem(PIN_STORAGE_KEY, "true");
-      }
-      setError("");
-      onSuccess();
-    } else {
+    // Validate email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError("Veuillez entrer une adresse email valide");
+      return;
+    }
+    
+    // Validate PIN
+    if (pin !== correctPin) {
       setError("Code PIN incorrect");
       setPin("");
+      return;
     }
+    
+    // Store validation in sessionStorage
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem(PIN_STORAGE_KEY, "true");
+      sessionStorage.setItem(EMAIL_STORAGE_KEY, email);
+    }
+    setError("");
+    onSuccess(email);
   };
 
   return (
@@ -60,36 +73,62 @@ export function PinAuthDialog({ open, onSuccess }: PinAuthDialogProps) {
             Accès Présentateur
           </DialogTitle>
           <DialogDescription>
-            Entrez le code PIN pour accéder aux fonctions de présentation
+            Entrez votre email et le code PIN pour accéder au tableau de bord
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
+            {/* Email Field */}
             <div className="grid gap-2">
+              <Label htmlFor="email" className="flex items-center gap-2">
+                <Mail className="w-4 h-4" />
+                Adresse email
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="votre.email@example.com"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setError("");
+                }}
+                disabled={pinQuery.isLoading}
+                autoFocus
+              />
+            </div>
+
+            {/* PIN Field */}
+            <div className="grid gap-2">
+              <Label htmlFor="pin" className="flex items-center gap-2">
+                <Lock className="w-4 h-4" />
+                Code PIN
+              </Label>
               <Input
                 id="pin"
                 type="text"
-                placeholder="Code PIN"
+                placeholder="Entrez le code PIN"
                 value={pin}
                 onChange={(e) => {
                   setPin(e.target.value);
                   setError("");
                 }}
-                className="text-center text-2xl tracking-widest"
-                autoFocus
+                className="text-center text-xl tracking-wider"
                 disabled={pinQuery.isLoading}
               />
-              {error && (
-                <p className="text-sm text-red-500 text-center">{error}</p>
-              )}
-              {pinQuery.isLoading && (
-                <p className="text-sm text-gray-500 text-center">Chargement...</p>
-              )}
             </div>
+
+            {/* Error Message */}
+            {error && (
+              <p className="text-sm text-red-500 text-center">{error}</p>
+            )}
+            {pinQuery.isLoading && (
+              <p className="text-sm text-gray-500 text-center">Chargement...</p>
+            )}
           </div>
           <DialogFooter>
             <Button type="submit" className="w-full" disabled={pinQuery.isLoading}>
-              Valider
+              Se connecter
             </Button>
           </DialogFooter>
         </form>
@@ -104,9 +143,16 @@ export function isPinValidated(): boolean {
   return sessionStorage.getItem(PIN_STORAGE_KEY) === "true";
 }
 
+// Helper function to get stored email
+export function getStoredEmail(): string | null {
+  if (typeof window === "undefined") return null;
+  return sessionStorage.getItem(EMAIL_STORAGE_KEY);
+}
+
 // Helper function to clear PIN validation
 export function clearPinValidation(): void {
   if (typeof window === "undefined") return;
   sessionStorage.removeItem(PIN_STORAGE_KEY);
+  sessionStorage.removeItem(EMAIL_STORAGE_KEY);
 }
 
