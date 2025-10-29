@@ -55,14 +55,14 @@ export default function PresenterControl() {
   // Queries
   const sessionsQuery = trpc.presentation.getSessions.useQuery(undefined, {
     enabled: isAuthenticated,
-    refetchInterval: 500, // Poll every 500ms for faster synchronization
+    refetchInterval: 2000, // Poll every 2s for synchronization
   });
 
   const documentsQuery = trpc.documents.getSessionDocuments.useQuery(
     { sessionId: sessionIdNum },
     { 
       enabled: !!sessionIdNum && isAuthenticated,
-      refetchInterval: 500, // Poll every 500ms for faster synchronization
+      refetchInterval: 2000, // Poll every 2s for synchronization
     }
   );
 
@@ -70,7 +70,7 @@ export default function PresenterControl() {
     { sessionId: sessionIdNum },
     { 
       enabled: !!sessionIdNum && isAuthenticated,
-      refetchInterval: 500, // Poll every 500ms for faster synchronization
+      refetchInterval: 2000, // Poll every 2s for synchronization
     }
   );
 
@@ -593,7 +593,7 @@ export default function PresenterControl() {
                       >
                         <Page
                           pageNumber={1}
-                          width={96}
+                          width={64}
                           renderTextLayer={false}
                           renderAnnotationLayer={false}
                         />
