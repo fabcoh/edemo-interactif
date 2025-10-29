@@ -69,9 +69,8 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Two Column Layout */}
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          {/* Presenter Card */}
+        {/* Presenter Card - Centered */}
+        <div className="max-w-xl mx-auto">
           <div className="bg-white rounded-lg shadow-lg p-8 hover:shadow-xl transition-shadow">
             <div className="flex justify-center mb-4">
               <div className="bg-blue-100 p-4 rounded-full">
@@ -100,45 +99,9 @@ export default function Home() {
                 </li>
               </ul>
             </div>
-            <Button className="w-full" size="lg" onClick={handlePresenterAccess}>
+            <Button className="w-full mt-6" size="lg" onClick={handlePresenterAccess}>
               Se Connecter pour Présenter
             </Button>
-          </div>
-
-          {/* Viewer Card */}
-          <div className="bg-white rounded-lg shadow-lg p-8 hover:shadow-xl transition-shadow">
-            <div className="flex justify-center mb-4">
-              <div className="bg-green-100 p-4 rounded-full">
-                <Users className="w-8 h-8 text-green-600" />
-              </div>
-            </div>
-            <h3 className="text-2xl font-bold text-center text-gray-900 mb-4">
-              Je suis Spectateur
-            </h3>
-            <p className="text-gray-600 text-center mb-6">
-              Vous avez reçu un lien ? Entrez le code de session pour voir la présentation en direct
-            </p>
-            <div className="space-y-3">
-              <ul className="text-sm text-gray-600 space-y-2">
-                <li className="flex items-center gap-2">
-                  <span className="text-green-600">✓</span> Accès via lien unique
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-green-600">✓</span> Visualisation en temps réel
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-green-600">✓</span> Support PDF, images et vidéos
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-green-600">✓</span> Aucune connexion requise
-                </li>
-              </ul>
-            </div>
-            <Link href="/viewer" className="block mt-6">
-              <Button className="w-full" size="lg" variant="outline">
-                Rejoindre une Présentation
-              </Button>
-            </Link>
           </div>
         </div>
 
