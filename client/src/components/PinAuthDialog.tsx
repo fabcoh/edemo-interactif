@@ -93,7 +93,6 @@ export function PinAuthDialog({ open, onSuccess }: PinAuthDialogProps) {
                   setEmail(e.target.value);
                   setError("");
                 }}
-                disabled={pinQuery.isLoading}
                 autoFocus
               />
             </div>
@@ -114,7 +113,6 @@ export function PinAuthDialog({ open, onSuccess }: PinAuthDialogProps) {
                   setError("");
                 }}
                 className="text-center text-xl tracking-wider"
-                disabled={pinQuery.isLoading}
               />
             </div>
 
