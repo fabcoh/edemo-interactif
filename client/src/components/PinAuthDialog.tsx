@@ -29,15 +29,18 @@ export function PinAuthDialog({ open, onSuccess }: PinAuthDialogProps) {
   // Fetch the correct PIN from the database
   const pinQuery = trpc.auth.getPresenterPin.useQuery(undefined, {
     enabled: open,
+    retry: 2,
+    staleTime: 60000, // Cache for 1 minute
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const correctPin = pinQuery.data?.pin;
+    // Use fetched PIN or fallback to default
+    const correctPin = pinQuery.data?.pin || "5656";
     
-    if (!correctPin) {
-      setError("Erreur de chargement du code PIN");
+    if (pinQuery.isError) {
+      setError("Erreur de connexion au serveur. Réessayez.");
       return;
     }
     
@@ -125,8 +128,8 @@ export function PinAuthDialog({ open, onSuccess }: PinAuthDialogProps) {
             )}
           </div>
           <DialogFooter>
-            <Button type="submit" className="w-full" disabled={pinQuery.isLoading}>
-              Se connecter
+            <Button type="submit" className="w-full">
+              {pinQuery.isLoading ? "Chargement..." : "Se connecter"}
             </Button>
           </DialogFooter>
         </form>
