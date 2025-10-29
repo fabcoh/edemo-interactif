@@ -28,7 +28,9 @@ export function PinAuthDialog({ open, onSuccess }: PinAuthDialogProps) {
     
     if (pin === CORRECT_PIN) {
       // Store validation in sessionStorage
-      sessionStorage.setItem(PIN_STORAGE_KEY, "true");
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem(PIN_STORAGE_KEY, "true");
+      }
       setError("");
       onSuccess();
     } else {
@@ -85,11 +87,13 @@ export function PinAuthDialog({ open, onSuccess }: PinAuthDialogProps) {
 
 // Helper function to check if PIN is validated
 export function isPinValidated(): boolean {
+  if (typeof window === "undefined") return false;
   return sessionStorage.getItem(PIN_STORAGE_KEY) === "true";
 }
 
 // Helper function to clear PIN validation
 export function clearPinValidation(): void {
+  if (typeof window === "undefined") return;
   sessionStorage.removeItem(PIN_STORAGE_KEY);
 }
 
