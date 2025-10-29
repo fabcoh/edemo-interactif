@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Copy, Share2, Trash2, Eye, FileText, Image, Video, Users, Mail, X, Play, Edit2, Check } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { PinAuthDialog, isPinValidated } from "@/components/PinAuthDialog";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 /**
  * Presenter Dashboard - Manage presentation sessions and documents

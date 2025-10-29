@@ -369,3 +369,8 @@ Le projet Edemo Live est maintenant complet avec :
 - [ ] Permettre l'accès aux routes protégées après validation du PIN
 - [ ] Les spectateurs n'ont pas besoin de PIN (accès public maintenu)
 
+
+
+
+- [ ] Corriger l'erreur React #310 sur la page présentateur après authentification PIN
+
