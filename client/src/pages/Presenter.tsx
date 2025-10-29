@@ -30,17 +30,17 @@ export default function Presenter() {
   
   // Queries - MUST be called before any conditional returns
   const sessionsQuery = trpc.presentation.getSessions.useQuery(undefined, {
-    enabled: isAuthenticated && pinValidated,
+    enabled: isAuthenticated && !!userEmail,
   });
 
   const documentsQuery = trpc.documents.getSessionDocuments.useQuery(
     { sessionId: selectedSessionId || 0 },
-    { enabled: !!selectedSessionId && pinValidated }
+    { enabled: !!selectedSessionId && !!userEmail }
   );
 
   const collaboratorsQuery = trpc.collaboration.getCollaborators.useQuery(
     { sessionId: selectedSessionId || 0 },
-    { enabled: !!selectedSessionId && pinValidated }
+    { enabled: !!selectedSessionId && !!userEmail }
   );
 
   // Mutations - MUST be called before any conditional returns
