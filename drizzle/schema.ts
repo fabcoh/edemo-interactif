@@ -238,3 +238,21 @@ export const chatMessages = mysqlTable("chat_messages", {
 export type ChatMessage = typeof chatMessages.$inferSelect;
 export type InsertChatMessage = typeof chatMessages.$inferInsert;
 
+/**
+ * App Settings table
+ * Stores application-wide settings like PIN code
+ */
+export const appSettings = mysqlTable("app_settings", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Setting key (e.g., "presenter_pin") */
+  settingKey: varchar("settingKey", { length: 100 }).notNull().unique(),
+  /** Setting value */
+  settingValue: text("settingValue").notNull(),
+  /** Timestamps */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AppSetting = typeof appSettings.$inferSelect;
+export type InsertAppSetting = typeof appSettings.$inferInsert;
+

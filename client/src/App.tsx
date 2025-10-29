@@ -10,6 +10,7 @@ import PresenterSession from "./pages/PresenterSession";
 import PresenterControl from "./pages/PresenterControl";
 import Viewer from "./pages/Viewer";
 import AdminInvitations from "./pages/AdminInvitations";
+import AdminSettings from "./pages/AdminSettings";
 import InvitationAccept from "./pages/InvitationAccept";
 import CommercialAccess from "./pages/CommercialAccess";
 
@@ -24,6 +25,7 @@ function Router() {
       <Route path={"/viewer"} component={Viewer} />
       <Route path={"/view/:code"} component={Viewer} />
       <Route path={"/admin/invitations"} component={AdminInvitations} />
+      <Route path={"/admin/settings"} component={AdminSettings} />
       <Route path={"/invite/:token"} component={InvitationAccept} />
       <Route path={"/commercial/:token"} component={CommercialAccess} />
       <Route path={"/404"} component={NotFound} />

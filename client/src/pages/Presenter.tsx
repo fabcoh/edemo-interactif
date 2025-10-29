@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Copy, Share2, Trash2, Eye, FileText, Image, Video, Users, Mail, X, Play, Edit2, Check } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { PinAuthDialog, isPinValidated } from "@/components/PinAuthDialog";
+import { EmailAuthDialog, getStoredEmail } from "@/components/EmailAuthDialog";
 import { useEffect } from "react";
 
 /**
@@ -21,6 +22,8 @@ export default function Presenter() {
   const [, setLocation] = useLocation();
   const [showPinDialog, setShowPinDialog] = useState(false);
   const [pinValidated, setPinValidated] = useState(false);
+  const [showEmailDialog, setShowEmailDialog] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
   const [newSessionTitle, setNewSessionTitle] = useState("");
   const [selectedSessionId, setSelectedSessionId] = useState<number | null>(null);
   const [collaboratorEmail, setCollaboratorEmail] = useState("");
@@ -85,23 +88,45 @@ export default function Presenter() {
     },
   });
   
-  // Check PIN validation on mount
+  // Check PIN and Email validation on mount
   useEffect(() => {
+    const storedEmail = getStoredEmail();
     if (!isPinValidated()) {
       setShowPinDialog(true);
+    } else if (!storedEmail) {
+      setPinValidated(true);
+      setShowEmailDialog(true);
     } else {
       setPinValidated(true);
+      setUserEmail(storedEmail);
     }
   }, []);
   
   const handlePinSuccess = () => {
     setShowPinDialog(false);
     setPinValidated(true);
+    // Check if email is already stored
+    const storedEmail = getStoredEmail();
+    if (!storedEmail) {
+      setShowEmailDialog(true);
+    } else {
+      setUserEmail(storedEmail);
+    }
   };
   
-  // Show PIN dialog while not validated (only authentication needed for presenter)
+  const handleEmailSuccess = (email: string) => {
+    setShowEmailDialog(false);
+    setUserEmail(email);
+  };
+  
+  // Show PIN dialog while not validated
   if (!pinValidated) {
     return <PinAuthDialog open={showPinDialog} onSuccess={handlePinSuccess} />;
+  }
+  
+  // Show Email dialog while email not provided
+  if (!userEmail) {
+    return <EmailAuthDialog open={showEmailDialog} onSuccess={handleEmailSuccess} />;
   }
 
   const sessions = sessionsQuery.data || [];
@@ -169,7 +194,7 @@ export default function Presenter() {
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Tableau de Bord Présentateur</h1>
-            <p className="text-sm text-gray-600">Bienvenue, {user?.name}</p>
+            <p className="text-sm text-gray-600">Bienvenue, {userEmail}</p>
           </div>
           <Link href="/">
             <Button variant="outline">Accueil</Button>

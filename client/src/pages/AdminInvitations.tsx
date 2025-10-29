@@ -160,12 +160,20 @@ export default function AdminInvitations() {
                 Gérez les liens d'accès pour les commerciaux
               </p>
             </div>
-            <Button
-              onClick={() => window.location.href = "/"}
-              variant="outline"
-            >
-              Retour à l'accueil
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                onClick={() => window.location.href = "/admin/settings"}
+                variant="outline"
+              >
+                Paramètres
+              </Button>
+              <Button
+                onClick={() => window.location.href = "/"}
+                variant="outline"
+              >
+                Retour à l'accueil
+              </Button>
+            </div>
           </div>
         </div>
       </div>

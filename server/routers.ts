@@ -35,6 +35,8 @@ import {
   updateCommercialLinkLastUsed,
   revokeCommercialLink,
   deleteCommercialInvitation,
+  getPresenterPin,
+  updatePresenterPin,
 } from "./db";
 import { storagePut, storageGet } from "./storage";
 import { TRPCError } from "@trpc/server";
@@ -93,6 +95,14 @@ export const appRouter = router({
         success: true,
       } as const;
     }),
+    /**
+     * Get presenter PIN code (public access for login)
+     */
+    getPresenterPin: publicProcedure
+      .query(async () => {
+        const pin = await getPresenterPin();
+        return { pin };
+      }),
   }),
 
   // ============ PRESENTATION SESSION ROUTES ============
@@ -840,6 +850,45 @@ export const appRouter = router({
         }
 
         await deleteCommercialInvitation(input.id);
+        return { success: true };
+      }),
+
+    /**
+     * Get presenter PIN code (admin only)
+     */
+    getPresenterPin: protectedProcedure
+      .query(async ({ ctx }) => {
+        // Check if user is admin
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Only admins can view PIN settings",
+          });
+        }
+
+        const { getPresenterPin } = await import("./db");
+        const pin = await getPresenterPin();
+        return { pin };
+      }),
+
+    /**
+     * Update presenter PIN code (admin only)
+     */
+    updatePresenterPin: protectedProcedure
+      .input(z.object({
+        pin: z.string().min(4).max(20),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // Check if user is admin
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Only admins can update PIN settings",
+          });
+        }
+
+        const { updatePresenterPin } = await import("./db");
+        await updatePresenterPin(input.pin);
         return { success: true };
       }),
   }),

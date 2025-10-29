@@ -820,3 +820,63 @@ export async function deleteAllChatMessages(sessionId: number) {
   await db.delete(chatMessages).where(eq(chatMessages.sessionId, sessionId));
 }
 
+
+/**
+ * Get app setting by key
+ */
+export async function getAppSetting(key: string) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const { appSettings } = await import("../drizzle/schema");
+  const result = await db
+    .select()
+    .from(appSettings)
+    .where(eq(appSettings.settingKey, key))
+    .limit(1);
+
+  return result[0] || null;
+}
+
+/**
+ * Update app setting
+ */
+export async function updateAppSetting(key: string, value: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { appSettings } = await import("../drizzle/schema");
+  
+  // Check if setting exists
+  const existing = await getAppSetting(key);
+  
+  if (existing) {
+    // Update existing
+    await db
+      .update(appSettings)
+      .set({ settingValue: value })
+      .where(eq(appSettings.settingKey, key));
+  } else {
+    // Insert new
+    await db.insert(appSettings).values({
+      settingKey: key,
+      settingValue: value,
+    });
+  }
+}
+
+/**
+ * Get presenter PIN code
+ */
+export async function getPresenterPin(): Promise<string> {
+  const setting = await getAppSetting("presenter_pin");
+  return setting?.settingValue || "5656"; // Default fallback
+}
+
+/**
+ * Update presenter PIN code
+ */
+export async function updatePresenterPin(newPin: string) {
+  await updateAppSetting("presenter_pin", newPin);
+}
+
