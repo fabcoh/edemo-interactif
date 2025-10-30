@@ -167,10 +167,11 @@ export default function ViewerChatPanel({ sessionCode, onLoadDocument }: ViewerC
           {[...messages].reverse().map((msg) => (
             <div 
               key={msg.id} 
-              className={`inline-block px-4 py-2 rounded-full shadow-lg backdrop-blur-sm text-white text-sm ${
+              className={`block px-4 py-2 rounded-full shadow-lg backdrop-blur-sm text-white text-sm ${
                 msg.senderType === 'presenter' ? 'bg-blue-500/60' : 'bg-green-500/60'
               }`}
               style={{
+                width: 'fit-content',
                 maxWidth: '85%',
                 wordWrap: 'break-word'
               }}
