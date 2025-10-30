@@ -168,3 +168,11 @@ _Aucune pour le moment_
 - ( ) Couleurs différentes : Présentateur (bleu) vs Spectateur (vert)
 - ( ) Inverser ordre : Nouveaux messages en haut, anciens en bas
 
+
+
+### Refonte UI Chat Viewer (bulles)
+- ( ) Zone messages : 1/3 largeur (au lieu de pleine largeur)
+- ( ) Retirer l'heure
+- ( ) Style bulles 💧 : arrondies, semi-transparentes, détachées
+- ( ) Couleurs : Bleu (présentateur) / Vert (spectateur)
+

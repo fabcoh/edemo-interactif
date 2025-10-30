@@ -154,25 +154,31 @@ export default function ViewerChatPanel({ sessionCode, onLoadDocument }: ViewerC
   return (
     <div
       ref={chatContainerRef}
-      className="fixed left-0 right-0 z-50 transition-all duration-300"
+      className="fixed left-0 z-50 transition-all duration-300"
       style={{
         bottom: "60px",
+        width: showMessages ? "33.33%" : "auto",
         height: showMessages ? "40vh" : "auto",
         minHeight: "60px",
       }}
     >
       {/* Zone messages (visible uniquement si showMessages) */}
       {showMessages && (
-        <div className="flex-1 overflow-y-auto p-2 space-y-1 bg-black/90 backdrop-blur" style={{ maxHeight: "calc(40vh - 60px)" }}>
+        <div className="flex-1 overflow-y-auto p-3 space-y-2" style={{ maxHeight: "calc(40vh - 60px)" }}>
           {[...messages].reverse().map((msg) => (
             <div 
               key={msg.id} 
-              className={`flex items-center justify-between px-2 py-1 rounded text-sm ${
-                msg.senderType === 'presenter' ? 'text-blue-400' : 'text-green-400'
+              className={`px-4 py-2 rounded-full shadow-lg backdrop-blur-sm ${
+                msg.senderType === 'presenter' 
+                  ? 'bg-blue-500/60 text-white' 
+                  : 'bg-green-500/60 text-white'
               }`}
+              style={{
+                maxWidth: '85%',
+                wordWrap: 'break-word'
+              }}
             >
-              <span className="flex-1">{msg.message}</span>
-              <span className="text-xs text-gray-500 ml-2">{new Date(msg.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
+              {msg.message}
             </div>
           ))}
           <div ref={messagesEndRef} />
