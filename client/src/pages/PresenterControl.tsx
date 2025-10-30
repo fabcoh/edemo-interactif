@@ -934,9 +934,10 @@ export default function PresenterControl() {
                         )}
                       </>
                     )}
-                    {displayedDocument.type === "pdf" && displayedDocument.fileUrl.match(/\.pdf$/i) && (
+                    {displayedDocument.type === "pdf" && (
                       <div className="w-full h-full flex flex-col items-center justify-center">
                         <Document
+                          key={displayedDocument.fileUrl}
                           file={displayedDocument.fileUrl}
                           onLoadSuccess={({ numPages }) => setNumPages(numPages)}
                           onLoadError={(error) => {

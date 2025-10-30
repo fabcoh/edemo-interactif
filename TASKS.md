@@ -111,3 +111,8 @@ _Aucune pour le moment_
 
 3. Mettre à jour ce fichier TASKS.md après chaque tâche
 
+
+
+### Bug urgent
+- ( ) Les PDF ne s'affichent pas dans le viewer du présentateur (grand affichage)
+
