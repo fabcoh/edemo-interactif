@@ -2,7 +2,8 @@
 
 **Projet** : Système de présentation interactif avec synchronisation temps réel  
 **Dernier checkpoint** : #56e6c92e  
-**Dernière mise à jour** : 30/10/2025 10:50
+**Derniers commits** : 56a9cdb, 1294434, e267900, 220dd38  
+**Dernière mise à jour** : 30/10/2025 13:15
 
 ---
 
@@ -68,7 +69,7 @@
 
 ### Autres
 - ( ) Loupe/magnifier sur PDF pour zoomer sur une zone spécifique
-- (X) Sélection zone rectangulaire : Présentateur peut sélectionner une zone, encadrée par un rectangle avec croix pour supprimer. Lecteur voit l'encadré - EN COURS (60%)
+- ✅ Sélection zone rectangulaire : Présentateur peut sélectionner une zone, encadrée par un rectangle avec croix pour supprimer. Lecteur voit l'encadré | Commits 56a9cdb, 1294434, e267900, 220dd38 | 30/10/2025 13:15
 - ( ) Pouvoir bouger le document pour mieux visualiser une zone (pan/drag)
 - ( ) Toutes modifications d'affichage et zoom concernent également les PDF
 - ( ) Nombre de spectateurs affiché en haut doit être en temps réel (actuellement statique)
