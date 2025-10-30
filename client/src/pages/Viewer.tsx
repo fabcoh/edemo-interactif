@@ -36,6 +36,11 @@ export default function Viewer() {
   const [presenterCursorVisible, setPresenterCursorVisible] = useState(false);
   const [presenterPanOffsetX, setPresenterPanOffsetX] = useState(0);
   const [presenterPanOffsetY, setPresenterPanOffsetY] = useState(0);
+  const [rectangleX, setRectangleX] = useState(0);
+  const [rectangleY, setRectangleY] = useState(0);
+  const [rectangleWidth, setRectangleWidth] = useState(0);
+  const [rectangleHeight, setRectangleHeight] = useState(0);
+  const [rectangleVisible, setRectangleVisible] = useState(false);
   const pdfContainerRef = useRef<HTMLDivElement>(null);
   const [documentError, setDocumentError] = useState<string | null>(null);
   const [viewerDocuments, setViewerDocuments] = useState<Array<{id: string, url: string, name: string, type: string}>>([]);
@@ -102,6 +107,11 @@ export default function Viewer() {
       setPresenterCursorVisible(cursorQuery.data.cursorVisible);
       setPresenterPanOffsetX(cursorQuery.data.panOffsetX);
       setPresenterPanOffsetY(cursorQuery.data.panOffsetY);
+      setRectangleX(cursorQuery.data.rectangleX || 0);
+      setRectangleY(cursorQuery.data.rectangleY || 0);
+      setRectangleWidth(cursorQuery.data.rectangleWidth || 0);
+      setRectangleHeight(cursorQuery.data.rectangleHeight || 0);
+      setRectangleVisible(cursorQuery.data.rectangleVisible || false);
       
       // Synchroniser le scroll du conteneur PDF
       if (pdfContainerRef.current && displayDocument?.type === 'pdf') {
@@ -325,6 +335,30 @@ export default function Viewer() {
                         👆
                       </div>
                     </div>
+                  );
+                })()}
+                {/* Rectangle Selection Overlay */}
+                {rectangleVisible && imageRef.current && (() => {
+                  const imageRect = imageRef.current.getBoundingClientRect();
+                  const containerRect = imageRef.current.parentElement?.getBoundingClientRect();
+                  if (!containerRect) return null;
+                  
+                  // Calculate rectangle position and size in pixels
+                  const rectLeft = (rectangleX / 100) * imageRect.width + (imageRect.left - containerRect.left);
+                  const rectTop = (rectangleY / 100) * imageRect.height + (imageRect.top - containerRect.top);
+                  const rectWidth = (rectangleWidth / 100) * imageRect.width;
+                  const rectHeight = (rectangleHeight / 100) * imageRect.height;
+                  
+                  return (
+                    <div
+                      className="absolute border-4 border-blue-500 bg-blue-500 bg-opacity-10 pointer-events-none"
+                      style={{
+                        left: `${rectLeft}px`,
+                        top: `${rectTop}px`,
+                        width: `${rectWidth}px`,
+                        height: `${rectHeight}px`,
+                      }}
+                    />
                   );
                 })()}
               </div>
