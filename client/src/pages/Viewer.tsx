@@ -4,7 +4,7 @@ import { useState, useRef } from "react";
 import { useRoute } from "wouter";
 import ChatPanel from "@/components/ChatPanel";
 import ViewerChatPanel from "@/components/ViewerChatPanel";
-import { DebugPanel } from "@/components/DebugPanel";
+
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -227,8 +227,8 @@ export default function Viewer() {
       <div className="fixed inset-0 bg-black flex flex-col">
         {/* Main Content Area - Vertical Layout */}
         <div className="h-full flex flex-col">
-          {/* Document Display - 65% of screen */}
-          <div className="h-[65%] bg-black flex flex-col items-center justify-center overflow-hidden relative">
+          {/* Document Display - Full height with padding for chat */}
+          <div className="flex-1 bg-black flex flex-col items-center justify-center overflow-hidden relative" style={{ paddingBottom: "120px" }}>
 
           {/* Document Content */}
           <div 
@@ -399,18 +399,7 @@ export default function Viewer() {
           />
         </div>
 
-        {/* Debug Panel */}
-        <DebugPanel
-          title="Viewer Debug"
-          data={{
-            presenterZoom: `${presenterZoom}%`,
-            presenterPan: `x:${Math.round(presenterPanOffsetX)} y:${Math.round(presenterPanOffsetY)}`,
-            presenterCursor: presenterCursorVisible ? `x:${Math.round(presenterCursorX)} y:${Math.round(presenterCursorY)}` : 'hidden',
-            rectangle: rectangleVisible ? `${Math.round(rectangleWidth)}x${Math.round(rectangleHeight)}` : 'none',
-            docType: displayDocument?.type || 'none',
-          }}
-          actions={[]}
-        />
+
       </div>
     );
   }

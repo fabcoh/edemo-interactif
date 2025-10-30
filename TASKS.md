@@ -131,3 +131,9 @@ _Aucune pour le moment_
 ### UI Viewer
 - ( ) Remonter la zone d'écriture du bas pour éviter qu'elle soit cachée par le message système
 
+
+
+### UI Viewer (suite)
+- ( ) Agrandir zone viewer pour qu'elle soit cachée par le panneau chat
+- ( ) Retirer DebugPanel du viewer
+
