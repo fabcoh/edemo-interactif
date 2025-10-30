@@ -288,14 +288,10 @@ export default function PresenterControl() {
       const xPercent = (imageX / imageRect.width) * 100;
       const yPercent = (imageY / imageRect.height) * 100;
       
-      updateZoomAndCursorMutation.mutate({
-        sessionId: sessionIdNum,
-        zoomLevel: zoom,
+      updatePresenterState({
         cursorX: xPercent,
         cursorY: yPercent,
         cursorVisible: showMouseCursor && zoom >= 100,
-        panOffsetX: panOffset.x,
-        panOffsetY: panOffset.y,
       });
     }
   };
@@ -365,17 +361,10 @@ export default function PresenterControl() {
             onClick={() => {
               const newZoom = Math.max(50, zoom - 10);
               setZoom(newZoom);
-              if (currentSession) {
-                updateZoomAndCursorMutation.mutate({
-                  sessionId: sessionIdNum,
-                  zoomLevel: newZoom,
-                  cursorX: mousePos.x,
-                  cursorY: mousePos.y,
-                  cursorVisible: showMouseCursor && newZoom > 100,
-                  panOffsetX: panOffset.x,
-                  panOffsetY: panOffset.y,
-                });
-              }
+              updatePresenterState({
+                zoomLevel: newZoom,
+                cursorVisible: showMouseCursor && newZoom > 100,
+              });
             }}
             variant="outline"
             size="sm"
@@ -392,17 +381,10 @@ export default function PresenterControl() {
             onChange={(e) => {
               const newZoom = parseInt(e.target.value);
               setZoom(newZoom);
-              if (currentSession) {
-                updateZoomAndCursorMutation.mutate({
-                  sessionId: sessionIdNum,
-                  zoomLevel: newZoom,
-                  cursorX: mousePos.x,
-                  cursorY: mousePos.y,
-                  cursorVisible: showMouseCursor && newZoom > 100,
-                  panOffsetX: panOffset.x,
-                  panOffsetY: panOffset.y,
-                });
-              }
+              updatePresenterState({
+                zoomLevel: newZoom,
+                cursorVisible: showMouseCursor && newZoom > 100,
+              });
             }}
             className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
             style={{
@@ -416,17 +398,10 @@ export default function PresenterControl() {
             onClick={() => {
               const newZoom = Math.min(200, zoom + 10);
               setZoom(newZoom);
-              if (currentSession) {
-                updateZoomAndCursorMutation.mutate({
-                  sessionId: sessionIdNum,
-                  zoomLevel: newZoom,
-                  cursorX: mousePos.x,
-                  cursorY: mousePos.y,
-                  cursorVisible: showMouseCursor && newZoom > 100,
-                  panOffsetX: panOffset.x,
-                  panOffsetY: panOffset.y,
-                });
-              }
+              updatePresenterState({
+                zoomLevel: newZoom,
+                cursorVisible: showMouseCursor && newZoom > 100,
+              });
             }}
             variant="outline"
             size="sm"
@@ -437,17 +412,10 @@ export default function PresenterControl() {
           <Button
             onClick={() => {
               setZoom(100);
-              if (currentSession) {
-                updateZoomAndCursorMutation.mutate({
-                  sessionId: sessionIdNum,
-                  zoomLevel: 100,
-                  cursorX: mousePos.x,
-                  cursorY: mousePos.y,
-                  cursorVisible: false,
-                  panOffsetX: panOffset.x,
-                  panOffsetY: panOffset.y,
-                });
-              }
+              updatePresenterState({
+                zoomLevel: 100,
+                cursorVisible: false,
+              });
             }}
             variant="outline"
             size="sm"
@@ -802,14 +770,10 @@ export default function PresenterControl() {
                           const xPercent = (imageX / imageRect.width) * 100;
                           const yPercent = (imageY / imageRect.height) * 100;
                           
-                          updateZoomAndCursorMutation.mutate({
-                            sessionId: sessionIdNum,
-                            zoomLevel: zoom,
+                          updatePresenterState({
                             cursorX: xPercent,
                             cursorY: yPercent,
                             cursorVisible: true,
-                            panOffsetX: panOffset.x,
-                            panOffsetY: panOffset.y,
                           });
                         }
                       }
@@ -823,17 +787,10 @@ export default function PresenterControl() {
                         const newZoom = Math.max(50, Math.min(200, initialZoom * scale));
                         setZoom(Math.round(newZoom));
                         
-                        if (currentSession) {
-                          updateZoomAndCursorMutation.mutate({
-                            sessionId: sessionIdNum,
-                            zoomLevel: Math.round(newZoom),
-                            cursorX: mousePos.x,
-                            cursorY: mousePos.y,
-                            cursorVisible: showMouseCursor && newZoom > 100,
-                            panOffsetX: panOffset.x,
-                            panOffsetY: panOffset.y,
-                          });
-                        }
+                        updatePresenterState({
+                          zoomLevel: Math.round(newZoom),
+                          cursorVisible: showMouseCursor && newZoom > 100,
+                        });
                       } else if (e.touches.length === 1) {
                         // Single finger: update cursor position and pan
                         if (imageRef.current) {
@@ -857,14 +814,10 @@ export default function PresenterControl() {
                             const xPercent = (imageX / imageRect.width) * 100;
                             const yPercent = (imageY / imageRect.height) * 100;
                           
-                            updateZoomAndCursorMutation.mutate({
-                              sessionId: sessionIdNum,
-                              zoomLevel: zoom,
+                            updatePresenterState({
                               cursorX: xPercent,
                               cursorY: yPercent,
                               cursorVisible: true,
-                              panOffsetX: panOffset.x,
-                              panOffsetY: panOffset.y,
                             });
                           }
                         }
@@ -877,15 +830,9 @@ export default function PresenterControl() {
                         setShowMouseCursor(false);
                         
                         // Hide cursor for viewers
-                        if (displayedDocumentId && currentSession) {
-                          updateZoomAndCursorMutation.mutate({
-                            sessionId: sessionIdNum,
-                            zoomLevel: zoom,
-                            cursorX: mousePos.x,
-                            cursorY: mousePos.y,
+                        if (displayedDocumentId) {
+                          updatePresenterState({
                             cursorVisible: false,
-                            panOffsetX: panOffset.x,
-                            panOffsetY: panOffset.y,
                           });
                         }
                       }
