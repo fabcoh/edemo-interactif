@@ -186,30 +186,28 @@ export default function ViewerChatPanel({ sessionCode, onLoadDocument }: ViewerC
       )}
 
       {/* Ligne de saisie (toujours visible) */}
-      <div className="flex flex-col gap-2 p-2 bg-black/70 backdrop-blur">
-        {/* Ligne 1: Zone d'écriture pleine largeur */}
+      <div className="flex items-center gap-2 p-2 bg-black/70 backdrop-blur">
+        {/* Zone d'écriture (60%) */}
         <input
           type="text"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
           placeholder="Écrire un message..."
-          className="w-full bg-gray-800 text-white px-3 py-2 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-[0.6] bg-gray-800 text-white px-3 py-2 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
 
-        {/* Ligne 2: Boutons */}
-        <div className="flex items-center gap-2">
-          {/* Bouton Envoyer */}
-          <button
-            onClick={handleSendMessage}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm font-medium transition-colors"
-          >
-            ➤ Envoyer
-          </button>
+        {/* Bouton Envoyer (10%) */}
+        <button
+          onClick={handleSendMessage}
+          className="flex-[0.1] bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm font-medium transition-colors"
+        >
+          ➤
+        </button>
 
-          {/* Zone de dépôt */}
-          <div
-            className={`flex-1 border-2 border-dashed rounded px-3 py-2 text-center cursor-pointer transition-colors ${
+        {/* Zone de dépôt (20%) */}
+        <div
+          className={`flex-[0.2] border-2 border-dashed rounded px-3 py-2 text-center cursor-pointer transition-colors ${
             isDragging ? "border-blue-500 bg-blue-500/10" : "border-gray-600 hover:border-gray-500"
           }`}
           onDrop={handleDrop}
@@ -230,14 +228,13 @@ export default function ViewerChatPanel({ sessionCode, onLoadDocument }: ViewerC
           <span className="text-xs text-gray-400">Glisser</span>
         </div>
 
-          {/* Icône messages */}
-          <button
-            onClick={() => setShowMessages(!showMessages)}
-            className="p-2 rounded hover:bg-gray-700 transition-colors"
-          >
-            <MessageCircle className={`w-5 h-5 ${showMessages ? "text-blue-500" : "text-gray-400"}`} />
-          </button>
-        </div>
+        {/* Icône messages (10%) */}
+        <button
+          onClick={() => setShowMessages(!showMessages)}
+          className="flex-[0.1] p-2 rounded hover:bg-gray-700 transition-colors"
+        >
+          <MessageCircle className={`w-5 h-5 ${showMessages ? "text-blue-500" : "text-gray-400"}`} />
+        </button>
       </div>
     </div>
   );
