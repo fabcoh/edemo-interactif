@@ -72,6 +72,7 @@
 - ( ) Pouvoir bouger le document pour mieux visualiser une zone (pan/drag)
 - ( ) Toutes modifications d'affichage et zoom concernent également les PDF
 - ( ) Nombre de spectateurs affiché en haut doit être en temps réel (actuellement statique)
+- ( ) Retirer l'identification pour les accès (permettre accès anonyme)
 
 ---
 

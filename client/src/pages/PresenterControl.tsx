@@ -112,6 +112,32 @@ export default function PresenterControl() {
 
   const updateZoomAndCursorMutation = trpc.presentation.updateZoomAndCursor.useMutation();
 
+  // Helper function to update zoom, cursor and rectangle
+  const updatePresenterState = (overrides: Partial<{
+    zoomLevel: number;
+    cursorX: number;
+    cursorY: number;
+    cursorVisible: boolean;
+    panOffsetX: number;
+    panOffsetY: number;
+  }> = {}) => {
+    if (!currentSession) return;
+    updateZoomAndCursorMutation.mutate({
+      sessionId: sessionIdNum,
+      zoomLevel: overrides.zoomLevel ?? zoom,
+      cursorX: overrides.cursorX ?? mousePos.x,
+      cursorY: overrides.cursorY ?? mousePos.y,
+      cursorVisible: overrides.cursorVisible ?? showMouseCursor,
+      panOffsetX: overrides.panOffsetX ?? panOffset.x,
+      panOffsetY: overrides.panOffsetY ?? panOffset.y,
+      rectangleX: rectangle.x,
+      rectangleY: rectangle.y,
+      rectangleWidth: rectangle.width,
+      rectangleHeight: rectangle.height,
+      rectangleVisible: rectangle.visible,
+    });
+  };
+
   const sendMessageMutation = trpc.chat.sendMessage.useMutation();
 
   // Synchronize displayed document with session's current document (for viewer uploads)
