@@ -15,6 +15,14 @@ export default function ViewerChatPanel({ sessionCode, onLoadDocument }: ViewerC
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const autoCloseTimerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Récupérer la session pour avoir le sessionId
+  const sessionQuery = trpc.presentation.getSessionByCode.useQuery(
+    { sessionCode },
+    { enabled: !!sessionCode }
+  );
+
+  const sessionId = sessionQuery.data?.id;
+
   // Récupérer les messages
   const messagesQuery = trpc.getMessages.useQuery(
     { sessionCode },
@@ -90,11 +98,12 @@ export default function ViewerChatPanel({ sessionCode, onLoadDocument }: ViewerC
   }, [messages, showMessages]);
 
   const handleSendMessage = () => {
-    if (message.trim()) {
+    if (message.trim() && sessionId) {
       sendMessageMutation.mutate({
-        sessionCode,
-        content: message,
+        sessionId,
+        senderType: "viewer" as const,
         senderName: "Spectateur",
+        message: message,
       });
     }
   };
