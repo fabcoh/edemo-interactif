@@ -68,6 +68,10 @@
 
 ### Autres
 - ( ) Loupe/magnifier sur PDF pour zoomer sur une zone spécifique
+- (X) Sélection zone rectangulaire : Présentateur peut sélectionner une zone, encadrée par un rectangle avec croix pour supprimer. Lecteur voit l'encadré - EN COURS (60%)
+- ( ) Pouvoir bouger le document pour mieux visualiser une zone (pan/drag)
+- ( ) Toutes modifications d'affichage et zoom concernent également les PDF
+- ( ) Nombre de spectateurs affiché en haut doit être en temps réel (actuellement statique)
 
 ---
 

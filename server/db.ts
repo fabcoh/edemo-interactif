@@ -525,7 +525,12 @@ export async function updatePresenterCursor(
   cursorY: number,
   cursorVisible: boolean,
   panOffsetX: number,
-  panOffsetY: number
+  panOffsetY: number,
+  rectangleX?: number,
+  rectangleY?: number,
+  rectangleWidth?: number,
+  rectangleHeight?: number,
+  rectangleVisible?: boolean
 ): Promise<PresenterCursor> {
   const db = await getDb();
   if (!db) {
@@ -550,6 +555,11 @@ export async function updatePresenterCursor(
         cursorVisible,
         panOffsetX,
         panOffsetY,
+        ...(rectangleX !== undefined && { rectangleX }),
+        ...(rectangleY !== undefined && { rectangleY }),
+        ...(rectangleWidth !== undefined && { rectangleWidth }),
+        ...(rectangleHeight !== undefined && { rectangleHeight }),
+        ...(rectangleVisible !== undefined && { rectangleVisible }),
         updatedAt: new Date(),
       })
       .where(eq(presenterCursors.sessionId, sessionId));
@@ -562,6 +572,11 @@ export async function updatePresenterCursor(
       cursorVisible,
       panOffsetX,
       panOffsetY,
+      ...(rectangleX !== undefined && { rectangleX }),
+      ...(rectangleY !== undefined && { rectangleY }),
+      ...(rectangleWidth !== undefined && { rectangleWidth }),
+      ...(rectangleHeight !== undefined && { rectangleHeight }),
+      ...(rectangleVisible !== undefined && { rectangleVisible }),
       updatedAt: new Date(),
     };
   } else {
@@ -574,6 +589,11 @@ export async function updatePresenterCursor(
       cursorVisible,
       panOffsetX,
       panOffsetY,
+      ...(rectangleX !== undefined && { rectangleX }),
+      ...(rectangleY !== undefined && { rectangleY }),
+      ...(rectangleWidth !== undefined && { rectangleWidth }),
+      ...(rectangleHeight !== undefined && { rectangleHeight }),
+      ...(rectangleVisible !== undefined && { rectangleVisible }),
     });
 
     const result = await db

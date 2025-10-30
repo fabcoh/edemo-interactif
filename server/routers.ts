@@ -303,6 +303,11 @@ export const appRouter = router({
         cursorVisible: z.boolean(),
         panOffsetX: z.number(),
         panOffsetY: z.number(),
+        rectangleX: z.number().optional(),
+        rectangleY: z.number().optional(),
+        rectangleWidth: z.number().optional(),
+        rectangleHeight: z.number().optional(),
+        rectangleVisible: z.boolean().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         const sessions = await getPresentationSessionsByPresenter(ctx.user.id);
@@ -322,7 +327,12 @@ export const appRouter = router({
           input.cursorY,
           input.cursorVisible,
           input.panOffsetX,
-          input.panOffsetY
+          input.panOffsetY,
+          input.rectangleX,
+          input.rectangleY,
+          input.rectangleWidth,
+          input.rectangleHeight,
+          input.rectangleVisible
         );
 
         return { success: true };
@@ -350,6 +360,11 @@ export const appRouter = router({
             cursorVisible: false,
             panOffsetX: 0,
             panOffsetY: 0,
+            rectangleX: 0,
+            rectangleY: 0,
+            rectangleWidth: 0,
+            rectangleHeight: 0,
+            rectangleVisible: false,
           };
         }
 
@@ -360,6 +375,11 @@ export const appRouter = router({
           cursorVisible: cursor.cursorVisible,
           panOffsetX: cursor.panOffsetX,
           panOffsetY: cursor.panOffsetY,
+          rectangleX: cursor.rectangleX || 0,
+          rectangleY: cursor.rectangleY || 0,
+          rectangleWidth: cursor.rectangleWidth || 0,
+          rectangleHeight: cursor.rectangleHeight || 0,
+          rectangleVisible: cursor.rectangleVisible || false,
         };
       }),
   }),

@@ -149,6 +149,16 @@ export const presenterCursors = mysqlTable("presenter_cursors", {
   panOffsetX: float("panOffsetX").default(0).notNull(),
   /** Pan offset Y in pixels */
   panOffsetY: float("panOffsetY").default(0).notNull(),
+  /** Rectangle selection - X position as percentage (0-100) */
+  rectangleX: float("rectangleX").default(0),
+  /** Rectangle selection - Y position as percentage (0-100) */
+  rectangleY: float("rectangleY").default(0),
+  /** Rectangle selection - Width as percentage (0-100) */
+  rectangleWidth: float("rectangleWidth").default(0),
+  /** Rectangle selection - Height as percentage (0-100) */
+  rectangleHeight: float("rectangleHeight").default(0),
+  /** Whether the rectangle is visible */
+  rectangleVisible: boolean("rectangleVisible").default(false).notNull(),
   /** Timestamps */
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

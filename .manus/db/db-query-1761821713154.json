@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE presenter_cursors \nADD COLUMN rectangleX FLOAT DEFAULT 0,\nADD COLUMN rectangleY FLOAT DEFAULT 0,\nADD COLUMN rectangleWidth FLOAT DEFAULT 0,\nADD COLUMN rectangleHeight FLOAT DEFAULT 0,\nADD COLUMN rectangleVisible BOOLEAN DEFAULT FALSE NOT NULL;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3j1v42nUZuvgHzn.root --database 8CbieS7mEqbTHNrWVL4VaZ --execute ALTER TABLE presenter_cursors \nADD COLUMN rectangleX FLOAT DEFAULT 0,\nADD COLUMN rectangleY FLOAT DEFAULT 0,\nADD COLUMN rectangleWidth FLOAT DEFAULT 0,\nADD COLUMN rectangleHeight FLOAT DEFAULT 0,\nADD COLUMN rectangleVisible BOOLEAN DEFAULT FALSE NOT NULL;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1421
+}

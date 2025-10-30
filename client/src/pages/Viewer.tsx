@@ -340,6 +340,7 @@ export default function Viewer() {
               />
             )}
           </div>
+          </div>
 
           {/* ViewerChatPanel - Overlay en bas */}
           <ViewerChatPanel
