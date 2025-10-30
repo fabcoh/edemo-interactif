@@ -143,3 +143,9 @@ _Aucune pour le moment_
 - ( ) Réduire hauteur du volet chat (s'élève trop)
 - ( ) Supprimer contour noir au-dessus de la zone d'écriture
 
+
+
+### Bugs Chat
+- ( ) Les messages ne partent pas quand on appuie sur Entrée
+- ( ) Bouton "Envoyer" manquant côté viewer
+

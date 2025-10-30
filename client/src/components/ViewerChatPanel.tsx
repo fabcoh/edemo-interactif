@@ -168,19 +168,27 @@ export default function ViewerChatPanel({ sessionCode, onLoadDocument }: ViewerC
 
       {/* Ligne de saisie (toujours visible) */}
       <div className="flex items-center gap-2 p-2">
-        {/* Zone d'écriture (70%) */}
+        {/* Zone d'écriture (60%) */}
         <input
           type="text"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+          onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
           placeholder="Écrire un message..."
-          className="flex-[0.7] bg-gray-800 text-white px-3 py-2 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-[0.6] bg-gray-800 text-white px-3 py-2 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
 
-        {/* Zone de dépôt (25%) */}
+        {/* Bouton Envoyer (10%) */}
+        <button
+          onClick={handleSendMessage}
+          className="flex-[0.1] bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm font-medium transition-colors"
+        >
+          ➤
+        </button>
+
+        {/* Zone de dépôt (20%) */}
         <div
-          className={`flex-[0.25] border-2 border-dashed rounded px-3 py-2 text-center cursor-pointer transition-colors ${
+          className={`flex-[0.2] border-2 border-dashed rounded px-3 py-2 text-center cursor-pointer transition-colors ${
             isDragging ? "border-blue-500 bg-blue-500/10" : "border-gray-600 hover:border-gray-500"
           }`}
           onDrop={handleDrop}
