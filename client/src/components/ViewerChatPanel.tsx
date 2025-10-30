@@ -57,6 +57,11 @@ export default function ViewerChatPanel({ sessionCode, onLoadDocument }: ViewerC
     if (messages.length > 0) {
       setShowMessages(true);
       
+      // Scroll vers le haut (car les nouveaux messages sont en haut)
+      if (messagesEndRef.current) {
+        messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      
       // Démarrer le timer de fermeture automatique (7 secondes)
       if (autoCloseTimerRef.current) {
         clearTimeout(autoCloseTimerRef.current);
@@ -164,11 +169,13 @@ export default function ViewerChatPanel({ sessionCode, onLoadDocument }: ViewerC
           }}
         >
           <div className="h-full overflow-y-auto p-3 space-y-2">
-          {[...messages].reverse().map((msg) => (
+          {[...messages].reverse().map((msg, index) => (
             <div 
               key={msg.id} 
               className={`block px-4 py-2 rounded-full shadow-lg backdrop-blur-sm text-white text-sm ${
-                msg.senderType === 'presenter' ? 'bg-blue-500/60' : 'bg-green-500/60'
+                msg.senderType === 'presenter' 
+                  ? (index === 0 ? 'bg-blue-500' : 'bg-blue-500/60')
+                  : (index === 0 ? 'bg-green-500' : 'bg-green-500/60')
               }`}
               style={{
                 width: 'fit-content',
