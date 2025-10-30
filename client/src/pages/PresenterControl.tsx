@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import ChatPanel from "@/components/ChatPanel";
+import { DebugPanel } from "@/components/DebugPanel";
 import { Document, Page, pdfjs } from 'react-pdf';
 import {
   AlertDialog,
@@ -1068,6 +1069,24 @@ export default function PresenterControl() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Debug Panel */}
+      <DebugPanel
+        title="Présentateur Debug"
+        data={{
+          zoom: `${zoom}%`,
+          pan: `x:${Math.round(panOffset.x)} y:${Math.round(panOffset.y)}`,
+          cursor: showMouseCursor ? `x:${Math.round(mousePos.x)} y:${Math.round(mousePos.y)}` : 'hidden',
+          rectangle: rectangle.visible ? `${Math.round(rectangle.width)}x${Math.round(rectangle.height)}` : 'none',
+          isPanning,
+          isDrawing: isDrawingRectangle,
+        }}
+        actions={[
+          { label: 'Reset Zoom', onClick: () => setZoom(100) },
+          { label: 'Reset Pan', onClick: () => setPanOffset({ x: 0, y: 0 }) },
+          { label: 'Hide Rectangle', onClick: () => setRectangle({ ...rectangle, visible: false }) },
+        ]}
+      />
     </div>
   );
 }

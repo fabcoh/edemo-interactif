@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import { useRoute } from "wouter";
 import ChatPanel from "@/components/ChatPanel";
 import ViewerChatPanel from "@/components/ViewerChatPanel";
+import { DebugPanel } from "@/components/DebugPanel";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -397,6 +398,19 @@ export default function Viewer() {
             }}
           />
         </div>
+
+        {/* Debug Panel */}
+        <DebugPanel
+          title="Viewer Debug"
+          data={{
+            presenterZoom: `${presenterZoom}%`,
+            presenterPan: `x:${Math.round(presenterPanOffsetX)} y:${Math.round(presenterPanOffsetY)}`,
+            presenterCursor: presenterCursorVisible ? `x:${Math.round(presenterCursorX)} y:${Math.round(presenterCursorY)}` : 'hidden',
+            rectangle: rectangleVisible ? `${Math.round(rectangleWidth)}x${Math.round(rectangleHeight)}` : 'none',
+            docType: displayDocument?.type || 'none',
+          }}
+          actions={[]}
+        />
       </div>
     );
   }
