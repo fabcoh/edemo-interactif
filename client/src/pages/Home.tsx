@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
 import { Link, useLocation } from "wouter";
 import { Presentation, Users } from "lucide-react";
-import { PinAuthDialog, isPinValidated, getStoredEmail } from "@/components/PinAuthDialog";
 import { useState } from "react";
 
 /**
@@ -12,18 +11,7 @@ import { useState } from "react";
 export default function Home() {
   const { user, isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
-  const [showPinDialog, setShowPinDialog] = useState(false);
-  
   const handlePresenterAccess = () => {
-    if (isPinValidated()) {
-      setLocation("/presenter");
-    } else {
-      setShowPinDialog(true);
-    }
-  };
-  
-  const handlePinSuccess = (email: string) => {
-    setShowPinDialog(false);
     setLocation("/presenter");
   };
 
@@ -136,9 +124,7 @@ export default function Home() {
         </div>
       </main>
 
-      {/* PIN Auth Dialog */}
-      <PinAuthDialog open={showPinDialog} onSuccess={handlePinSuccess} />
-      
+
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-8 mt-12">
         <div className="container mx-auto px-4 text-center">

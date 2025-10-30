@@ -10,7 +10,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Copy, Share2, Trash2, Eye, FileText, Image, Video, Users, Mail, X, Play, Edit2, Check } from "lucide-react";
 import { Link, useLocation } from "wouter";
-import { PinAuthDialog, isPinValidated, getStoredEmail } from "@/components/PinAuthDialog";
 import { useEffect } from "react";
 
 /**
@@ -19,8 +18,7 @@ import { useEffect } from "react";
 export default function Presenter() {
   const { user, isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
-  const [showAuthDialog, setShowAuthDialog] = useState(false);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [userEmail] = useState<string>("presenter@edemo.local"); // Auto-authenticated
   const [newSessionTitle, setNewSessionTitle] = useState("");
   const [selectedSessionId, setSelectedSessionId] = useState<number | null>(null);
   const [collaboratorEmail, setCollaboratorEmail] = useState("");
@@ -85,25 +83,7 @@ export default function Presenter() {
     },
   });
   
-  // Check authentication on mount
-  useEffect(() => {
-    const storedEmail = getStoredEmail();
-    if (!isPinValidated() || !storedEmail) {
-      setShowAuthDialog(true);
-    } else {
-      setUserEmail(storedEmail);
-    }
-  }, []);
-  
-  const handleAuthSuccess = (email: string) => {
-    setShowAuthDialog(false);
-    setUserEmail(email);
-  };
-  
-  // Show authentication dialog while not authenticated
-  if (!userEmail) {
-    return <PinAuthDialog open={showAuthDialog} onSuccess={handleAuthSuccess} />;
-  }
+  // Auto-authenticated - no PIN required
 
   const sessions = sessionsQuery.data || [];
   const documents = documentsQuery.data || [];
