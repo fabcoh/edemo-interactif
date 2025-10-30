@@ -250,6 +250,7 @@ export default function Viewer() {
                   <Page
                     pageNumber={pageNumber}
                     scale={presenterZoom / 100}
+                    width={Math.min(window.innerWidth * 0.9, 1200)}
                     className="max-w-full"
                     renderTextLayer={true}
                     renderAnnotationLayer={true}

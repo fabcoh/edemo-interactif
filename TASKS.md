@@ -52,8 +52,9 @@
 ## ( ) TÂCHES À FAIRE
 
 ### Bugs à corriger (URGENT)
-1. (X) Synchronisation du zoom des PDF du présentateur ne se fait pas du côté lecteur - EN COURS DE TEST
-2. ( ) Pouvoir déplacer les PDF (pan/scroll)
+1. ✅ Synchronisation du zoom des PDF du présentateur ne se fait pas du côté lecteur | Commit 4b5a87a | 30/10/2025 11:40
+2. ( ) PDF s'ouvre trop grand côté lecteur - Ajuster la taille par défaut
+3. ( ) Pouvoir déplacer les PDF (pan/scroll)
 
 ### Fonctionnalités demandées (par ordre de priorité)
 1. ( ) Synchronisation des PDFs entre présentateur et lecteur (vérifier + corriger bugs ci-dessus)
