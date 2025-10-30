@@ -152,22 +152,22 @@ export default function ViewerChatPanel({ sessionCode, onLoadDocument }: ViewerC
   };
 
   return (
-    <>
-      {/* Panneau messages (1/3 à droite) */}
+    <div
+      ref={chatContainerRef}
+      className="fixed left-0 right-0 z-50 transition-all duration-300"
+      style={{
+        bottom: "0px",
+        height: showMessages ? "40vh" : "auto",
+        minHeight: "60px",
+      }}
+    >
+      {/* Zone messages (visible uniquement si showMessages) */}
       {showMessages && (
-        <div
-          className="fixed right-0 z-50 transition-all duration-300"
-          style={{
-            bottom: "60px",
-            width: "33.33%",
-            height: "40vh",
-          }}
-        >
-          <div className="h-full overflow-y-auto p-3 space-y-2">
+        <div className="flex-1 overflow-y-auto p-3 space-y-2 bg-black/90 backdrop-blur" style={{ maxHeight: "calc(40vh - 60px)" }}>
           {[...messages].reverse().map((msg) => (
             <div 
               key={msg.id} 
-              className={`px-4 py-2 rounded-full shadow-lg backdrop-blur-sm ${
+              className={`inline-block px-4 py-2 rounded-full shadow-lg backdrop-blur-sm ${
                 msg.senderType === 'presenter' 
                   ? 'bg-blue-500/60 text-white' 
                   : 'bg-green-500/60 text-white'
@@ -180,17 +180,12 @@ export default function ViewerChatPanel({ sessionCode, onLoadDocument }: ViewerC
               {msg.message}
             </div>
           ))}
-            <div ref={messagesEndRef} />
-          </div>
+          <div ref={messagesEndRef} />
         </div>
       )}
 
-      {/* Barre de saisie (pleine largeur en bas) */}
-      <div
-        ref={chatContainerRef}
-        className="fixed left-0 right-0 z-50 flex items-center gap-2 p-2 bg-black/70 backdrop-blur"
-        style={{ bottom: "0px" }}
-      >
+      {/* Ligne de saisie (toujours visible) */}
+      <div className="flex items-center gap-2 p-2 bg-black/70 backdrop-blur">
         {/* Zone d'écriture (60%) */}
         <input
           type="text"
@@ -240,6 +235,6 @@ export default function ViewerChatPanel({ sessionCode, onLoadDocument }: ViewerC
           <MessageCircle className={`w-5 h-5 ${showMessages ? "text-blue-500" : "text-gray-400"}`} />
         </button>
       </div>
-    </>
+    </div>
   );
 }
