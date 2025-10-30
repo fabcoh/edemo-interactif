@@ -171,7 +171,15 @@ export default function PresenterControl() {
     );
   }
 
-  const documents = documentsQuery.data || [];
+  const documentsRaw = documentsQuery.data || [];
+  
+  // Auto-detect file type from URL for all documents
+  const documents = documentsRaw.map(doc => ({
+    ...doc,
+    type: doc.fileUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? 'image' as const :
+          doc.fileUrl.match(/\.pdf$/i) ? 'pdf' as const :
+          doc.type
+  }));
   const viewerCount = viewerCountQuery.data?.count || 0;
   const selectedDocument = documents.find(d => d.id === selectedDocumentId);
   const displayedDocumentRaw = documents.find(d => d.id === displayedDocumentId);
