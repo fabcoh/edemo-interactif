@@ -149,3 +149,10 @@ _Aucune pour le moment_
 - ( ) Les messages ne partent pas quand on appuie sur Entrée
 - ( ) Bouton "Envoyer" manquant côté viewer
 
+
+
+### Bugs Chat (suite)
+- ( ) Viewer: Messages s'envoient mais ne s'affichent pas dans la zone
+- ( ) Viewer: Étirer la zone des chats (plus haute)
+- ( ) Présentateur: Messages ne s'envoient pas (restent locaux uniquement)
+
