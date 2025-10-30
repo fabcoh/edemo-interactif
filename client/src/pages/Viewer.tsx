@@ -249,10 +249,10 @@ export default function Viewer() {
                 >
                   <Page
                     pageNumber={pageNumber}
+                    scale={presenterZoom / 100}
                     className="max-w-full"
                     renderTextLayer={true}
                     renderAnnotationLayer={true}
-                    width={window.innerWidth * 0.65}
                   />
                 </Document>
                 {numPages && numPages > 1 && (
