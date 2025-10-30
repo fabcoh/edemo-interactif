@@ -578,7 +578,7 @@ export default function PresenterControl() {
                     </button>
                   </>
                 )}
-                {doc.type === "pdf" && (
+                {doc.type === "pdf" && doc.fileUrl.match(/\.pdf$/i) && (
                   <>
                     {/* Fond gradient comme pour les images */}
                     <div 
@@ -891,7 +891,7 @@ export default function PresenterControl() {
                         )}
                       </>
                     )}
-                    {displayedDocument.type === "pdf" && (
+                    {displayedDocument.type === "pdf" && displayedDocument.fileUrl.match(/\.pdf$/i) && (
                       <div className="w-full h-full flex flex-col items-center justify-center">
                         <Document
                           file={displayedDocument.fileUrl}
