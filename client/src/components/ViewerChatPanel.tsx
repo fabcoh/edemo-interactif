@@ -156,6 +156,9 @@ export default function ViewerChatPanel({ sessionCode, onLoadDocument }: ViewerC
     setIsDragging(false);
   };
 
+  // ========================================
+  // BARRE LECTEUR AVEC BULLE - Configuration finale
+  // ========================================
   return (
     <>
       {/* Bulles messages (à droite, transparent) */}
