@@ -24,7 +24,7 @@ export default function ViewerChatPanel({ sessionCode, onLoadDocument }: ViewerC
   const sessionId = sessionQuery.data?.id;
 
   // Récupérer les messages
-  const messagesQuery = trpc.getMessages.useQuery(
+  const messagesQuery = trpc.chat.getMessages.useQuery(
     { sessionCode },
     {
       enabled: !!sessionCode,
@@ -35,14 +35,14 @@ export default function ViewerChatPanel({ sessionCode, onLoadDocument }: ViewerC
   const messages = messagesQuery.data || [];
 
   // Mutations
-  const sendMessageMutation = trpc.sendMessage.useMutation({
+  const sendMessageMutation = trpc.chat.sendMessage.useMutation({
     onSuccess: () => {
       setMessage("");
       messagesQuery.refetch();
     },
   });
 
-  const uploadFileMutation = trpc.uploadFile.useMutation({
+  const uploadFileMutation = trpc.chat.uploadFile.useMutation({
     onSuccess: (data) => {
       if (onLoadDocument) {
         const fileType = data.name.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image';
