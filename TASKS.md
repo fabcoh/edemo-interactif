@@ -137,3 +137,9 @@ _Aucune pour le moment_
 - ( ) Agrandir zone viewer pour qu'elle soit cachée par le panneau chat
 - ( ) Retirer DebugPanel du viewer
 
+
+
+### UI Viewer Chat
+- ( ) Réduire hauteur du volet chat (s'élève trop)
+- ( ) Supprimer contour noir au-dessus de la zone d'écriture
+

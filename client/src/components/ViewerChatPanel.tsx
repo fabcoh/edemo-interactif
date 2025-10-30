@@ -148,13 +148,13 @@ export default function ViewerChatPanel({ sessionCode, onLoadDocument }: ViewerC
       className="fixed left-0 right-0 z-50 bg-black/90 backdrop-blur transition-all duration-300"
       style={{
         bottom: "60px",
-        height: showMessages ? "35vh" : "auto",
+        height: showMessages ? "25vh" : "auto",
         minHeight: "60px",
       }}
     >
       {/* Zone messages (visible uniquement si showMessages) */}
       {showMessages && (
-        <div className="flex-1 overflow-y-auto p-4 space-y-2" style={{ maxHeight: "calc(35vh - 60px)" }}>
+        <div className="flex-1 overflow-y-auto p-4 space-y-2" style={{ maxHeight: "calc(25vh - 60px)" }}>
           {messages.map((msg) => (
             <div key={msg.id} className="bg-gray-800/50 rounded p-2">
               <div className="text-xs text-gray-400">{msg.senderName}</div>
@@ -167,7 +167,7 @@ export default function ViewerChatPanel({ sessionCode, onLoadDocument }: ViewerC
       )}
 
       {/* Ligne de saisie (toujours visible) */}
-      <div className="flex items-center gap-2 p-2 border-t border-gray-700">
+      <div className="flex items-center gap-2 p-2">
         {/* Zone d'écriture (70%) */}
         <input
           type="text"
