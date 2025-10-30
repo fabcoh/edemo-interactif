@@ -906,6 +906,31 @@ export default function PresenterControl() {
                             </div>
                           </div>
                         )}
+                        {/* Rectangle Selection Overlay */}
+                        {rectangle.visible && imageRef.current && (
+                          <div
+                            className="absolute border-4 border-blue-500 bg-blue-500 bg-opacity-10"
+                            style={{
+                              left: `${rectangle.x}%`,
+                              top: `${rectangle.y}%`,
+                              width: `${rectangle.width}%`,
+                              height: `${rectangle.height}%`,
+                              pointerEvents: 'none',
+                            }}
+                          >
+                            {/* Close Button */}
+                            <button
+                              onClick={() => {
+                                setRectangle({ ...rectangle, visible: false });
+                                updatePresenterState();
+                              }}
+                              className="absolute -top-3 -right-3 bg-red-600 hover:bg-red-700 text-white rounded-full p-1 pointer-events-auto"
+                              title="Fermer la sélection"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                        )}
                       </>
                     )}
                     {displayedDocument.type === "pdf" && displayedDocument.fileUrl.match(/\.pdf$/i) && (
