@@ -174,7 +174,15 @@ export default function PresenterControl() {
   const documents = documentsQuery.data || [];
   const viewerCount = viewerCountQuery.data?.count || 0;
   const selectedDocument = documents.find(d => d.id === selectedDocumentId);
-  const displayedDocument = documents.find(d => d.id === displayedDocumentId);
+  const displayedDocumentRaw = documents.find(d => d.id === displayedDocumentId);
+  
+  // Auto-detect file type from URL if type is incorrect
+  const displayedDocument = displayedDocumentRaw ? {
+    ...displayedDocumentRaw,
+    type: displayedDocumentRaw.fileUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? 'image' as const :
+          displayedDocumentRaw.fileUrl.match(/\.pdf$/i) ? 'pdf' as const :
+          displayedDocumentRaw.type
+  } : undefined;
 
   const handleDisplayDocument = async (docId: number) => {
     // Send zoom with the document
@@ -880,7 +888,10 @@ export default function PresenterControl() {
                         <Document
                           file={displayedDocument.fileUrl}
                           onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-                          onLoadError={(error) => console.error('PDF load error:', error)}
+                          onLoadError={(error) => {
+                            console.error('PDF load error:', error);
+                            console.log('Document type:', displayedDocument.type, 'URL:', displayedDocument.fileUrl);
+                          }}
                           loading={
                             <div className="text-center">
                               <div className="text-6xl mb-4">📄</div>
