@@ -577,7 +577,7 @@ export default function PresenterControl() {
                     </button>
                   </>
                 )}
-                {doc.type === "pdf" && doc.fileUrl.match(/\.pdf$/i) && (
+                {doc.type === "pdf" && (
                   <>
                     {/* Fond gradient comme pour les images */}
                     <div 
@@ -586,12 +586,33 @@ export default function PresenterControl() {
                         background: `linear-gradient(135deg, hsl(${(doc.id * 60) % 360}, 70%, 40%), hsl(${(doc.id * 60 + 60) % 360}, 70%, 40%))`
                       }}
                     />
-                    {/* Preview PDF par-dessus le gradient - Fallback visible */}
-                    <div className="w-full h-full flex items-center justify-center overflow-hidden relative z-10">
-                      <div className="text-center">
-                        <div className="text-4xl mb-1">📄</div>
-                        <p className="text-xs text-white font-bold">PDF</p>
-                      </div>
+                    {/* Preview PDF par-dessus le gradient */}
+                    <div className="w-full h-full flex items-center justify-center overflow-hidden relative z-10 bg-white/90">
+                      <Document
+                        file={doc.fileUrl}
+                        onLoadError={(error) => {
+                          console.error('PDF thumbnail error:', error);
+                        }}
+                        loading={
+                          <div className="text-center">
+                            <div className="text-2xl">📄</div>
+                            <p className="text-xs text-gray-500 mt-1">Chargement...</p>
+                          </div>
+                        }
+                        error={
+                          <div className="text-center">
+                            <div className="text-2xl">📄</div>
+                            <p className="text-xs text-red-600 mt-1">Erreur</p>
+                          </div>
+                        }
+                      >
+                        <Page
+                          pageNumber={1}
+                          width={96}
+                          renderTextLayer={false}
+                          renderAnnotationLayer={false}
+                        />
+                      </Document>
                     </div>
                     {/* Bouton Supprimer en haut à droite - TOUJOURS VISIBLE */}
                     <button
