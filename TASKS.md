@@ -53,7 +53,7 @@
 
 ### Bugs à corriger (URGENT)
 1. ✅ Synchronisation du zoom des PDF du présentateur ne se fait pas du côté lecteur | Commit 4b5a87a | 30/10/2025 11:40
-2. ( ) PDF s'ouvre trop grand côté lecteur - Ajuster la taille par défaut
+2. ✅ PDF s'ouvre trop grand côté lecteur - Ajuster la taille par défaut | Commit 106982d | 30/10/2025 11:45
 3. ( ) Pouvoir déplacer les PDF (pan/scroll)
 
 ### Fonctionnalités demandées (par ordre de priorité)

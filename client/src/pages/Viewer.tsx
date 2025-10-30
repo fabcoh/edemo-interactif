@@ -35,6 +35,7 @@ export default function Viewer() {
   const [presenterCursorVisible, setPresenterCursorVisible] = useState(false);
   const [presenterPanOffsetX, setPresenterPanOffsetX] = useState(0);
   const [presenterPanOffsetY, setPresenterPanOffsetY] = useState(0);
+  const pdfContainerRef = useRef<HTMLDivElement>(null);
   const [documentError, setDocumentError] = useState<string | null>(null);
   const [viewerDocuments, setViewerDocuments] = useState<Array<{id: string, url: string, name: string, type: string}>>([]);
   const [numPages, setNumPages] = useState<number | null>(null);
@@ -100,6 +101,12 @@ export default function Viewer() {
       setPresenterCursorVisible(cursorQuery.data.cursorVisible);
       setPresenterPanOffsetX(cursorQuery.data.panOffsetX);
       setPresenterPanOffsetY(cursorQuery.data.panOffsetY);
+      
+      // Synchroniser le scroll du conteneur PDF
+      if (pdfContainerRef.current && displayDocument?.type === 'pdf') {
+        pdfContainerRef.current.scrollLeft = cursorQuery.data.panOffsetX;
+        pdfContainerRef.current.scrollTop = cursorQuery.data.panOffsetY;
+      }
       console.log('[Viewer] Cursor data:', {
         zoom: cursorQuery.data.zoomLevel,
         x: cursorQuery.data.cursorX,
@@ -225,7 +232,7 @@ export default function Viewer() {
             )}
 
             {!documentError && displayDocument.type === "pdf" && (
-              <div className="w-full h-full overflow-auto bg-gray-900 relative">
+              <div ref={pdfContainerRef} className="w-full h-full overflow-auto bg-gray-900 relative">
                 <Document
                   file={displayDocument.fileUrl}
                   onLoadSuccess={({ numPages }) => setNumPages(numPages)}
