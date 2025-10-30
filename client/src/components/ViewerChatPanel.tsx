@@ -230,13 +230,14 @@ export default function ViewerChatPanel({ sessionCode, onLoadDocument }: ViewerC
           <span className="text-xs text-gray-400">Glisser</span>
         </div>
 
-        {/* Icône messages (5%) */}
-        <button
-          onClick={() => setShowMessages(!showMessages)}
-          className="flex-[0.05] p-2 rounded hover:bg-gray-700 transition-colors"
-        >
-          <MessageCircle className={`w-5 h-5 ${showMessages ? "text-blue-500" : "text-gray-400"}`} />
-        </button>
+          {/* Icône messages */}
+          <button
+            onClick={() => setShowMessages(!showMessages)}
+            className="p-2 rounded hover:bg-gray-700 transition-colors"
+          >
+            <MessageCircle className={`w-5 h-5 ${showMessages ? "text-blue-500" : "text-gray-400"}`} />
+          </button>
+        </div>
       </div>
     </div>
   );
