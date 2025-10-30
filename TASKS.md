@@ -116,3 +116,18 @@ _Aucune pour le moment_
 ### Bug urgent
 - ( ) Les PDF ne s'affichent pas dans le viewer du présentateur (grand affichage)
 
+
+
+### Performance
+- ( ) Accélérer l'affichage et la synchronisation des deux côtés (présentateur + viewer)
+
+
+
+### Interface lecteur
+- ( ) Restaurer interface lecteur : texte sur 2 lignes + volet qui se monte avec messages
+
+
+
+### UI Viewer
+- ( ) Remonter la zone d'écriture du bas pour éviter qu'elle soit cachée par le message système
+

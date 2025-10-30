@@ -145,8 +145,9 @@ export default function ViewerChatPanel({ sessionCode, onLoadDocument }: ViewerC
   return (
     <div
       ref={chatContainerRef}
-      className="fixed bottom-0 left-0 right-0 z-50 bg-black/90 backdrop-blur transition-all duration-300"
+      className="fixed left-0 right-0 z-50 bg-black/90 backdrop-blur transition-all duration-300"
       style={{
+        bottom: "60px",
         height: showMessages ? "35vh" : "auto",
         minHeight: "60px",
       }}
