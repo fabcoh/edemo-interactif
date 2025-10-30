@@ -49,6 +49,10 @@ export default function PresenterControl() {
   const [initialZoom, setInitialZoom] = useState(100);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [documentToDelete, setDocumentToDelete] = useState<number | null>(null);
+  // Rectangle selection states
+  const [rectangle, setRectangle] = useState({ x: 0, y: 0, width: 0, height: 0, visible: false });
+  const [isDrawingRectangle, setIsDrawingRectangle] = useState(false);
+  const [rectangleStart, setRectangleStart] = useState({ x: 0, y: 0 });
 
   const sessionIdNum = sessionId ? parseInt(sessionId) : 0;
 
