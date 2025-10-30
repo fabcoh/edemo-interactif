@@ -163,12 +163,16 @@ export default function ViewerChatPanel({ sessionCode, onLoadDocument }: ViewerC
     >
       {/* Zone messages (visible uniquement si showMessages) */}
       {showMessages && (
-        <div className="flex-1 overflow-y-auto p-4 space-y-2 bg-black/90 backdrop-blur" style={{ maxHeight: "calc(40vh - 60px)" }}>
-          {messages.map((msg) => (
-            <div key={msg.id} className="bg-gray-800/50 rounded p-2">
-              <div className="text-xs text-gray-400">{msg.senderName}</div>
-              <div className="text-sm text-white">{msg.message}</div>
-              <div className="text-xs text-gray-500">{new Date(msg.createdAt).toLocaleTimeString()}</div>
+        <div className="flex-1 overflow-y-auto p-2 space-y-1 bg-black/90 backdrop-blur" style={{ maxHeight: "calc(40vh - 60px)" }}>
+          {[...messages].reverse().map((msg) => (
+            <div 
+              key={msg.id} 
+              className={`flex items-center justify-between px-2 py-1 rounded text-sm ${
+                msg.senderType === 'presenter' ? 'text-blue-400' : 'text-green-400'
+              }`}
+            >
+              <span className="flex-1">{msg.message}</span>
+              <span className="text-xs text-gray-500 ml-2">{new Date(msg.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
             </div>
           ))}
           <div ref={messagesEndRef} />

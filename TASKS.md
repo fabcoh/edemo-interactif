@@ -162,3 +162,9 @@ _Aucune pour le moment_
 - ( ) Messages du présentateur ne s'affichent pas dans le panneau
 - ( ) Bandeau noir au-dessus du panneau quand il s'ouvre
 
+
+
+### Améliorations Chat Viewer
+- ( ) Couleurs différentes : Présentateur (bleu) vs Spectateur (vert)
+- ( ) Inverser ordre : Nouveaux messages en haut, anciens en bas
+
