@@ -55,16 +55,16 @@
 1. ✅ Synchronisation du zoom des PDF du présentateur ne se fait pas du côté lecteur | Commit 4b5a87a | 30/10/2025 11:40
 2. ✅ PDF s'ouvre trop grand côté lecteur - Ajuster la taille par défaut | Commit 106982d | 30/10/2025 11:45
 3. ✅ Pouvoir déplacer les PDF (pan/scroll) | Commit 10e26b1 | 30/10/2025 11:52
-4. (X) Plus d'affichage miniature côté présentateur - EN COURS
+4. (X) Plus d'affichage miniature côté présentateur - EN ATTENTE DE DÉTAILS
 
 ### Fonctionnalités demandées (par ordre de priorité)
-1. ( ) Synchronisation des PDFs entre présentateur et lecteur (vérifier + corriger bugs ci-dessus)
+1. ✅ Synchronisation des PDFs entre présentateur et lecteur | Commits 4b5a87a, 106982d, 10e26b1 | 30/10/2025 11:52
 2. ( ) Ajout d'un accès à la page du PDF
-3. ( ) Interface lecteur volet sur 2 lignes
-4. ( ) Interface bas lecteur avec ViewerChatPanel + overlay
-5. ( ) Ouverture automatique à l'arrivée d'un message
-6. ( ) Fermeture automatique après 7 secondes
-7. ( ) Ligne de saisie (écriture 70% + glisser 25% + icône 5%)
+3. ✅ Interface lecteur volet sur 2 lignes | Commit 9bdc440 | 30/10/2025 12:00
+4. ✅ Interface bas lecteur avec ViewerChatPanel + overlay | Commit 9bdc440 | 30/10/2025 12:00
+5. ✅ Ouverture automatique à l'arrivée d'un message | Commit 9bdc440 | 30/10/2025 12:00
+6. ✅ Fermeture automatique après 7 secondes | Commit 9bdc440 | 30/10/2025 12:00
+7. ✅ Ligne de saisie (écriture 70% + glisser 25% + icône 5%) | Commit 9bdc440 | 30/10/2025 12:00
 
 ### Autres
 - ( ) Loupe/magnifier sur PDF pour zoomer sur une zone spécifique
