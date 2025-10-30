@@ -172,7 +172,7 @@ export default function ViewerChatPanel({ sessionCode, onLoadDocument }: ViewerC
           {[...messages].reverse().map((msg, index) => (
             <div 
               key={msg.id} 
-              className={`px-4 py-2 rounded-full shadow-lg backdrop-blur-sm text-white text-sm whitespace-nowrap ${
+              className={`flex items-center justify-center px-4 py-2 rounded-full shadow-lg backdrop-blur-sm text-white text-sm whitespace-nowrap ${
                 msg.senderType === 'presenter' 
                   ? (index === 0 ? 'bg-blue-500' : 'bg-blue-500/60')
                   : (index === 0 ? 'bg-green-500' : 'bg-green-500/60')
@@ -191,11 +191,11 @@ export default function ViewerChatPanel({ sessionCode, onLoadDocument }: ViewerC
         </div>
       )}
 
-      {/* Barre de saisie (pleine largeur, tout en bas) */}
+      {/* Barre de saisie (pleine largeur, au-dessus du message Manus) */}
       <div
         ref={chatContainerRef}
         className="fixed left-0 right-0 z-50 flex items-center gap-2 p-2 bg-black/70 backdrop-blur"
-        style={{ bottom: "0px" }}
+        style={{ bottom: "40px" }}
       >
         {/* Zone d'écriture (60%) */}
         <input
