@@ -168,19 +168,19 @@ export default function ViewerChatPanel({ sessionCode, onLoadDocument }: ViewerC
             height: "40vh",
           }}
         >
-          <div className="h-full overflow-y-auto p-3 space-y-2">
+          <div className="h-full overflow-y-auto p-3 space-y-2 flex flex-col items-end">
           {[...messages].reverse().map((msg, index) => (
             <div 
               key={msg.id} 
-              className={`block px-4 py-2 rounded-full shadow-lg backdrop-blur-sm text-white text-sm ${
+              className={`px-4 py-2 rounded-full shadow-lg backdrop-blur-sm text-white text-sm whitespace-nowrap ${
                 msg.senderType === 'presenter' 
                   ? (index === 0 ? 'bg-blue-500' : 'bg-blue-500/60')
                   : (index === 0 ? 'bg-green-500' : 'bg-green-500/60')
               }`}
               style={{
-                width: 'fit-content',
-                maxWidth: '85%',
-                wordWrap: 'break-word'
+                maxWidth: '95%',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
               }}
             >
               {msg.message}
