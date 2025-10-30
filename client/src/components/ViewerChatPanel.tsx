@@ -152,19 +152,18 @@ export default function ViewerChatPanel({ sessionCode, onLoadDocument }: ViewerC
   };
 
   return (
-    <div
-      ref={chatContainerRef}
-      className="fixed right-0 z-50 transition-all duration-300"
-      style={{
-        bottom: "60px",
-        width: showMessages ? "33.33%" : "auto",
-        height: showMessages ? "40vh" : "auto",
-        minHeight: "60px",
-      }}
-    >
-      {/* Zone messages (visible uniquement si showMessages) */}
+    <>
+      {/* Panneau messages (1/3 à droite) */}
       {showMessages && (
-        <div className="flex-1 overflow-y-auto p-3 space-y-2" style={{ maxHeight: "calc(40vh - 60px)" }}>
+        <div
+          className="fixed right-0 z-50 transition-all duration-300"
+          style={{
+            bottom: "60px",
+            width: "33.33%",
+            height: "40vh",
+          }}
+        >
+          <div className="h-full overflow-y-auto p-3 space-y-2">
           {[...messages].reverse().map((msg) => (
             <div 
               key={msg.id} 
@@ -181,12 +180,17 @@ export default function ViewerChatPanel({ sessionCode, onLoadDocument }: ViewerC
               {msg.message}
             </div>
           ))}
-          <div ref={messagesEndRef} />
+            <div ref={messagesEndRef} />
+          </div>
         </div>
       )}
 
-      {/* Ligne de saisie (toujours visible) */}
-      <div className="flex items-center gap-2 p-2 bg-black/70 backdrop-blur">
+      {/* Barre de saisie (pleine largeur en bas) */}
+      <div
+        ref={chatContainerRef}
+        className="fixed left-0 right-0 z-50 flex items-center gap-2 p-2 bg-black/70 backdrop-blur"
+        style={{ bottom: "0px" }}
+      >
         {/* Zone d'écriture (60%) */}
         <input
           type="text"
@@ -236,6 +240,6 @@ export default function ViewerChatPanel({ sessionCode, onLoadDocument }: ViewerC
           <MessageCircle className={`w-5 h-5 ${showMessages ? "text-blue-500" : "text-gray-400"}`} />
         </button>
       </div>
-    </div>
+    </>
   );
 }

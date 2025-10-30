@@ -176,3 +176,9 @@ _Aucune pour le moment_
 - ( ) Style bulles 💧 : arrondies, semi-transparentes, détachées
 - ( ) Couleurs : Bleu (présentateur) / Vert (spectateur)
 
+
+
+### Séparation barre saisie
+- ( ) Panneau messages : 1/3 droite (bulles)
+- ( ) Barre saisie : Pleine largeur en bas (indépendante)
+
