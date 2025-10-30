@@ -176,7 +176,7 @@ export default function ViewerChatPanel({ sessionCode, onLoadDocument }: ViewerC
       )}
 
       {/* Ligne de saisie (toujours visible) */}
-      <div className="flex items-center gap-2 p-2">
+      <div className="flex items-center gap-2 p-2 bg-black/70 backdrop-blur">
         {/* Zone d'écriture (60%) */}
         <input
           type="text"
