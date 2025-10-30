@@ -156,3 +156,9 @@ _Aucune pour le moment_
 - ( ) Viewer: Étirer la zone des chats (plus haute)
 - ( ) Présentateur: Messages ne s'envoient pas (restent locaux uniquement)
 
+
+
+### Bugs Chat Viewer (affichage)
+- ( ) Messages du présentateur ne s'affichent pas dans le panneau
+- ( ) Bandeau noir au-dessus du panneau quand il s'ouvre
+

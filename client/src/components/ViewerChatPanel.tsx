@@ -154,7 +154,7 @@ export default function ViewerChatPanel({ sessionCode, onLoadDocument }: ViewerC
   return (
     <div
       ref={chatContainerRef}
-      className="fixed left-0 right-0 z-50 bg-black/90 backdrop-blur transition-all duration-300"
+      className="fixed left-0 right-0 z-50 transition-all duration-300"
       style={{
         bottom: "60px",
         height: showMessages ? "40vh" : "auto",
@@ -163,11 +163,11 @@ export default function ViewerChatPanel({ sessionCode, onLoadDocument }: ViewerC
     >
       {/* Zone messages (visible uniquement si showMessages) */}
       {showMessages && (
-        <div className="flex-1 overflow-y-auto p-4 space-y-2" style={{ maxHeight: "calc(40vh - 60px)" }}>
+        <div className="flex-1 overflow-y-auto p-4 space-y-2 bg-black/90 backdrop-blur" style={{ maxHeight: "calc(40vh - 60px)" }}>
           {messages.map((msg) => (
             <div key={msg.id} className="bg-gray-800/50 rounded p-2">
               <div className="text-xs text-gray-400">{msg.senderName}</div>
-              <div className="text-sm text-white">{msg.content}</div>
+              <div className="text-sm text-white">{msg.message}</div>
               <div className="text-xs text-gray-500">{new Date(msg.createdAt).toLocaleTimeString()}</div>
             </div>
           ))}
