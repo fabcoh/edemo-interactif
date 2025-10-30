@@ -714,21 +714,61 @@ export default function PresenterControl() {
                     className="relative w-full h-full flex items-start justify-center overflow-hidden"
                     style={{ cursor: zoom >= 100 ? 'none' : 'default' }}
                     onMouseDown={(e) => {
-                      if (zoom >= 100) {
+                      if (e.ctrlKey && imageRef.current) {
+                        // Ctrl+Click: Start rectangle selection
+                        const containerRect = e.currentTarget.getBoundingClientRect();
+                        const imageRect = imageRef.current.getBoundingClientRect();
+                        const imageX = e.clientX - imageRect.left;
+                        const imageY = e.clientY - imageRect.top;
+                        const xPercent = (imageX / imageRect.width) * 100;
+                        const yPercent = (imageY / imageRect.height) * 100;
+                        
+                        setIsDrawingRectangle(true);
+                        setRectangleStart({ x: xPercent, y: yPercent });
+                        setRectangle({ x: xPercent, y: yPercent, width: 0, height: 0, visible: false });
+                      } else if (zoom >= 100) {
+                        // Normal click: Pan
                         setIsPanning(true);
                         setPanStart({ x: e.clientX - panOffset.x, y: e.clientY - panOffset.y });
                       }
                     }}
                     onMouseMove={(e) => {
-                      if (isPanning && zoom >= 100) {
+                      if (isDrawingRectangle && imageRef.current) {
+                        // Drawing rectangle
+                        const imageRect = imageRef.current.getBoundingClientRect();
+                        const imageX = e.clientX - imageRect.left;
+                        const imageY = e.clientY - imageRect.top;
+                        const xPercent = (imageX / imageRect.width) * 100;
+                        const yPercent = (imageY / imageRect.height) * 100;
+                        
+                        const width = xPercent - rectangleStart.x;
+                        const height = yPercent - rectangleStart.y;
+                        
+                        setRectangle({
+                          x: width >= 0 ? rectangleStart.x : xPercent,
+                          y: height >= 0 ? rectangleStart.y : yPercent,
+                          width: Math.abs(width),
+                          height: Math.abs(height),
+                          visible: true,
+                        });
+                      } else if (isPanning && zoom >= 100) {
                         setPanOffset({
                           x: e.clientX - panStart.x,
                           y: e.clientY - panStart.y,
                         });
                       }
-                      handleMouseMove(e);
+                      if (!isPanning) {
+                        handleMouseMove(e);
+                      }
                     }}
-                    onMouseUp={() => setIsPanning(false)}
+                    onMouseUp={() => {
+                      if (isDrawingRectangle) {
+                        setIsDrawingRectangle(false);
+                        // Send rectangle to backend
+                        updatePresenterState();
+                      }
+                      setIsPanning(false);
+                    }}
                     onMouseLeave={() => {
                       setIsPanning(false);
                       setShowMouseCursor(false);
