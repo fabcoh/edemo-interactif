@@ -1262,7 +1262,7 @@ export default function PresenterControl() {
                           }}>
                             <Page
                               pageNumber={pageNumber}
-                              width={typeof window !== 'undefined' ? Math.min(window.innerWidth * 0.8, 900) : 800}
+                              width={typeof window !== 'undefined' ? (window.innerWidth < 768 ? window.innerWidth * 0.95 : Math.min(window.innerWidth * 0.8, 900)) : 800}
                               className="max-w-full"
                               renderTextLayer={true}
                               renderAnnotationLayer={true}

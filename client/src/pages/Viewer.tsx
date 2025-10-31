@@ -277,7 +277,7 @@ export default function Viewer() {
                   }}>
                     <Page
                       pageNumber={pageNumber}
-                      width={Math.min(window.innerWidth * 0.8, 900)}
+                      width={window.innerWidth < 768 ? window.innerWidth * 0.95 : Math.min(window.innerWidth * 0.8, 900)}
                       className="max-w-full"
                       renderTextLayer={true}
                       renderAnnotationLayer={true}
