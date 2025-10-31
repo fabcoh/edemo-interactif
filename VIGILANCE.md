@@ -44,18 +44,32 @@
 
 ---
 
-### **3. Page blanche au démarrage**
+### **3. Ports dynamiques (3000/3001) - PROBLÈME CRITIQUE**
 
 **Problème** :
-- Le port du serveur change parfois (3000 → 3001)
-- L'URL devient invalide
+- Le serveur Manus change de port aléatoirement (3000 → 3001 → 3002)
+- L'URL devient invalide et affiche une page blanche
+- L'utilisateur doit manuellement changer le port dans l'URL
 
-**Solution** :
+**Cause** :
+- Manus gère les ports de manière dynamique
+- Pas de contrôle possible sur le port fixe
+- Le port change au redémarrage ou après inactivité
+
+**Solution actuelle (manuelle)** :
 1. Vérifier le statut du serveur : `webdev_check_status`
 2. Utiliser l'URL avec le bon port
 3. Redémarrer le serveur si nécessaire : `webdev_restart_server`
 
-**⚠️ TOUJOURS** vérifier le port actuel avant de donner une URL à l'utilisateur
+**Solution à implémenter** :
+- [ ] Créer une page de redirection automatique
+- [ ] Détecter le port actif (3000, 3001, 3002)
+- [ ] Rediriger automatiquement vers le bon port
+- [ ] Afficher un message si aucun port n'est actif
+
+**⚠️ RÈGLE CRITIQUE** : TOUJOURS vérifier le port actuel avant de donner une URL à l'utilisateur
+
+**Code de référence** : À créer dans `client/public/index.html` ou page de redirection
 
 ---
 

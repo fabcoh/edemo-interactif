@@ -1,0 +1,96 @@
+# 📋 TODO - EDEMO LIVE
+
+**Date de création** : 31 octobre 2025  
+**Dernière mise à jour** : 31 octobre 2025
+
+---
+
+## 🔴 PRIORITÉ HAUTE
+
+### **Bases de données séparées dev/prod**
+- [ ] Créer une base de données dédiée pour la production
+- [ ] Configurer Railway avec la nouvelle DATABASE_URL
+- [ ] Migrer les données de test vers la base de prod
+- [ ] Séparer les données de développement et de production
+- [ ] Documenter la nouvelle configuration dans MEMORY.md
+
+**Raison** : Actuellement dev et prod partagent la même base de données, ce qui peut causer des problèmes de données mixtes et de sécurité.
+
+**Impact** : Moyen - Nécessite configuration Railway + migration de données
+
+---
+
+## 🟡 PRIORITÉ MOYENNE
+
+### **Système de redirection automatique de ports**
+- [x] Documenter le problème dans VIGILANCE.md
+- [x] Créer une page HTML de redirection (`port-redirect.html`)
+- [ ] Tester la page de redirection
+- [ ] Intégrer la redirection dans le workflow
+- [ ] Documenter l'utilisation dans README.md
+
+**Raison** : Le port Manus change aléatoirement (3000/3001/3002), causant des URLs invalides.
+
+**Impact** : Faible - Améliore l'expérience utilisateur mais pas critique
+
+---
+
+## 🟢 AMÉLIORATIONS FUTURES
+
+### **Interface présentateur**
+- [x] Header compact (textes réduits)
+- [x] Suppression du panneau debug
+- [ ] Améliorer la réactivité mobile
+- [ ] Ajouter des raccourcis clavier
+
+### **Chat**
+- [x] Style bulles WhatsApp
+- [x] Désactivation autocorrection
+- [ ] Notifications push pour nouveaux messages
+- [ ] Historique des conversations
+
+### **Documents**
+- [x] Upload PDF, images, vidéos
+- [x] Vignettes avec dégradés de couleurs
+- [ ] Prévisualisation en plein écran
+- [ ] Support de plus de formats (PowerPoint, etc.)
+
+### **Sécurité**
+- [ ] Authentification renforcée
+- [ ] Limitation du nombre de spectateurs
+- [ ] Logs d'activité
+- [ ] Expiration automatique des sessions
+
+---
+
+## ✅ TERMINÉ
+
+- [x] Système d'instances de session (multi-présentateurs)
+- [x] Chat en temps réel (style WhatsApp)
+- [x] Upload de documents (PDF, images, vidéos)
+- [x] Zoom et pan synchronisés
+- [x] Curseur visible en temps réel
+- [x] Liens d'accès commerciaux
+- [x] Partage WhatsApp
+- [x] Interface présentateur optimisée (header compact)
+- [x] Panneau debug supprimé
+- [x] Système de mémoire persistante (MEMORY, VIGILANCE, WORKFLOW)
+- [x] Documentation complète de l'architecture
+- [x] Configuration GitHub + Railway automatique
+
+---
+
+## 📝 NOTES
+
+### **Prochaines étapes recommandées**
+1. Séparer les bases de données dev/prod (priorité haute)
+2. Tester la page de redirection automatique
+3. Améliorer la réactivité mobile
+
+### **Bugs connus**
+- Voir `VIGILANCE.md` pour la liste complète
+
+---
+
+**⚠️ IMPORTANT** : Ce fichier doit être mis à jour à chaque nouvelle tâche ou complétion !
+

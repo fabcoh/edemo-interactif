@@ -69,17 +69,50 @@
 ### **Workflow de déploiement**
 
 ```
-[Développement Manus]
-        ↓
-   [Commit local]
-        ↓
-[Push GitHub (depuis machine locale)]
-        ↓
-   [Railway détecte]
-        ↓
-  [Redéploiement auto]
-        ↓
-   [Production live]
+┌─────────────────────────────────────────────────────────┐
+│                    MANUS (Développement)                │
+│  - Serveur de dev (port 3000/3001)                     │
+│  - Hot reload activé                                    │
+│  - URL: https://3000-xxx.manusvm.computer              │
+└────────────────┬────────────────────────────────────────┘
+                 │
+                 │ git commit + git push github main
+                 │
+                 ▼
+┌─────────────────────────────────────────────────────────┐
+│                    GITHUB (Dépôt)                       │
+│  - Dépôt: fabcoh/edemo-interactif                      │
+│  - Stocke le code source                               │
+│  - Historique des commits                              │
+│  - URL: https://github.com/fabcoh/edemo-interactif    │
+└────────────────┬────────────────────────────────────────┘
+                 │
+                 │ Railway surveille le dépôt
+                 │ Détecte automatiquement les push
+                 │
+                 ▼
+┌─────────────────────────────────────────────────────────┐
+│                  RAILWAY (Production)                   │
+│  - Détecte le push sur GitHub                          │
+│  - Clone le code depuis GitHub                         │
+│  - Build automatique (pnpm run build)                  │
+│  - Déploie en production                               │
+│  - URL: https://edemo-interactif-production.up...     │
+└─────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────┐
+│              TiDB Cloud (Base de données)               │
+│  - Host: gateway02.us-east-1.prod.aws.tidbcloud.com   │
+│  - Fournie par Manus                                   │
+│  - Partagée entre dev et prod                          │
+└────────────┬────────────────────────────────┬───────────┘
+             │                                │
+             │ DATABASE_URL                   │ DATABASE_URL
+             │                                │
+             ▼                                ▼
+    ┌─────────────────┐            ┌─────────────────┐
+    │  MANUS (Dev)    │            │  RAILWAY (Prod) │
+    └─────────────────┘            └─────────────────┘
 ```
 
 ---

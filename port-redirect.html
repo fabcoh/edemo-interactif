@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edemo Live - Redirection</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            text-align: center;
+            padding: 2rem;
+            max-width: 600px;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .status {
+            font-size: 1.2rem;
+            margin: 2rem 0;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .error {
+            background: rgba(255, 0, 0, 0.2);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        .manual-links {
+            margin-top: 2rem;
+        }
+        .manual-links a {
+            display: inline-block;
+            margin: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+        .manual-links a:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Edemo Live</h1>
+        <div class="status" id="status">
+            <div class="spinner"></div>
+            <p>Recherche du serveur actif...</p>
+        </div>
+        <div class="manual-links" id="manual-links" style="display: none;">
+            <p>Essayez manuellement :</p>
+            <a href="https://3000-ih44u8onzba9v1o4wiete-6d7b15e5.manusvm.computer/presenter" target="_blank">Port 3000</a>
+            <a href="https://3001-ih44u8onzba9v1o4wiete-6d7b15e5.manusvm.computer/presenter" target="_blank">Port 3001</a>
+            <a href="https://3002-ih44u8onzba9v1o4wiete-6d7b15e5.manusvm.computer/presenter" target="_blank">Port 3002</a>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const BASE_DOMAIN = 'ih44u8onzba9v1o4wiete-6d7b15e5.manusvm.computer';
+        const PORTS = [3000, 3001, 3002];
+        const TARGET_PATH = '/presenter'; // Page par défaut
+        const TIMEOUT = 5000; // 5 secondes par port
+
+        // Fonction pour tester un port
+        async function testPort(port) {
+            const url = `https://${port}-${BASE_DOMAIN}`;
+            const statusDiv = document.getElementById('status');
+            
+            statusDiv.innerHTML = `
+                <div class="spinner"></div>
+                <p>Test du port ${port}...</p>
+            `;
+
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), TIMEOUT);
+
+                const response = await fetch(url, {
+                    method: 'HEAD',
+                    mode: 'no-cors', // Évite les problèmes CORS
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
+                return true; // Le serveur répond
+            } catch (error) {
+                return false; // Le serveur ne répond pas
+            }
+        }
+
+        // Fonction principale de redirection
+        async function findAndRedirect() {
+            const statusDiv = document.getElementById('status');
+            const manualLinks = document.getElementById('manual-links');
+
+            for (const port of PORTS) {
+                const isActive = await testPort(port);
+                
+                if (isActive) {
+                    const redirectUrl = `https://${port}-${BASE_DOMAIN}${TARGET_PATH}`;
+                    statusDiv.innerHTML = `
+                        <p style="font-size: 1.5rem;">✅ Serveur trouvé !</p>
+                        <p>Redirection vers le port ${port}...</p>
+                    `;
+                    
+                    // Redirection après 1 seconde
+                    setTimeout(() => {
+                        window.location.href = redirectUrl;
+                    }, 1000);
+                    
+                    return;
+                }
+            }
+
+            // Aucun port actif trouvé
+            statusDiv.innerHTML = `
+                <div class="error">
+                    <p style="font-size: 1.5rem;">❌ Aucun serveur actif</p>
+                    <p>Le serveur de développement ne semble pas démarré.</p>
+                    <p>Veuillez contacter l'administrateur.</p>
+                </div>
+            `;
+            manualLinks.style.display = 'block';
+        }
+
+        // Démarrer la recherche au chargement de la page
+        window.addEventListener('load', findAndRedirect);
+    </script>
+</body>
+</html>
+
