@@ -383,7 +383,7 @@ export default function PresenterControl() {
 
       <main className="flex-1 container mx-auto px-4 py-2 flex flex-col gap-2 overflow-hidden">
         {/* Zoom Controls + Upload - Sur la même ligne */}
-        <div className="flex items-center gap-2 bg-gray-800 p-1 rounded-lg border border-gray-700">
+        <div className="hidden flex items-center gap-2 bg-gray-800 p-1 rounded-lg border border-gray-700">
           <span className="text-xs text-gray-400 whitespace-nowrap">Zoom:</span>
           <Button
             onClick={() => {

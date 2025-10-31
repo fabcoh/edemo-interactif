@@ -288,3 +288,25 @@
 
 **Impact** : CRITIQUE - Fonctionnalité restaurée
 
+
+
+
+### **✅ Masquer la grande barre du haut et remonter le contenu**
+- [x] Masquer la grande barre avec "Glisser un fichier ici", Copier, WhatsApp
+- [x] Remonter la section Documents pour utiliser l'espace libéré
+- [x] Vérifier que la mini barre reste visible et fonctionnelle
+- [x] Tester que tout fonctionne correctement
+
+**Solution appliquée** :
+- Ajout de `hidden` à la div parente de la grande barre (ligne 386)
+- La section Documents remonte automatiquement pour utiliser l'espace
+- La mini barre reste visible et fonctionnelle avec tous les contrôles
+- Gain d'espace vertical significatif pour afficher le PDF et les documents
+
+**Fichiers modifiés** :
+- client/src/pages/PresenterControl.tsx : Ajout de `hidden` à la grande barre
+
+**Raison** : Gagner de l'espace vertical pour afficher plus de contenu
+
+**Impact** : Moyen - Amélioration de l'espace d'affichage
+
