@@ -754,7 +754,7 @@ export default function PresenterControl() {
                     >
                       ←
                     </Button>
-                    <span className="text-white text-[10px] font-semibold min-w-[45px] text-center">
+                    <span className="text-white text-[9px] font-semibold min-w-[35px] text-center">
                       {pageNumber}/{numPages || '?'}
                     </span>
                     <Button
@@ -799,7 +799,7 @@ export default function PresenterControl() {
                       }}
                       onMouseEnter={(e) => e.currentTarget.select()}
                       onFocus={(e) => e.currentTarget.select()}
-                      className="w-11 h-5 px-1 text-[10px] text-center bg-white/90 text-gray-900 border-none rounded focus:outline-none focus:ring-2 focus:ring-blue-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      className="w-9 h-5 px-1 text-[9px] text-center bg-white/90 text-gray-900 border-none rounded focus:outline-none focus:ring-2 focus:ring-blue-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       autoComplete="off"
                       autoCorrect="off"
                       autoCapitalize="off"
@@ -1160,7 +1160,7 @@ export default function PresenterControl() {
                               }}
                               onMouseEnter={(e) => e.currentTarget.select()}
                               onFocus={(e) => e.currentTarget.select()}
-                              className="w-11 h-5 px-1 text-[10px] text-center bg-white/90 text-gray-900 border-none rounded focus:outline-none focus:ring-2 focus:ring-blue-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                              className="w-9 h-5 px-1 text-[9px] text-center bg-white/90 text-gray-900 border-none rounded focus:outline-none focus:ring-2 focus:ring-blue-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                               autoComplete="off"
                               autoCorrect="off"
                               autoCapitalize="off"
