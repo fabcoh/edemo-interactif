@@ -967,26 +967,46 @@ export default function PresenterControl() {
                           />
                         </Document>
                         {numPages && numPages > 1 && (
-                          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-black/70 px-4 py-2 rounded-lg flex items-center gap-2 z-10">
+                          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-black/70 px-3 py-1.5 rounded-lg flex items-center gap-1.5 z-10">
                             <Button
                               size="sm"
                               variant="outline"
+                              className="h-7 w-7 p-0"
                               onClick={() => setPageNumber(prev => Math.max(1, prev - 1))}
                               disabled={pageNumber <= 1}
                             >
                               ←
                             </Button>
-                            <span className="text-white text-sm">
+                            <span className="text-white text-xs">
                               Page {pageNumber} / {numPages}
                             </span>
                             <Button
                               size="sm"
                               variant="outline"
+                              className="h-7 w-7 p-0"
                               onClick={() => setPageNumber(prev => Math.min(numPages, prev + 1))}
                               disabled={pageNumber >= numPages}
                             >
                               →
                             </Button>
+                            <div className="w-px h-5 bg-gray-500 mx-1"></div>
+                            <input
+                              type="number"
+                              min="1"
+                              max={numPages}
+                              value={pageNumber}
+                              onChange={(e) => {
+                                const value = parseInt(e.target.value);
+                                if (value >= 1 && value <= numPages) {
+                                  setPageNumber(value);
+                                }
+                              }}
+                              className="w-12 h-7 px-1.5 text-xs text-center bg-gray-800 text-white border border-gray-600 rounded focus:outline-none focus:border-blue-500"
+                              autoComplete="off"
+                              autoCorrect="off"
+                              autoCapitalize="off"
+                              spellCheck="false"
+                            />
                           </div>
                         )}
                       </div>

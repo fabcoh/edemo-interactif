@@ -94,3 +94,15 @@
 
 **⚠️ IMPORTANT** : Ce fichier doit être mis à jour à chaque nouvelle tâche ou complétion !
 
+
+
+### **Navigation de pages PDF**
+- [x] Côté lecteur : Supprimer l'icône de changement de page
+- [x] Côté présentateur : Affiner l'icône de changement de page
+- [x] Côté présentateur : Ajouter champ numérique pour accès direct à une page
+- [x] Tester la navigation avec PDFs multi-pages
+
+**Raison** : Simplifier l'interface lecteur et améliorer la navigation présentateur
+
+**Impact** : Faible - Amélioration UX
+
