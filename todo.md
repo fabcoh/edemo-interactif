@@ -569,3 +569,14 @@ Le projet Edemo Live est maintenant complet avec :
 - [x] Recherche automatique au chargement de la fiche
 - [x] Bouton "Voir les détails" et 2ème page fonctionnels
 
+
+
+
+## 🎨 Optimiser layout page 2
+
+- [ ] Rendre le bouton "Retour au résumé" visible (texte noir ou bleu foncé)
+- [ ] Repositionner la photo en haut à gauche (80x80px au lieu de centré)
+- [ ] Placer les infos enrichies à côté de la photo (layout horizontal)
+- [ ] Réduire l'espacement vertical pour libérer de l'espace
+- [ ] Formulaire de suivi compact en dessous
+

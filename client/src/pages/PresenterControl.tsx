@@ -1353,17 +1353,50 @@ export default function PresenterControl() {
                 // Simulation de recherche (2 secondes)
                 await new Promise(resolve => setTimeout(resolve, 2000));
                 
-                // Retourner des données fictives pour la démo
+                // Générer des données uniques basées sur le nom/prénom/âge
+                const age = parseInt(contact.age);
+                const nameHash = (contact.nom + contact.prenom).split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+                
+                // Postes variés selon l'âge
+                const postes = age < 30 
+                  ? ['Chargé de Clientèle', 'Commercial Junior', 'Assistant Commercial', 'Conseiller Client']
+                  : age < 45
+                  ? ['Directeur Commercial', 'Responsable Développement', 'Chef des Ventes', 'Manager Commercial']
+                  : ['Directeur Général', 'Directeur Régional', 'Président', 'Vice-Président'];
+                
+                // Entreprises variées
+                const entreprises = ['Acme Corporation', 'TechCorp', 'InnovateLab', 'FutureTech', 'GlobalSolutions', 'SmartBusiness', 'NextGen SA', 'Visionary Group'];
+                
+                // Secteurs variés
+                const secteurs = ['Tech / SaaS', 'Finance', 'Santé', 'E-commerce', 'Industrie', 'Services', 'Consulting', 'Marketing'];
+                
+                // Formations variées
+                const formations = ['MBA - HEC Paris', 'Master Commerce - ESSEC', 'Licence Économie - Sorbonne', 'École de Commerce - EDHEC', 'Master Marketing - Sciences Po', 'BTS Commerce', 'DUT Gestion'];
+                
+                // Tailles d'entreprise variées
+                const tailles = ['1-10 employés', '10-50 employés', '50-200 employés', '200-500 employés', '500+ employés'];
+                
+                // Sélection basée sur le hash du nom (pour cohérence)
+                const posteIndex = nameHash % postes.length;
+                const entrepriseIndex = (nameHash * 2) % entreprises.length;
+                const secteurIndex = (nameHash * 3) % secteurs.length;
+                const formationIndex = (nameHash * 5) % formations.length;
+                const tailleIndex = (nameHash * 7) % tailles.length;
+                
+                // Couleurs variées pour l'avatar
+                const couleurs = ['3b82f6', 'ef4444', '10b981', 'f59e0b', '8b5cf6', 'ec4899', '06b6d4', '84cc16'];
+                const couleurIndex = nameHash % couleurs.length;
+                
                 return {
                   fullName: `${contact.prenom} ${contact.nom}`,
-                  jobTitle: 'Directeur Commercial',
-                  company: 'Acme Corporation',
-                  age: parseInt(contact.age),
-                  photoUrl: `https://ui-avatars.com/api/?name=${contact.prenom}+${contact.nom}&size=128&background=3b82f6&color=fff`,
+                  jobTitle: postes[posteIndex],
+                  company: entreprises[entrepriseIndex],
+                  age: age,
+                  photoUrl: `https://ui-avatars.com/api/?name=${contact.prenom}+${contact.nom}&size=128&background=${couleurs[couleurIndex]}&color=fff`,
                   linkedinUrl: `https://linkedin.com/in/${contact.prenom.toLowerCase()}-${contact.nom.toLowerCase()}`,
-                  education: 'MBA - HEC Paris',
-                  companySize: '50-200 employés',
-                  industry: 'Tech / SaaS',
+                  education: formations[formationIndex],
+                  companySize: tailles[tailleIndex],
+                  industry: secteurs[secteurIndex],
                 };
               }}
               onSave={async (contact, enrichedData, notes, rappelDate, status) => {

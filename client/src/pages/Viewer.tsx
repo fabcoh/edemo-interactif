@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { useRoute } from "wouter";
 import ChatPanel from "@/components/ChatPanel";
-import ViewerChatPanel from "@/components/ViewerChatPanel";
+// import ViewerChatPanel from "@/components/ViewerChatPanel";
 
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
