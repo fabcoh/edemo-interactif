@@ -806,3 +806,30 @@ Le projet Edemo Live est maintenant complet avec :
 - [x] Adapter l'affichage côté spectateur pour utiliser les pourcentages (images et PDF)
 - [ ] Tester la synchronisation de la zone affichée
 
+
+
+
+## 🐛 Bug amplification déplacement (utiliser taille image au lieu de conteneur)
+
+- [ ] Modifier présentateur : calculer pourcentage basé sur taille IMAGE
+- [ ] Modifier spectateur : appliquer pourcentage basé sur taille IMAGE
+- [ ] Tester le déplacement (doit être identique sur tous les écrans)
+
+
+
+
+## 🐛 Bug synchronisation complète - Revenir aux pixels absolus
+
+- [ ] Annuler toutes les conversions en pourcentage
+- [ ] Revenir au système en pixels absolus (comme avant)
+- [ ] Tester la synchronisation
+
+
+
+
+## 🔧 Réduire amplification déplacement spectateur (÷2.5)
+
+- [x] Diviser panOffset par 2.5 côté spectateur (images)
+- [x] Diviser panOffset par 2.5 côté spectateur (PDF)
+- [x] Coefficient optimal trouvé : 2.5
+

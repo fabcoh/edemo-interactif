@@ -47,6 +47,7 @@ export default function Viewer() {
   const [numPages, setNumPages] = useState<number | null>(null);
   const [pageNumber, setPageNumber] = useState(1);
   const imageRef = useRef<HTMLImageElement>(null);
+  const [pdfPageWidth, setPdfPageWidth] = useState<number>(800);
 
   // Extract session code from URL if present
   useEffect(() => {
@@ -271,17 +272,7 @@ export default function Viewer() {
                   className="flex flex-col items-center"
                 >
                   <div style={{
-                    transform: (() => {
-                      // Convert percentage panOffset to pixels based on container size
-                      const container = pdfContainerRef.current;
-                      if (container) {
-                        const containerRect = container.getBoundingClientRect();
-                        const panOffsetXPx = (presenterPanOffsetX / 100) * containerRect.width;
-                        const panOffsetYPx = (presenterPanOffsetY / 100) * containerRect.height;
-                        return `scale(${presenterZoom / 100}) translate(${panOffsetXPx / (presenterZoom / 100)}px, ${panOffsetYPx / (presenterZoom / 100)}px)`;
-                      }
-                      return `scale(${presenterZoom / 100})`;
-                    })(),
+                    transform: `scale(${presenterZoom / 100}) translate(${(presenterPanOffsetX / 2.5) / (presenterZoom / 100)}px, ${(presenterPanOffsetY / 2.5) / (presenterZoom / 100)}px)`,
                     transition: "transform 0.2s ease-out",
                   }}>
                     <Page
@@ -303,17 +294,7 @@ export default function Viewer() {
                   src={displayDocument.fileUrl}
                   alt="Document"
                   style={{
-                    transform: (() => {
-                      // Convert percentage panOffset to pixels based on container size
-                      const container = imageRef.current?.parentElement;
-                      if (container) {
-                        const containerRect = container.getBoundingClientRect();
-                        const panOffsetXPx = (presenterPanOffsetX / 100) * containerRect.width;
-                        const panOffsetYPx = (presenterPanOffsetY / 100) * containerRect.height;
-                        return `scale(${presenterZoom / 100}) translate(${panOffsetXPx / (presenterZoom / 100)}px, ${panOffsetYPx / (presenterZoom / 100)}px)`;
-                      }
-                      return `scale(${presenterZoom / 100})`;
-                    })(),
+                    transform: `scale(${presenterZoom / 100}) translate(${(presenterPanOffsetX / 2.5) / (presenterZoom / 100)}px, ${(presenterPanOffsetY / 2.5) / (presenterZoom / 100)}px)`,
                     transition: "transform 0.2s ease-out",
                   }}
                   className="max-w-full max-h-full object-contain"

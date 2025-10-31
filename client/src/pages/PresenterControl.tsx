@@ -135,19 +135,9 @@ export default function PresenterControl() {
   }> = {}) => {
     if (!currentSession) return;
     
-    // Convert panOffset from pixels to percentage based on container size
-    let panOffsetXToSend = overrides.panOffsetX ?? panOffset.x;
-    let panOffsetYToSend = overrides.panOffsetY ?? panOffset.y;
-    
-    // Get container dimensions for percentage calculation
-    if (imageRef.current) {
-      const containerRect = imageRef.current.parentElement?.getBoundingClientRect();
-      if (containerRect) {
-        // Convert to percentage of container width/height
-        panOffsetXToSend = (panOffsetXToSend / containerRect.width) * 100;
-        panOffsetYToSend = (panOffsetYToSend / containerRect.height) * 100;
-      }
-    }
+    // Send panOffset in pixels (no conversion)
+    const panOffsetXToSend = overrides.panOffsetX ?? panOffset.x;
+    const panOffsetYToSend = overrides.panOffsetY ?? panOffset.y;
     
     updateZoomAndCursorMutation.mutate({
       sessionId: sessionIdNum,
