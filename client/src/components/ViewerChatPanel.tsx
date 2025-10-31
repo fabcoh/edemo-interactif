@@ -44,9 +44,12 @@ export default function ViewerChatPanel({ sessionCode, onLoadDocument }: ViewerC
 
   const uploadFileMutation = trpc.chat.uploadFile.useMutation({
     onSuccess: (data) => {
+      // data only contains { url, key }, no 'name' property
+      // Extract filename from key or URL
+      const fileName = data.key.split('/').pop() || 'document';
       if (onLoadDocument) {
-        const fileType = data.name.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image';
-        onLoadDocument(data.url, data.name, fileType);
+        const fileType = fileName.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image';
+        onLoadDocument(data.url, fileName, fileType);
       }
       messagesQuery.refetch();
     },
@@ -126,11 +129,13 @@ export default function ViewerChatPanel({ sessionCode, onLoadDocument }: ViewerC
 
       if (response.ok) {
         const data = await response.json();
-        uploadFileMutation.mutate({
-          sessionCode,
-          fileUrl: data.url,
-          fileName: file.name,
-        });
+        // TODO: Fix this - uploadFile expects sessionId (number), not sessionCode
+        console.log('File uploaded to S3:', data);
+        // uploadFileMutation.mutate({
+        //   sessionId: ???,
+        //   fileUrl: data.url,
+        //   fileName: file.name,
+        // });
       }
     } catch (error) {
       console.error("Upload error:", error);

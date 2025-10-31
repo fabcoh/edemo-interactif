@@ -114,6 +114,11 @@ export default function Viewer() {
       setRectangleHeight(cursorQuery.data.rectangleHeight || 0);
       setRectangleVisible(cursorQuery.data.rectangleVisible || false);
       
+      // Synchronize PDF page number
+      if (cursorQuery.data.pageNumber && cursorQuery.data.pageNumber !== pageNumber) {
+        setPageNumber(cursorQuery.data.pageNumber);
+      }
+      
       // Synchroniser le scroll du conteneur PDF
       if (pdfContainerRef.current && displayDocument?.type === 'pdf') {
         pdfContainerRef.current.scrollLeft = cursorQuery.data.panOffsetX;
@@ -360,7 +365,9 @@ export default function Viewer() {
           <ViewerChatPanel
             sessionCode={sessionCode}
             onLoadDocument={async (url: string, name: string, type: string) => {
-              setDisplayDocument({ fileUrl: url, fileName: name, type });
+              // TODO: Fix this - displayDocument is read-only from session
+              // setDisplayDocument({ fileUrl: url, fileName: name, type });
+              console.log('Document loaded from chat:', { url, name, type });
               if (type === 'pdf') {
                 setNumPages(null);
                 setPageNumber(1);

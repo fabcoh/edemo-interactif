@@ -1,0 +1,1 @@
+ALTER TABLE `presenter_cursors` ADD `pageNumber` int DEFAULT 1 NOT NULL;

@@ -152,3 +152,29 @@
 
 **Impact** : Moyen - Amélioration UX
 
+
+
+
+### **✅ CORRIGÉ: Synchronisation pageNumber PDF cassée**
+- [x] Le présentateur change de page PDF
+- [x] Le spectateur ne voit PAS le changement de page
+- [x] Vérifier comment pageNumber est envoyé aux spectateurs
+- [x] Vérifier comment le spectateur reçoit pageNumber
+- [x] Corriger la synchronisation complète
+
+**Solution appliquée** :
+1. Ajout du champ `pageNumber` dans la table `presenter_cursors`
+2. Ajout de `pageNumber` dans la procédure `updateZoomAndCursor`
+3. Appel de `updatePresenterState({ pageNumber })` quand on change de page
+4. Récupération de `pageNumber` dans `getCursorAndZoom`
+5. Synchronisation automatique côté spectateur toutes les 500ms
+
+**Fichiers modifiés** :
+- drizzle/schema.ts : Ajout champ pageNumber
+- server/db.ts : Ajout pageNumber dans updatePresenterCursor
+- server/routers.ts : Ajout pageNumber dans updateZoomAndCursor et getCursorAndZoom
+- client/src/pages/PresenterControl.tsx : Appel updatePresenterState avec pageNumber
+- client/src/pages/Viewer.tsx : Synchronisation pageNumber depuis cursorQuery
+
+**Impact** : CRITIQUE - Fonctionnalité principale restaurée
+

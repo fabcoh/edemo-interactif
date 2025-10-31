@@ -159,6 +159,8 @@ export const presenterCursors = mysqlTable("presenter_cursors", {
   rectangleHeight: float("rectangleHeight").default(0),
   /** Whether the rectangle is visible */
   rectangleVisible: boolean("rectangleVisible").default(false).notNull(),
+  /** Current PDF page number (for multi-page PDFs) */
+  pageNumber: int("pageNumber").default(1).notNull(),
   /** Timestamps */
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

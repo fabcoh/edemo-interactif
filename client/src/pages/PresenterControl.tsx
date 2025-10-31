@@ -120,6 +120,7 @@ export default function PresenterControl() {
     cursorVisible: boolean;
     panOffsetX: number;
     panOffsetY: number;
+    pageNumber: number;
   }> = {}) => {
     if (!currentSession) return;
     updateZoomAndCursorMutation.mutate({
@@ -130,6 +131,7 @@ export default function PresenterControl() {
       cursorVisible: overrides.cursorVisible ?? showMouseCursor,
       panOffsetX: overrides.panOffsetX ?? panOffset.x,
       panOffsetY: overrides.panOffsetY ?? panOffset.y,
+      pageNumber: overrides.pageNumber ?? pageNumber,
       rectangleX: rectangle.x,
       rectangleY: rectangle.y,
       rectangleWidth: rectangle.width,
@@ -943,7 +945,11 @@ export default function PresenterControl() {
                                 size="sm"
                                 variant="outline"
                                 className="h-6 w-6 p-0 text-xs font-bold bg-white/90 hover:bg-white border-none"
-                                onClick={() => setPageNumber(prev => Math.max(1, prev - 1))}
+                                onClick={() => {
+                          const newPage = Math.max(1, pageNumber - 1);
+                          setPageNumber(newPage);
+                          updatePresenterState({ pageNumber: newPage });
+                        }}
                                 disabled={pageNumber <= 1}
                               >
                                 ←
@@ -955,7 +961,11 @@ export default function PresenterControl() {
                                 size="sm"
                                 variant="outline"
                                 className="h-6 w-6 p-0 text-xs font-bold bg-white/90 hover:bg-white border-none"
-                                onClick={() => setPageNumber(prev => Math.min(numPages, prev + 1))}
+                                onClick={() => {
+                          const newPage = Math.min(numPages!, pageNumber + 1);
+                          setPageNumber(newPage);
+                          updatePresenterState({ pageNumber: newPage });
+                        }}
                                 disabled={pageNumber >= numPages}
                               >
                                 →
@@ -981,8 +991,12 @@ export default function PresenterControl() {
                                 const value = parseInt(e.target.value);
                                 if (isNaN(value) || value < 1) {
                                   setPageNumber(1);
-                                } else if (value > numPages) {
-                                  setPageNumber(numPages);
+                                  updatePresenterState({ pageNumber: 1 });
+                                } else if (value > numPages!) {
+                                  setPageNumber(numPages!);
+                                  updatePresenterState({ pageNumber: numPages! });
+                                } else {
+                                  updatePresenterState({ pageNumber: value });
                                 }
                               }}
                               onMouseEnter={(e) => e.currentTarget.select()}
