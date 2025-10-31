@@ -739,7 +739,7 @@ export default function PresenterControl() {
               <CardContent className="flex-1 flex items-start justify-center overflow-hidden relative p-0">
                 {/* Mini barre toujours visible - Position absolute en haut (sauf pour les PDFs multi-pages qui ont leur propre barre) */}
                 {(displayedDocument?.type !== "pdf" || (displayedDocument?.type === "pdf" && numPages === 1)) && (
-                <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-50">
+                <div className="absolute top-2 left-2 z-50">
                   <div className="bg-black/60 backdrop-blur-sm px-3 py-0.5 rounded-full flex items-center gap-2 shadow-lg">
                     <Button
                       size="sm"
@@ -754,9 +754,6 @@ export default function PresenterControl() {
                     >
                       ←
                     </Button>
-                    <span className="text-white text-[9px] font-semibold min-w-[35px] text-center">
-                      {pageNumber}/{numPages || '?'}
-                    </span>
                     <Button
                       size="sm"
                       variant="outline"
@@ -1113,9 +1110,6 @@ export default function PresenterControl() {
                               >
                                 ←
                               </Button>
-                              <span className="text-white text-[10px] font-semibold min-w-[45px] text-center">
-                                {pageNumber}/{numPages}
-                              </span>
                               <Button
                                 size="sm"
                                 variant="outline"
