@@ -754,6 +754,39 @@ export default function PresenterControl() {
                     >
                       ←
                     </Button>
+                    <input
+                      type="text"
+                      value={`${pageNumber}/${numPages || '?'}`}
+                      onChange={(e) => {
+                        const value = e.target.value.split('/')[0];
+                        if (value === '' || /^\d+$/.test(value)) {
+                          const numValue = parseInt(value);
+                          if (!isNaN(numValue)) {
+                            setPageNumber(numValue);
+                          }
+                        }
+                      }}
+                      onBlur={(e) => {
+                        const value = parseInt(e.target.value.split('/')[0]);
+                        if (isNaN(value) || value < 1) {
+                          setPageNumber(1);
+                          updatePresenterState({ pageNumber: 1 });
+                        } else if (numPages && value > numPages) {
+                          setPageNumber(numPages);
+                          updatePresenterState({ pageNumber: numPages });
+                        } else {
+                          updatePresenterState({ pageNumber: value });
+                        }
+                      }}
+                      onFocus={(e) => {
+                        e.currentTarget.setSelectionRange(0, String(pageNumber).length);
+                      }}
+                      className="w-12 h-5 px-1 text-[9px] text-center bg-white/90 text-gray-900 border-none rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                      autoComplete="off"
+                      autoCorrect="off"
+                      autoCapitalize="off"
+                      spellCheck="false"
+                    />
                     <Button
                       size="sm"
                       variant="outline"
@@ -767,41 +800,6 @@ export default function PresenterControl() {
                     >
                       →
                     </Button>
-                    <div className="w-px h-4 bg-gray-400"></div>
-                    <input
-                      type="number"
-                      min="1"
-                      max={numPages || 999}
-                      value={pageNumber}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        if (value === '' || /^\d+$/.test(value)) {
-                          const numValue = parseInt(value);
-                          if (!isNaN(numValue)) {
-                            setPageNumber(numValue);
-                          }
-                        }
-                      }}
-                      onBlur={(e) => {
-                        const value = parseInt(e.target.value);
-                        if (isNaN(value) || value < 1) {
-                          setPageNumber(1);
-                          updatePresenterState({ pageNumber: 1 });
-                        } else if (numPages && value > numPages) {
-                          setPageNumber(numPages);
-                          updatePresenterState({ pageNumber: numPages });
-                        } else {
-                          updatePresenterState({ pageNumber: value });
-                        }
-                      }}
-                      onMouseEnter={(e) => e.currentTarget.select()}
-                      onFocus={(e) => e.currentTarget.select()}
-                      className="w-9 h-5 px-1 text-[9px] text-center bg-white/90 text-gray-900 border-none rounded focus:outline-none focus:ring-2 focus:ring-blue-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      autoComplete="off"
-                      autoCorrect="off"
-                      autoCapitalize="off"
-                      spellCheck="false"
-                    />
                     <div className="w-px h-4 bg-gray-400 ml-1"></div>
                     <input
                       type="range"
@@ -1110,6 +1108,39 @@ export default function PresenterControl() {
                               >
                                 ←
                               </Button>
+                            <input
+                              type="text"
+                              value={`${pageNumber}/${numPages || '?'}`}
+                              onChange={(e) => {
+                                const value = e.target.value.split('/')[0];
+                                if (value === '' || /^\d+$/.test(value)) {
+                                  const numValue = parseInt(value);
+                                  if (!isNaN(numValue)) {
+                                    setPageNumber(numValue);
+                                  }
+                                }
+                              }}
+                              onBlur={(e) => {
+                                const value = parseInt(e.target.value.split('/')[0]);
+                                if (isNaN(value) || value < 1) {
+                                  setPageNumber(1);
+                                  updatePresenterState({ pageNumber: 1 });
+                                } else if (numPages && value > numPages) {
+                                  setPageNumber(numPages);
+                                  updatePresenterState({ pageNumber: numPages });
+                                } else {
+                                  updatePresenterState({ pageNumber: value });
+                                }
+                              }}
+                              onFocus={(e) => {
+                                e.currentTarget.setSelectionRange(0, String(pageNumber).length);
+                              }}
+                              className="w-12 h-5 px-1 text-[9px] text-center bg-white/90 text-gray-900 border-none rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                              autoComplete="off"
+                              autoCorrect="off"
+                              autoCapitalize="off"
+                              spellCheck="false"
+                            />
                               <Button
                                 size="sm"
                                 variant="outline"
@@ -1123,43 +1154,6 @@ export default function PresenterControl() {
                               >
                                 →
                               </Button>
-                              <div className="w-px h-4 bg-gray-400"></div>
-                            <input
-                              type="number"
-                              min="1"
-                              max={numPages}
-                              value={pageNumber}
-                              onChange={(e) => {
-                                const value = e.target.value;
-                                // Permettre la saisie vide ou de chiffres pendant la frappe
-                                if (value === '' || /^\d+$/.test(value)) {
-                                  const numValue = parseInt(value);
-                                  if (!isNaN(numValue)) {
-                                    setPageNumber(numValue);
-                                  }
-                                }
-                              }}
-                              onBlur={(e) => {
-                                // Valider et corriger quand l'utilisateur quitte le champ
-                                const value = parseInt(e.target.value);
-                                if (isNaN(value) || value < 1) {
-                                  setPageNumber(1);
-                                  updatePresenterState({ pageNumber: 1 });
-                                } else if (value > numPages!) {
-                                  setPageNumber(numPages!);
-                                  updatePresenterState({ pageNumber: numPages! });
-                                } else {
-                                  updatePresenterState({ pageNumber: value });
-                                }
-                              }}
-                              onMouseEnter={(e) => e.currentTarget.select()}
-                              onFocus={(e) => e.currentTarget.select()}
-                              className="w-9 h-5 px-1 text-[9px] text-center bg-white/90 text-gray-900 border-none rounded focus:outline-none focus:ring-2 focus:ring-blue-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                              autoComplete="off"
-                              autoCorrect="off"
-                              autoCapitalize="off"
-                              spellCheck="false"
-                            />
                               {/* Mini barre de zoom simplifiée */}
                               <div className="w-px h-4 bg-gray-400 ml-1"></div>
                               <input
