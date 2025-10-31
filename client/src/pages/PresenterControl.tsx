@@ -737,6 +737,170 @@ export default function PresenterControl() {
           <div className="lg:col-span-3 flex flex-col gap-2 overflow-hidden">
             <Card className="border-0 flex-1 flex flex-col overflow-hidden bg-transparent">
               <CardContent className="flex-1 flex items-start justify-center overflow-hidden relative p-0">
+                {/* Mini barre toujours visible - Position absolute en haut (sauf pour les PDFs qui ont leur propre barre) */}
+                {displayedDocument?.type !== "pdf" && (
+                <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-50">
+                  <div className="bg-black/60 backdrop-blur-sm px-3 py-0.5 rounded-full flex items-center gap-2 shadow-lg">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-6 w-6 p-0 text-xs font-bold bg-white/90 hover:bg-white border-none"
+                      onClick={() => {
+                        const newPage = Math.max(1, pageNumber - 1);
+                        setPageNumber(newPage);
+                        updatePresenterState({ pageNumber: newPage });
+                      }}
+                      disabled={pageNumber <= 1 || !numPages}
+                    >
+                      ←
+                    </Button>
+                    <span className="text-white text-[10px] font-semibold min-w-[45px] text-center">
+                      {pageNumber}/{numPages || '?'}
+                    </span>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-6 w-6 p-0 text-xs font-bold bg-white/90 hover:bg-white border-none"
+                      onClick={() => {
+                        const newPage = Math.min(numPages || 999, pageNumber + 1);
+                        setPageNumber(newPage);
+                        updatePresenterState({ pageNumber: newPage });
+                      }}
+                      disabled={pageNumber >= (numPages || 999) || !numPages}
+                    >
+                      →
+                    </Button>
+                    <div className="w-px h-4 bg-gray-400"></div>
+                    <input
+                      type="number"
+                      min="1"
+                      max={numPages || 999}
+                      value={pageNumber}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === '' || /^\d+$/.test(value)) {
+                          const numValue = parseInt(value);
+                          if (!isNaN(numValue)) {
+                            setPageNumber(numValue);
+                          }
+                        }
+                      }}
+                      onBlur={(e) => {
+                        const value = parseInt(e.target.value);
+                        if (isNaN(value) || value < 1) {
+                          setPageNumber(1);
+                          updatePresenterState({ pageNumber: 1 });
+                        } else if (numPages && value > numPages) {
+                          setPageNumber(numPages);
+                          updatePresenterState({ pageNumber: numPages });
+                        } else {
+                          updatePresenterState({ pageNumber: value });
+                        }
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.select()}
+                      onFocus={(e) => e.currentTarget.select()}
+                      className="w-11 h-5 px-1 text-[10px] text-center bg-white/90 text-gray-900 border-none rounded focus:outline-none focus:ring-2 focus:ring-blue-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      autoComplete="off"
+                      autoCorrect="off"
+                      autoCapitalize="off"
+                      spellCheck="false"
+                    />
+                    <div className="w-px h-4 bg-gray-400 ml-1"></div>
+                    <Button
+                      onClick={() => {
+                        const newZoom = Math.max(50, zoom - 10);
+                        setZoom(newZoom);
+                        updatePresenterState({
+                          zoomLevel: newZoom,
+                          cursorVisible: showMouseCursor && newZoom > 100,
+                        });
+                      }}
+                      variant="outline"
+                      size="sm"
+                      className="h-6 w-6 p-0 bg-white/90 hover:bg-white border-none"
+                    >
+                      <ZoomOut className="w-3 h-3" />
+                    </Button>
+                    <input
+                      type="range"
+                      min="50"
+                      max="200"
+                      step="5"
+                      value={zoom}
+                      onChange={(e) => {
+                        const newZoom = parseInt(e.target.value);
+                        setZoom(newZoom);
+                        updatePresenterState({
+                          zoomLevel: newZoom,
+                          cursorVisible: showMouseCursor && newZoom > 100,
+                        });
+                      }}
+                      className="w-16 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                      style={{
+                        background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((zoom - 50) / 150) * 100}%, #6b7280 ${((zoom - 50) / 150) * 100}%, #6b7280 100%)`
+                      }}
+                    />
+                    <span className="text-white text-[10px] font-semibold min-w-[32px] text-center">
+                      {zoom}%
+                    </span>
+                    <Button
+                      onClick={() => {
+                        const newZoom = Math.min(200, zoom + 10);
+                        setZoom(newZoom);
+                        updatePresenterState({
+                          zoomLevel: newZoom,
+                          cursorVisible: showMouseCursor && newZoom > 100,
+                        });
+                      }}
+                      variant="outline"
+                      size="sm"
+                      className="h-6 w-6 p-0 bg-white/90 hover:bg-white border-none"
+                    >
+                      <ZoomIn className="w-3 h-3" />
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setZoom(100);
+                        updatePresenterState({
+                          zoomLevel: 100,
+                          cursorVisible: false,
+                        });
+                      }}
+                      variant="outline"
+                      size="sm"
+                      className="h-5 px-1.5 text-[9px] bg-white/90 hover:bg-white border-none"
+                    >
+                      R
+                    </Button>
+                    <div className="w-px h-4 bg-gray-400 ml-1"></div>
+                    <input
+                      type="file"
+                      id="mini-document-upload-always"
+                      accept="image/*,application/pdf,video/*"
+                      onChange={(e) => {
+                        if (e.target.files?.[0]) {
+                          handleUploadDocument(e.target.files[0]);
+                        }
+                      }}
+                      className="hidden"
+                    />
+                    <div
+                      onClick={() => document.getElementById('mini-document-upload-always')?.click()}
+                      onDragOver={(e) => e.preventDefault()}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        const files = e.dataTransfer.files;
+                        if (files.length > 0) {
+                          handleUploadDocument(files[0]);
+                        }
+                      }}
+                      className="border border-dashed border-gray-400 rounded px-2 py-0.5 text-center cursor-pointer hover:border-gray-300 transition-colors ml-1"
+                    >
+                      <p className="text-[9px] text-gray-300 whitespace-nowrap">Glisser un fichier ici</p>
+                    </div>
+                  </div>
+                </div>
+                )}
                 {displayedDocument ? (
                   <div
                     className="relative w-full h-full flex items-start justify-center overflow-hidden"
