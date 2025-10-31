@@ -221,3 +221,22 @@
 
 **Impact** : Très faible - Amélioration visuelle mineure
 
+
+
+
+### **✅ Déplacer le compteur de spectateurs à droite**
+- [x] Déplacer le compteur de spectateurs juste avant le bouton Terminer
+- [x] Ordre final : Retour | Titre | Copier | WhatsApp | Spectateurs | Terminer
+
+**Solution appliquée** :
+- Compteur de spectateurs déplacé juste avant le bouton Terminer
+- Ordre final : Copier | WhatsApp | Spectateurs | Terminer
+- Actions de partage groupées à gauche, contrôles à droite
+
+**Fichiers modifiés** :
+- client/src/pages/PresenterControl.tsx : Réorganisation de l'ordre des éléments
+
+**Raison** : Regrouper les actions de contrôle à droite
+
+**Impact** : Très faible - Amélioration organisation visuelle
+
