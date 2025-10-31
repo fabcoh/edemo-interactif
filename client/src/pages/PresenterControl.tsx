@@ -993,28 +993,73 @@ export default function PresenterControl() {
                               autoCapitalize="off"
                               spellCheck="false"
                             />
-                              {/* Mini barre de zoom */}
+                              {/* Mini barre de zoom - Clone de la grande barre */}
                               <div className="w-px h-4 bg-gray-400 ml-1"></div>
                               <Button
-                                size="sm"
+                                onClick={() => {
+                                  const newZoom = Math.max(50, zoom - 10);
+                                  setZoom(newZoom);
+                                  updatePresenterState({
+                                    zoomLevel: newZoom,
+                                    cursorVisible: showMouseCursor && newZoom > 100,
+                                  });
+                                }}
                                 variant="outline"
-                                className="h-6 w-6 p-0 text-xs font-bold bg-white/90 hover:bg-white border-none"
-                                onClick={() => setZoom(prev => Math.max(50, prev - 10))}
-                                disabled={zoom <= 50}
+                                size="sm"
+                                className="h-6 w-6 p-0 bg-white/90 hover:bg-white border-none"
                               >
-                                −
+                                <ZoomOut className="w-3 h-3" />
                               </Button>
-                              <span className="text-white text-[10px] font-semibold min-w-[35px] text-center">
+                              <input
+                                type="range"
+                                min="50"
+                                max="200"
+                                step="5"
+                                value={zoom}
+                                onChange={(e) => {
+                                  const newZoom = parseInt(e.target.value);
+                                  setZoom(newZoom);
+                                  updatePresenterState({
+                                    zoomLevel: newZoom,
+                                    cursorVisible: showMouseCursor && newZoom > 100,
+                                  });
+                                }}
+                                className="w-16 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                                style={{
+                                  background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((zoom - 50) / 150) * 100}%, #6b7280 ${((zoom - 50) / 150) * 100}%, #6b7280 100%)`
+                                }}
+                              />
+                              <span className="text-white text-[10px] font-semibold min-w-[32px] text-center">
                                 {zoom}%
                               </span>
                               <Button
-                                size="sm"
+                                onClick={() => {
+                                  const newZoom = Math.min(200, zoom + 10);
+                                  setZoom(newZoom);
+                                  updatePresenterState({
+                                    zoomLevel: newZoom,
+                                    cursorVisible: showMouseCursor && newZoom > 100,
+                                  });
+                                }}
                                 variant="outline"
-                                className="h-6 w-6 p-0 text-xs font-bold bg-white/90 hover:bg-white border-none"
-                                onClick={() => setZoom(prev => Math.min(200, prev + 10))}
-                                disabled={zoom >= 200}
+                                size="sm"
+                                className="h-6 w-6 p-0 bg-white/90 hover:bg-white border-none"
                               >
-                                +
+                                <ZoomIn className="w-3 h-3" />
+                              </Button>
+                              <Button
+                                onClick={() => {
+                                  setZoom(100);
+                                  updatePresenterState({
+                                    zoomLevel: 100,
+                                    cursorVisible: false,
+                                  });
+                                }}
+                                variant="outline"
+                                size="sm"
+                                className="h-5 px-1.5 text-[9px] bg-white/90 hover:bg-white border-none"
+                              >
+                                R
                               </Button>
                             </div>
                           </div>
