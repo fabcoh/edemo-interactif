@@ -1258,7 +1258,7 @@ export default function PresenterControl() {
                         >
                           <Page
                             pageNumber={pageNumber}
-                            scale={zoom / 100}
+                            width={typeof window !== 'undefined' ? window.innerWidth * (zoom / 100) : 800}
                             renderTextLayer={true}
                             renderAnnotationLayer={true}
                           />
