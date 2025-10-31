@@ -1102,8 +1102,20 @@ export default function PresenterControl() {
                               </Button>
                               {/* Séparateur */}
                               <div className="w-px h-4 bg-gray-400 ml-1"></div>
-                              {/* Espace upload "Glisser un fichier ici" */}
+                              {/* Espace upload "Glisser un fichier ici" - Mini barre */}
+                              <input
+                                type="file"
+                                id="mini-document-upload"
+                                accept="image/*,application/pdf,video/*"
+                                onChange={(e) => {
+                                  if (e.target.files?.[0]) {
+                                    handleUploadDocument(e.target.files[0]);
+                                  }
+                                }}
+                                className="hidden"
+                              />
                               <div
+                                onClick={() => document.getElementById('mini-document-upload')?.click()}
                                 onDragOver={(e) => e.preventDefault()}
                                 onDrop={(e) => {
                                   e.preventDefault();

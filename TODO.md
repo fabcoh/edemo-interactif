@@ -264,3 +264,27 @@
 
 **Impact** : Faible - Amélioration UX pour l'upload
 
+
+
+
+### **✅ CORRIGÉ: L'espace upload de la mini barre ne fonctionne pas**
+- [x] Analyser comment fonctionne l'uploader de base (grande barre)
+- [x] Ajouter un input file caché pour le clic
+- [x] Ajouter un onClick pour déclencher le sélecteur de fichiers
+- [x] Vérifier que le drag & drop fonctionne aussi
+- [x] Tester l'upload complet
+
+**Solution appliquée** :
+- Ajout d'un `<input type="file" id="mini-document-upload">` caché
+- Ajout d'un `onClick={() => document.getElementById('mini-document-upload')?.click()}`
+- Accept : image/*, application/pdf, video/*
+- Drag & drop déjà fonctionnel
+- Utilise la même fonction `handleUploadDocument`
+
+**Fichiers modifiés** :
+- client/src/pages/PresenterControl.tsx : Ajout input file + onClick
+
+**Raison** : L'espace upload était affiché mais ne permettait pas d'uploader
+
+**Impact** : CRITIQUE - Fonctionnalité restaurée
+
