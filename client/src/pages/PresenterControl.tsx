@@ -835,7 +835,7 @@ export default function PresenterControl() {
                           cursorVisible: showMouseCursor && newZoom > 100,
                         });
                       }}
-                      className="w-16 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                      className="w-12 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
                       style={{
                         background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((zoom - 50) / 150) * 100}%, #6b7280 ${((zoom - 50) / 150) * 100}%, #6b7280 100%)`
                       }}
@@ -1227,7 +1227,7 @@ export default function PresenterControl() {
                                     cursorVisible: showMouseCursor && newZoom > 100,
                                   });
                                 }}
-                                className="w-16 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                                className="w-12 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
                                 style={{
                                   background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((zoom - 50) / 150) * 100}%, #6b7280 ${((zoom - 50) / 150) * 100}%, #6b7280 100%)`
                                 }}
