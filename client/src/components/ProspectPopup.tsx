@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ChevronLeft, ChevronRight, Star, Search, ChevronDown } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Star, Search, ChevronDown, X } from 'lucide-react';
 import type { ProspectContact } from '@/lib/excelParser';
 
 interface EnrichedData {
@@ -156,17 +156,28 @@ export default function ProspectPopup({
           </Button>
         </div>
 
+        {/* Bouton fermer */}
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={onClose}
+          className="h-8 w-8 ml-auto"
+          title="Fermer"
+        >
+          <X className="h-4 w-4" />
+        </Button>
+
         {/* Icône de recherche avec animation */}
         <div className="relative">
           <div
             className={`
-              flex items-center justify-center w-12 h-12 rounded-full border-4
+              flex items-center justify-center w-16 h-16 rounded-full border-4
               ${isEnriching ? 'animate-spin bg-blue-500 border-blue-300' : ''}
               ${hasEnrichedData && !isEnriching ? 'animate-pulse bg-blue-500 border-blue-300' : ''}
               ${!isEnriching && !hasEnrichedData ? 'bg-blue-200 border-blue-300' : ''}
             `}
           >
-            <Search className="h-6 w-6 text-white" />
+            <Search className="h-8 w-8 text-white" />
           </div>
           {hasEnrichedData && !isEnriching && (
             <span className="absolute -top-2 -right-2 flex h-4 w-4">

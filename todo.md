@@ -603,3 +603,20 @@ Le projet Edemo Live est maintenant complet avec :
 - [ ] Label : "Provenance" ou "Source"
 - [ ] Positionner après la date de naissance ou en bas des infos enrichies
 
+
+## 🎨 Améliorer visibilité des icônes
+
+- [ ] Identifier les icônes peu visibles (recherche, fiches, etc.)
+- [ ] Agrandir les icônes (passer de 12x12px à 20x20px ou plus)
+- [ ] Améliorer les couleurs pour plus de contraste
+- [ ] Tester la visibilité sur différents écrans
+
+
+## 🔄 Boutons de navigation dans la popup
+
+- [ ] Ajouter flèche ← (fiche précédente) en haut à gauche
+- [ ] Ajouter flèche → (fiche suivante) en haut à droite
+- [ ] Ajouter bouton ✕ (fermer) en haut à droite
+- [ ] Ajouter indicateur "Fiche X / Y" au centre
+- [ ] Désactiver les flèches si première/dernière fiche
+
