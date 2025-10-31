@@ -18,10 +18,11 @@
 
 ### **Railway (Production)**
 - **Service** : Hébergement du site en production
+- **URL de production** : **https://edemo-interactif-production.up.railway.app**
 - **Connexion GitHub** : ✅ Configuré sur `fabcoh/edemo-interactif`
 - **Déploiement auto** : ✅ Oui (détecte les push sur GitHub)
-- **URL de production** : À documenter (vérifier sur railway.app)
 - **Temps de déploiement** : ~2-5 minutes après push
+- **Dernier déploiement** : ✅ Réussi (31 octobre 2025)
 - **Note** : Railway surveille le dépôt GitHub et redéploie automatiquement
 
 ### **Base de données**
@@ -58,8 +59,9 @@
    - Utilisation : Tests et développement
 
 2. **Production (Railway)**
-   - URL : À documenter
+   - URL : **https://edemo-interactif-production.up.railway.app**
    - Déploiement : Automatique depuis GitHub
+   - Status : 🟢 ACTIVE
    - Base de données : Partagée avec dev (à confirmer)
 
 ### **Workflow de déploiement**
@@ -136,13 +138,14 @@
 
 ## 🔄 DERNIÈRE SYNCHRONISATION
 
-- **Dernier commit local** : `cd90a57`
-- **Dernier push GitHub** : ✅ `cd90a57` (31 octobre 2025)
-- **Dernier déploiement Railway** : En cours (~2-5 min)
+- **Dernier commit local** : `923e344`
+- **Dernier push GitHub** : ✅ `923e344` (31 octobre 2025)
+- **Dernier déploiement Railway** : ✅ Réussi (31 octobre 2025)
+- **URL de production** : https://edemo-interactif-production.up.railway.app
 - **Commits récents** :
+  - `923e344` - Mise à jour MEMORY + WORKFLOW avec vraies infos GitHub
   - `cd90a57` - Ajout système de mémoire persistante (MEMORY, VIGILANCE, WORKFLOW)
   - `c6ad23b` - Interface présentateur optimisée - Header compact + Debug supprimé
-  - `1647dbc` - Icône messages fond bleu + Plus grande
 
 ---
 
