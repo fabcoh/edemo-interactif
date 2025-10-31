@@ -802,9 +802,6 @@ export default function PresenterControl() {
                     </Button>
                     <div className="w-px h-4 bg-gray-400 ml-1"></div>
                     <div className="relative flex flex-col items-center">
-                      <span className="absolute -top-4 text-white/70 text-[8px] font-semibold">
-                        {zoom}%
-                      </span>
                       <input
                         type="range"
                         min="50"
@@ -824,6 +821,9 @@ export default function PresenterControl() {
                           background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((zoom - 50) / 150) * 100}%, #6b7280 ${((zoom - 50) / 150) * 100}%, #6b7280 100%)`
                         }}
                       />
+                      <span className="absolute -bottom-3 text-white text-[8px] font-semibold">
+                        {zoom}%
+                      </span>
                     </div>
                     <Button
                       onClick={() => {
@@ -1162,9 +1162,6 @@ export default function PresenterControl() {
                               {/* Mini barre de zoom simplifiée */}
                               <div className="w-px h-4 bg-gray-400 ml-1"></div>
                               <div className="relative flex flex-col items-center">
-                                <span className="absolute -top-4 text-white/70 text-[8px] font-semibold">
-                                  {zoom}%
-                                </span>
                                 <input
                                   type="range"
                                   min="50"
@@ -1184,6 +1181,9 @@ export default function PresenterControl() {
                                     background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((zoom - 50) / 150) * 100}%, #6b7280 ${((zoom - 50) / 150) * 100}%, #6b7280 100%)`
                                   }}
                                 />
+                                <span className="absolute -bottom-3 text-white text-[8px] font-semibold">
+                                  {zoom}%
+                                </span>
                               </div>
                               <Button
                                 onClick={() => {
