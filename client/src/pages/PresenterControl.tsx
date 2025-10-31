@@ -1254,14 +1254,20 @@ export default function PresenterControl() {
                               <p className="text-gray-500 text-sm mt-2">{displayedDocument.title}</p>
                             </div>
                           }
-                          className="max-w-full max-h-full"
+                          className="flex flex-col items-center"
                         >
-                          <Page
-                            pageNumber={pageNumber}
-                            width={typeof window !== 'undefined' ? window.innerWidth * (zoom / 100) : 800}
-                            renderTextLayer={true}
-                            renderAnnotationLayer={true}
-                          />
+                          <div style={{
+                            transform: `scale(${zoom / 100}) translate(${panOffset.x / (zoom / 100)}px, ${panOffset.y / (zoom / 100)}px)`,
+                            transition: isPanning ? 'none' : 'transform 0.2s ease-out',
+                          }}>
+                            <Page
+                              pageNumber={pageNumber}
+                              width={Math.min(typeof window !== 'undefined' ? window.innerWidth * 0.9 : 800, 1200)}
+                              className="max-w-full"
+                              renderTextLayer={true}
+                              renderAnnotationLayer={true}
+                            />
+                          </div>
                         </Document>
                       </div>
                     )}

@@ -271,14 +271,18 @@ export default function Viewer() {
                   }
                   className="flex flex-col items-center"
                 >
-                  <Page
-                    pageNumber={pageNumber}
-                    scale={presenterZoom / 100}
-                    width={Math.min(window.innerWidth * 0.9, 1200)}
-                    className="max-w-full"
-                    renderTextLayer={true}
-                    renderAnnotationLayer={true}
-                  />
+                  <div style={{
+                    transform: `scale(${presenterZoom / 100}) translate(${presenterPanOffsetX / (presenterZoom / 100)}px, ${presenterPanOffsetY / (presenterZoom / 100)}px)`,
+                    transition: "transform 0.2s ease-out",
+                  }}>
+                    <Page
+                      pageNumber={pageNumber}
+                      width={Math.min(window.innerWidth * 0.9, 1200)}
+                      className="max-w-full"
+                      renderTextLayer={true}
+                      renderAnnotationLayer={true}
+                    />
+                  </div>
                 </Document>
               </div>
             )}
