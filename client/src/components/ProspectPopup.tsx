@@ -287,17 +287,17 @@ export default function ProspectPopup({
                   <div className="col-span-2">
                     <Label className="text-black">Date de naissance</Label>
                     <Input 
-                      value={`${enrichedData.birthDate} (${enrichedData.age || contact.age} ans)`} 
+                      value={`${enrichedData.birthDate} (${enrichedData.age || currentContact.age} ans)`} 
                       readOnly 
                       className="bg-white/50 text-black" 
                     />
                   </div>
                 )}
-                {contact.provenance && (
+                {currentContact.provenance && (
                   <div className="col-span-2">
                     <Label className="text-black">Provenance</Label>
                     <Input 
-                      value={contact.provenance} 
+                      value={currentContact.provenance} 
                       readOnly 
                       className="bg-white/50 text-black" 
                     />

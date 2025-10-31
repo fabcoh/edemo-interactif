@@ -620,3 +620,11 @@ Le projet Edemo Live est maintenant complet avec :
 - [ ] Ajouter indicateur "Fiche X / Y" au centre
 - [ ] Désactiver les flèches si première/dernière fiche
 
+
+## 🐛 Corriger ReferenceError dans Page 2
+
+- [ ] Remplacer contact.provenance par currentContact.provenance
+- [ ] Vérifier toutes les références à contact dans la Page 2
+- [ ] Remplacer par currentContact partout où nécessaire
+- [ ] Tester la Page 2 pour s'assurer qu'elle s'affiche correctement
+
