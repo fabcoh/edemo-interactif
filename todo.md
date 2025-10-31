@@ -412,3 +412,113 @@ Le projet Edemo Live est maintenant complet avec :
 
 - [x] Supprimer la barre PDF dupliquée (celle dans la condition type === "pdf")
 
+
+
+
+## 📊 Détection d'appareil et enrichissement spectateur
+
+### Détection automatique
+- [x] Détecter type d'appareil (Desktop, Tablet, Mobile)
+- [x] Détecter navigateur (Chrome, Firefox, Safari, Edge + version)
+- [x] Détecter OS (Windows, macOS, iOS, Android, Linux + version)
+- [x] Détecter langue du navigateur
+- [x] Détecter fuseau horaire
+- [x] Détecter résolution d'écran
+- [x] Utilitaire deviceDetection.ts créé
+
+### Saisie manuelle (barre violette Vue Lecteur)
+- [ ] Formulaire de saisie : Email + Téléphone
+- [ ] Bouton "Enrichir" pour lancer la recherche d'infos
+
+### Enrichissement automatique (via APIs)
+- [ ] Nom complet
+- [ ] Poste / Profession
+- [ ] Entreprise
+- [ ] Âge
+- [ ] Photo de profil
+- [ ] Profil LinkedIn
+- [ ] Ville / Pays
+- [ ] Formation
+- [ ] Taille de l'entreprise
+- [ ] Secteur d'activité
+
+### Métriques de session
+- [ ] Temps de connexion
+- [ ] Pages vues
+- [ ] Activité (actif/inactif)
+- [ ] Nombre de reconnexions
+
+### Affichage
+- [ ] Afficher toutes les infos dans la barre violette de la Vue Lecteur
+- [ ] Mise à jour du schéma DB (ajout colonnes)
+- [ ] Pousser les migrations DB
+
+
+
+
+## 📤 Upload fichier de prospection et enrichissement
+
+### Phase 1 : Parser Excel
+- [ ] Lire le fichier Excel exemple (Resultat_recherche(6).xlsx)
+- [ ] Créer le parser pour extraire : Nom, Prénom, Age, Adresse, Téléphone, Mail
+- [ ] Installer la librairie xlsx (si nécessaire)
+
+### Phase 2 : Bouton Upload
+- [ ] Ajouter bouton "📤 Upload prospection" dans la barre violette
+- [ ] Ajouter bouton "🔍 Enrichir" à côté
+- [ ] Gérer l'upload et le parsing du fichier
+
+### Phase 3 : Popup de navigation
+- [ ] Créer le popup avec navigation << FICHE >>
+- [ ] Afficher les champs : Nom, Prénom, Age, Adresse, Téléphone, Mail
+- [ ] Navigation entre les fiches (précédent/suivant)
+- [ ] Compteur de fiches (ex: FICHE 1/25)
+
+### Phase 4 : API d'enrichissement
+- [ ] Intégrer l'API d'enrichissement (Clearbit, Hunter.io, etc.)
+- [ ] Recherche basée sur Email et/ou Téléphone
+- [ ] Récupérer : Poste, Entreprise, LinkedIn, Photo, Formation, Secteur
+
+### Phase 5 : Affichage
+- [ ] Afficher les infos enrichies dans le popup
+- [ ] Afficher les infos de détection automatique
+- [ ] Bouton "🗑️ Supprimer la fiche"
+
+
+
+
+## 📋 Suivi des fiches et rappels automatiques
+
+### Phase 1 : Schéma DB
+- [x] Créer table `saved_prospects` (id, user_id, contact_data, status, rappel_date, notes, created_at)
+- [x] Pousser les migrations DB
+
+### Phase 2 : Upload et popup
+- [x] Bouton "Upload prospection" dans le Right Panel
+- [x] Parser Excel intégré
+- [x] Popup ProspectPopup créé et intégré
+- [x] Navigation << FICHE >> fonctionnelle
+- [x] Bouton "⭐ Marquer comme intéressante" dans le popup
+- [x] Champ "Date de rappel" avec sélecteur de date/heure
+- [ ] Champ "Notes" pour commentaires
+- [ ] Statut : Nouveau, En cours, Relancé, Converti, Perdu
+- [ ] Sauvegarder la fiche en DB
+
+### Phase 3 : Liste des fiches sauvegardées
+- [ ] Page/section "Mes prospects"
+- [ ] Affichage en tableau : Nom, Téléphone, Email, Statut, Rappel, Actions
+- [ ] Filtres : Statut, Date de rappel
+- [ ] Recherche par nom/email/téléphone
+
+### Phase 4 : Système de rappels
+- [ ] Cron job pour vérifier les rappels (toutes les 5 minutes)
+- [ ] Email automatique si non connecté : "Rappel : Contacter Jean Dupont"
+- [ ] Popup automatique si connecté : Affiche la fiche complète
+- [ ] Bouton "Reporter" pour reprogrammer le rappel
+- [ ] Recherche automatique des nouvelles infos à l'ouverture du rappel
+
+### Phase 5 : Enrichissement à la volée
+- [ ] Re-enrichir les infos quand le rappel s'ouvre
+- [ ] Comparer avec les anciennes infos
+- [ ] Afficher les changements (nouveau poste, nouvelle entreprise, etc.)
+

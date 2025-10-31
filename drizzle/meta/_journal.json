@@ -29,6 +29,20 @@
       "when": 1761902470928,
       "tag": "0003_square_whirlwind",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1761933335124,
+      "tag": "0004_pink_silver_fox",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1761936167451,
+      "tag": "0005_old_martin_li",
+      "breakpoints": true
     }
   ]
 }

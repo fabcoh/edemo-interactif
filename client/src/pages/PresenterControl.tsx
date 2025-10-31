@@ -9,6 +9,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import ChatPanel from "@/components/ChatPanel";
+import ProspectPopup from "@/components/ProspectPopup";
+import { parseProspectionFile, type ProspectContact } from "@/lib/excelParser";
+import { getDeviceInfo } from "@/lib/deviceDetection";
 import { Document, Page, pdfjs } from 'react-pdf';
 import {
   AlertDialog,
@@ -55,6 +58,12 @@ export default function PresenterControl() {
   const [rectangleStart, setRectangleStart] = useState({ x: 0, y: 0 });
   // Viewer preview floating window
   const [showViewerPreview, setShowViewerPreview] = useState(false);
+  
+  // Prospection system states
+  const [prospectContacts, setProspectContacts] = useState<ProspectContact[]>([]);
+  const [showProspectPopup, setShowProspectPopup] = useState(false);
+  const [currentProspectIndex, setCurrentProspectIndex] = useState(0);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const sessionIdNum = sessionId ? parseInt(sessionId) : 0;
 
@@ -160,9 +169,33 @@ export default function PresenterControl() {
   const handleUploadDocument = async (file: File) => {
     if (!file) return;
 
+    // Détecter si c'est un fichier Excel/CSV pour la prospection
+    const isProspectionFile = 
+      file.name.endsWith('.xlsx') || 
+      file.name.endsWith('.xls') || 
+      file.name.endsWith('.csv') ||
+      file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+      file.type === 'application/vnd.ms-excel' ||
+      file.type === 'text/csv';
+
+    if (isProspectionFile) {
+      // Ouvrir le popup de prospection
+      try {
+        const contacts = await parseProspectionFile(file);
+        setProspectContacts(contacts);
+        setCurrentProspectIndex(0);
+        setShowProspectPopup(true);
+      } catch (error) {
+        console.error('Erreur de parsing:', error);
+        alert('Erreur lors de la lecture du fichier Excel/CSV');
+      }
+      return;
+    }
+
+    // Sinon, traiter comme un document de présentation normal
     const validTypes = ['application/pdf', 'image/png', 'image/jpeg', 'video/mp4'];
     if (!validTypes.includes(file.type)) {
-      alert('Format de fichier non supporté. Veuillez utiliser PDF, PNG, JPG ou MP4.');
+      alert('Format de fichier non supporté. Veuillez utiliser PDF, PNG, JPG, MP4, Excel ou CSV.');
       return;
     }
 
@@ -747,10 +780,10 @@ export default function PresenterControl() {
           {/* Center - Preview Area */}
           <div className="lg:col-span-3 flex flex-col gap-2 overflow-hidden">
             <Card className="border-0 flex-1 flex flex-col overflow-hidden bg-transparent">
-              <CardContent className="flex-1 flex flex-col overflow-hidden relative p-0">
-                {/* Mini barre centrée au-dessus des documents */}
+              <CardContent className="flex-1 flex flex-col overflow-hidden p-0">
+                {/* Mini barre toujours visible pour tous les documents */}
                 {displayedDocument && (
-                <div className="w-full flex justify-center py-2 z-50">
+                <div className="flex justify-center py-2 bg-gray-900/50">
                   <div className="bg-black/60 backdrop-blur-sm px-3 py-0.5 rounded-full flex items-center gap-2 shadow-lg">
                     <Button
                       size="sm"
@@ -857,7 +890,7 @@ export default function PresenterControl() {
                     <input
                       type="file"
                       id="mini-document-upload-always"
-                      accept="image/*,application/pdf,video/*"
+                      accept="image/*,application/pdf,video/*,.xlsx,.xls,.csv"
                       onChange={(e) => {
                         if (e.target.files?.[0]) {
                           handleUploadDocument(e.target.files[0]);
@@ -1267,6 +1300,25 @@ export default function PresenterControl() {
           />
         </div>
       )}
+
+      {/* Prospect Popup */}
+      <ProspectPopup
+        open={showProspectPopup}
+        onClose={() => setShowProspectPopup(false)}
+        contacts={prospectContacts}
+        currentIndex={currentProspectIndex}
+        onNavigate={(index) => setCurrentProspectIndex(index)}
+        onEnrich={async (contact) => {
+          // TODO: Implémenter l'enrichissement via API
+          console.log('Enrichissement de:', contact);
+          return null;
+        }}
+        onSave={async (contact, enrichedData, notes, rappelDate, status) => {
+          // TODO: Implémenter la sauvegarde en DB
+          console.log('Sauvegarde:', { contact, enrichedData, notes, rappelDate, status });
+        }}
+        deviceInfo={getDeviceInfo()}
+      />
 
     </div>
   );

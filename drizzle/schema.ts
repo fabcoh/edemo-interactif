@@ -95,6 +95,23 @@ export const presentationViewers = mysqlTable("presentation_viewers", {
   userId: int("userId"),
   /** Anonymous viewer identifier (for non-authenticated viewers) */
   viewerIdentifier: varchar("viewerIdentifier", { length: 64 }),
+  
+  // Détection automatique (stocké en DB)
+  /** Device type: desktop, tablet, mobile */
+  deviceType: varchar("deviceType", { length: 20 }),
+  /** Browser name and version */
+  browser: varchar("browser", { length: 100 }),
+  /** Operating system and version */
+  os: varchar("os", { length: 100 }),
+  /** Screen resolution */
+  screenResolution: varchar("screenResolution", { length: 20 }),
+  
+  // Saisie manuelle (stocké en DB)
+  /** Email address (manually entered) */
+  email: varchar("email", { length: 320 }),
+  /** Phone number (manually entered) */
+  phone: varchar("phone", { length: 50 }),
+  
   /** Last activity timestamp */
   lastActivityAt: timestamp("lastActivityAt").defaultNow().notNull(),
   /** Timestamps */
@@ -267,4 +284,32 @@ export const appSettings = mysqlTable("app_settings", {
 
 export type AppSetting = typeof appSettings.$inferSelect;
 export type InsertAppSetting = typeof appSettings.$inferInsert;
+
+/**
+ * Saved Prospects table
+ * Stores interesting prospects with follow-up reminders
+ */
+export const savedProspects = mysqlTable("saved_prospects", {
+  id: int("id").autoincrement().primaryKey(),
+  /** User who saved this prospect */
+  userId: int("userId").notNull(),
+  /** Contact data (JSON) */
+  contactData: text("contactData").notNull(),
+  /** Enriched data (JSON) - stored for comparison */
+  enrichedData: text("enrichedData"),
+  /** Status: nouveau, en_cours, relance, converti, perdu */
+  status: mysqlEnum("status", ["nouveau", "en_cours", "relance", "converti", "perdu"]).default("nouveau").notNull(),
+  /** Reminder date and time */
+  rappelDate: timestamp("rappelDate"),
+  /** Notes about this prospect */
+  notes: text("notes"),
+  /** Whether reminder email was sent */
+  emailSent: boolean("emailSent").default(false).notNull(),
+  /** Timestamps */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type SavedProspect = typeof savedProspects.$inferSelect;
+export type InsertSavedProspect = typeof savedProspects.$inferInsert;
 

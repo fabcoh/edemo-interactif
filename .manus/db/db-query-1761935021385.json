@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `saved_prospects` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `userId` int NOT NULL,\n  `contactData` text NOT NULL,\n  `enrichedData` text,\n  `status` enum('nouveau','en_cours','relance','converti','perdu') NOT NULL DEFAULT 'nouveau',\n  `rappelDate` timestamp NULL,\n  `notes` text,\n  `emailSent` boolean NOT NULL DEFAULT false,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `saved_prospects_id` PRIMARY KEY(`id`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3j1v42nUZuvgHzn.root --database 8CbieS7mEqbTHNrWVL4VaZ --execute CREATE TABLE IF NOT EXISTS `saved_prospects` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `userId` int NOT NULL,\n  `contactData` text NOT NULL,\n  `enrichedData` text,\n  `status` enum('nouveau','en_cours','relance','converti','perdu') NOT NULL DEFAULT 'nouveau',\n  `rappelDate` timestamp NULL,\n  `notes` text,\n  `emailSent` boolean NOT NULL DEFAULT false,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `saved_prospects_id` PRIMARY KEY(`id`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1206
+}
