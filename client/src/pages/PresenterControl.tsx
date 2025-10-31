@@ -1150,7 +1150,86 @@ export default function PresenterControl() {
                       </>
                     )}
                     {displayedDocument.type === "pdf" && (
-                      <div className="w-full h-full flex flex-col items-center justify-center">
+                      <div 
+                        className="w-full h-full flex flex-col items-center justify-center"
+                        onMouseDown={(e) => {
+                          if (e.shiftKey) {
+                            // Shift + Click: Start rectangle selection
+                            setIsDrawingRectangle(true);
+                            const rect = e.currentTarget.getBoundingClientRect();
+                            const x = ((e.clientX - rect.left) / rect.width) * 100;
+                            const y = ((e.clientY - rect.top) / rect.height) * 100;
+                            setRectangleStart({ x, y });
+                            setRectangle({ x, y, width: 0, height: 0, visible: false });
+                          } else {
+                            // Normal click: Pan
+                            setIsPanning(true);
+                            setPanStart({ x: e.clientX - panOffset.x, y: e.clientY - panOffset.y });
+                          }
+                        }}
+                        onMouseMove={(e) => {
+                          if (isDrawingRectangle) {
+                            const rect = e.currentTarget.getBoundingClientRect();
+                            const x = ((e.clientX - rect.left) / rect.width) * 100;
+                            const y = ((e.clientY - rect.top) / rect.height) * 100;
+                            setRectangle({
+                              x: Math.min(rectangleStart.x, x),
+                              y: Math.min(rectangleStart.y, y),
+                              width: Math.abs(x - rectangleStart.x),
+                              height: Math.abs(y - rectangleStart.y),
+                              visible: true,
+                            });
+                          } else if (isPanning && zoom >= 100) {
+                            setPanOffset({
+                              x: e.clientX - panStart.x,
+                              y: e.clientY - panStart.y,
+                            });
+                          }
+                          if (!isPanning) {
+                            handleMouseMove(e);
+                          }
+                        }}
+                        onMouseUp={() => {
+                          if (isDrawingRectangle) {
+                            setIsDrawingRectangle(false);
+                            updatePresenterState({
+                              rectangleX: rectangle.x,
+                              rectangleY: rectangle.y,
+                              rectangleWidth: rectangle.width,
+                              rectangleHeight: rectangle.height,
+                              rectangleVisible: rectangle.visible,
+                            });
+                          }
+                          setIsPanning(false);
+                          updatePresenterState();
+                        }}
+                        onMouseLeave={() => {
+                          setIsPanning(false);
+                          setIsDrawingRectangle(false);
+                        }}
+                        onTouchStart={(e) => {
+                          if (e.touches.length === 1) {
+                            setIsPanning(true);
+                            setPanStart({
+                              x: e.touches[0].clientX - panOffset.x,
+                              y: e.touches[0].clientY - panOffset.y,
+                            });
+                          }
+                        }}
+                        onTouchMove={(e) => {
+                          if (isPanning && e.touches.length === 1 && zoom >= 100) {
+                            setPanOffset({
+                              x: e.touches[0].clientX - panStart.x,
+                              y: e.touches[0].clientY - panStart.y,
+                            });
+                          }
+                        }}
+                        onTouchEnd={() => {
+                          setIsPanning(false);
+                          updatePresenterState();
+                        }}
+                        style={{ cursor: isPanning ? 'grabbing' : (zoom >= 100 ? 'grab' : 'default') }}
+                      >
                         {/* Barre PDF supprimée - utilisation de la mini barre universelle centrée en haut */}
                         <Document
                           key={displayedDocument.fileUrl}

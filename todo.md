@@ -758,3 +758,21 @@ Le projet Edemo Live est maintenant complet avec :
 - [ ] Cacher ChatPanel complètement
 - [ ] Document en 100vh
 
+
+## 🎯 Déplacement document Vue Lecteur
+
+- [ ] Clarifier : Drag & Drop ou boutons
+- [ ] Implémenter système de déplacement
+- [ ] Tester
+
+
+
+
+## 🎯 Déplacement document synchronisé (Présentateur → Spectateurs)
+
+- [x] Retirer le drag & drop côté spectateur
+- [x] Drag & drop déjà implémenté côté présentateur (images uniquement)
+- [x] Synchronisation déjà en place (panOffsetX/Y)
+- [x] Ajouter drag & drop pour les PDF côté présentateur
+- [ ] Tester la synchronisation
+
