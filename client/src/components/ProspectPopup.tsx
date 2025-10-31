@@ -173,43 +173,31 @@ export default function ProspectPopup({
   return (
     <div className="space-y-3">
       {/* Navigation Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={handlePrevious}
-            disabled={currentIndex === 0}
-            className="h-10 w-10 bg-white border-2 border-gray-300 hover:bg-gray-100"
-          >
-            <ChevronLeft className="h-5 w-5 text-black" />
-          </Button>
-          <span className="text-lg font-bold text-black">
-            FICHE {currentIndex + 1}/{totalContacts}
-          </span>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={handleNext}
-            disabled={currentIndex === totalContacts - 1}
-            className="h-10 w-10 bg-white border-2 border-gray-300 hover:bg-gray-100"
-          >
-            <ChevronRight className="h-5 w-5 text-black" />
-          </Button>
-        </div>
-
+      <div className="flex items-center justify-center gap-2 relative">
         <Button
           variant="outline"
           size="icon"
-          onClick={onClose}
+          onClick={handlePrevious}
+          disabled={currentIndex === 0}
           className="h-10 w-10 bg-white border-2 border-gray-300 hover:bg-gray-100"
-          title="Fermer"
         >
-          <X className="h-5 w-5 text-black" />
+          <ChevronLeft className="h-5 w-5 text-black" />
+        </Button>
+        <span className="text-lg font-bold text-black">
+          FICHE {currentIndex + 1}/{totalContacts}
+        </span>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={handleNext}
+          disabled={currentIndex === totalContacts - 1}
+          className="h-10 w-10 bg-white border-2 border-gray-300 hover:bg-gray-100"
+        >
+          <ChevronRight className="h-5 w-5 text-black" />
         </Button>
 
-        {/* Icône de recherche avec animation */}
-        <div className="relative">
+        {/* Icône de recherche avec animation (position absolue à droite) */}
+        <div className="absolute right-0">
           <div
             className={`w-16 h-16 rounded-full flex items-center justify-center ${
               isEnriching ? 'bg-blue-400 animate-pulse' : hasEnrichedData ? 'bg-green-400' : 'bg-gray-300'
@@ -339,6 +327,19 @@ export default function ProspectPopup({
               <div className="col-span-2">
                 <Label className="text-xs text-black">Formation</Label>
                 <Input value={enrichedData.education} readOnly className="h-8 text-sm bg-white/50 text-black" />
+              </div>
+            )}
+            {enrichedData.linkedinUrl && (
+              <div className="col-span-2">
+                <Label className="text-xs text-black">LinkedIn</Label>
+                <a 
+                  href={enrichedData.linkedinUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="block h-8 px-3 py-1 text-sm bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-md border border-blue-300 truncate"
+                >
+                  {enrichedData.linkedinUrl}
+                </a>
               </div>
             )}
           </div>

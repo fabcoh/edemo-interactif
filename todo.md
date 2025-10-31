@@ -705,3 +705,13 @@ Le projet Edemo Live est maintenant complet avec :
 - [ ] Mini vignette photo cliquable (modal agrandissement)
 - [ ] Layout optimisé et compact
 
+
+## 🔧 Corrections popup compacte
+
+- [ ] Centrer la navigation "← FICHE X/Y →"
+- [ ] Retirer le bouton ✕ (fermeture)
+- [ ] Restaurer date de naissance dans section enrichie
+- [ ] Restaurer lien LinkedIn cliquable
+- [ ] Vérifier que toutes les infos enrichies sont présentes
+- [ ] Vérifier l'aperçu LinkedIn (page 1)
+
