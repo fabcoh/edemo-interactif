@@ -967,7 +967,7 @@ export default function PresenterControl() {
                           />
                         </Document>
                         {numPages && numPages > 1 && (
-                          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-black/70 px-3 py-1.5 rounded-lg flex items-center gap-1.5 z-10">
+                          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-black/70 px-2 py-1 rounded-lg flex items-center gap-1 z-10">
                             <Button
                               size="sm"
                               variant="outline"
@@ -977,8 +977,8 @@ export default function PresenterControl() {
                             >
                               ←
                             </Button>
-                            <span className="text-white text-xs">
-                              Page {pageNumber} / {numPages}
+                            <span className="text-white text-[10px]">
+                              {pageNumber}/{numPages}
                             </span>
                             <Button
                               size="sm"
@@ -989,7 +989,7 @@ export default function PresenterControl() {
                             >
                               →
                             </Button>
-                            <div className="w-px h-5 bg-gray-500 mx-1"></div>
+                            <div className="w-px h-4 bg-gray-500 mx-0.5"></div>
                             <input
                               type="number"
                               min="1"
@@ -1016,7 +1016,7 @@ export default function PresenterControl() {
                               }}
                               onMouseEnter={(e) => e.currentTarget.select()}
                               onFocus={(e) => e.currentTarget.select()}
-                              className="w-16 h-7 px-1.5 text-xs text-center bg-gray-800 text-white border border-gray-600 rounded focus:outline-none focus:border-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                              className="w-11 h-6 px-1 text-[10px] text-center bg-gray-800 text-white border border-gray-600 rounded focus:outline-none focus:border-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                               autoComplete="off"
                               autoCorrect="off"
                               autoCapitalize="off"
