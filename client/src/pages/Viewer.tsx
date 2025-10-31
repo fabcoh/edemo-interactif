@@ -3,7 +3,6 @@
 import { useState, useRef } from "react";
 import { useRoute } from "wouter";
 import ChatPanel from "@/components/ChatPanel";
-// import ViewerChatPanel from "@/components/ViewerChatPanel";
 
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
@@ -365,8 +364,8 @@ export default function Viewer() {
           </div>
           </div>
 
-          {/* ViewerChatPanel - Overlay en bas */}
-          <ViewerChatPanel
+          {/* ChatPanel - Overlay en bas */}
+          <ChatPanel
             sessionCode={sessionCode}
             onLoadDocument={async (url: string, name: string, type: string) => {
               // TODO: Fix this - displayDocument is read-only from session

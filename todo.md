@@ -739,3 +739,9 @@ Le projet Edemo Live est maintenant complet avec :
 - [ ] Agrandir zone d'affichage document
 - [ ] Tester
 
+
+## 🐛 Bug ViewerChatPanel
+
+- [ ] Remplacer ViewerChatPanel par ChatPanel
+- [ ] Retirer import commenté
+
