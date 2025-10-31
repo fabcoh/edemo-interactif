@@ -1100,6 +1100,22 @@ export default function PresenterControl() {
                               >
                                 R
                               </Button>
+                              {/* Séparateur */}
+                              <div className="w-px h-4 bg-gray-400 ml-1"></div>
+                              {/* Espace upload "Glisser un fichier ici" */}
+                              <div
+                                onDragOver={(e) => e.preventDefault()}
+                                onDrop={(e) => {
+                                  e.preventDefault();
+                                  const files = e.dataTransfer.files;
+                                  if (files.length > 0) {
+                                    handleUploadDocument(files[0]);
+                                  }
+                                }}
+                                className="border border-dashed border-gray-400 rounded px-2 py-0.5 text-center cursor-pointer hover:border-gray-300 transition-colors ml-1"
+                              >
+                                <p className="text-[9px] text-gray-300 whitespace-nowrap">Glisser un fichier ici</p>
+                              </div>
                             </div>
                           </div>
                         )}

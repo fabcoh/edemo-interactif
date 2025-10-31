@@ -240,3 +240,27 @@
 
 **Impact** : Très faible - Amélioration organisation visuelle
 
+
+
+
+### **✅ Cloner l'espace upload dans la mini barre du PresenterControl**
+- [x] Localiser l'espace "Glisser un fichier ici" dans PresenterControl
+- [x] Trouver la mini barre de zoom avec le bouton "R"
+- [x] Cloner l'espace upload à droite du bouton "R"
+- [x] Adapter la taille pour la mini barre (text-[9px])
+- [x] Tester le drag & drop
+
+**Solution appliquée** :
+- Espace upload ajouté dans la mini barre après le bouton R
+- Séparateur vertical ajouté pour la lisibilité
+- Taille réduite (text-[9px], px-2 py-0.5) pour s'intégrer dans la mini barre
+- Utilise la même fonction `handleUploadDocument` que la grande barre
+- Bordure pointillée grise avec hover pour indiquer le drag & drop
+
+**Fichiers modifiés** :
+- client/src/pages/PresenterControl.tsx : Ajout de l'espace upload dans la mini barre
+
+**Raison** : Faciliter l'upload de fichiers sans quitter le mode présentation
+
+**Impact** : Faible - Amélioration UX pour l'upload
+
