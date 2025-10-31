@@ -282,6 +282,16 @@ export default function ProspectPopup({
                     />
                   </div>
                 )}
+                {contact.provenance && (
+                  <div className="col-span-2">
+                    <Label className="text-black">Provenance</Label>
+                    <Input 
+                      value={contact.provenance} 
+                      readOnly 
+                      className="bg-white/50 text-black" 
+                    />
+                  </div>
+                )}
                 {enrichedData.jobTitle && (
                   <div>
                     <Label className="text-black">Poste</Label>

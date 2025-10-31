@@ -596,3 +596,10 @@ Le projet Edemo Live est maintenant complet avec :
 - [ ] Afficher la date de naissance dans ProspectPopup (Page 2) après le nom complet
 - [ ] Format : "Né(e) le : JJ/MM/AAAA (XX ans)"
 
+
+## 📍 Afficher la provenance de la fiche
+
+- [ ] Afficher le champ "Infos" de l'Excel dans la Page 2
+- [ ] Label : "Provenance" ou "Source"
+- [ ] Positionner après la date de naissance ou en bas des infos enrichies
+

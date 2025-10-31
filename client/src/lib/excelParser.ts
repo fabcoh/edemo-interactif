@@ -14,6 +14,7 @@ export interface ProspectContact {
   telephone: string;
   email: string;
   infos?: string;
+  provenance?: string;
 }
 
 /**
@@ -78,6 +79,7 @@ export async function parseProspectionFile(file: File): Promise<ProspectContact[
         );
         const emailIndex = headers.findIndex((h: string) => h.includes('mail') || h.includes('email'));
         const infosIndex = headers.findIndex((h: string) => h.includes('infos'));
+        const provenanceIndex = headers.findIndex((h: string) => h.includes('provenance') || h.includes('source'));
 
         // Parse data rows
         const contacts: ProspectContact[] = [];
@@ -113,6 +115,7 @@ export async function parseProspectionFile(file: File): Promise<ProspectContact[
           const telephone = telIndex >= 0 && row[telIndex] ? String(row[telIndex]).trim() : '';
           const email = emailIndex >= 0 && row[emailIndex] ? String(row[emailIndex]).trim() : '';
           const infos = infosIndex >= 0 && row[infosIndex] ? String(row[infosIndex]).trim() : '';
+          const provenance = provenanceIndex >= 0 && row[provenanceIndex] ? String(row[provenanceIndex]).trim() : '';
 
           // Only add if we have at least a name or email or phone
           if (nom || email || telephone) {
@@ -125,6 +128,7 @@ export async function parseProspectionFile(file: File): Promise<ProspectContact[
               telephone,
               email,
               infos,
+              provenance,
             });
           }
         }
