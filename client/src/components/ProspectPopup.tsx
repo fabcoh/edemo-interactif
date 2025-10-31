@@ -138,9 +138,9 @@ export default function ProspectPopup({
             size="icon"
             onClick={handlePrevious}
             disabled={currentIndex === 0}
-            className="h-8 w-8"
+            className="h-10 w-10 bg-white border-2 border-gray-300 hover:bg-gray-100"
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-5 w-5 text-black" />
           </Button>
           <span className="text-lg font-bold text-black">
             FICHE {currentIndex + 1}/{totalContacts}
@@ -150,9 +150,9 @@ export default function ProspectPopup({
             size="icon"
             onClick={handleNext}
             disabled={currentIndex === totalContacts - 1}
-            className="h-8 w-8"
+            className="h-10 w-10 bg-white border-2 border-gray-300 hover:bg-gray-100"
           >
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-5 w-5 text-black" />
           </Button>
         </div>
 
@@ -161,10 +161,10 @@ export default function ProspectPopup({
           variant="outline"
           size="icon"
           onClick={onClose}
-          className="h-8 w-8 ml-auto"
+          className="h-10 w-10 bg-white border-2 border-gray-300 hover:bg-gray-100 ml-auto"
           title="Fermer"
         >
-          <X className="h-4 w-4" />
+          <X className="h-5 w-5 text-black" />
         </Button>
 
         {/* Icône de recherche avec animation */}

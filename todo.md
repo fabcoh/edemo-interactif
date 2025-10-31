@@ -628,3 +628,11 @@ Le projet Edemo Live est maintenant complet avec :
 - [ ] Remplacer par currentContact partout où nécessaire
 - [ ] Tester la Page 2 pour s'assurer qu'elle s'affiche correctement
 
+
+## 🎨 Corriger visibilité des boutons de navigation
+
+- [ ] Ajouter fond blanc aux boutons ← → ✕
+- [ ] Ajouter bordure visible (border-2 border-gray-300)
+- [ ] Augmenter taille des icônes (h-4 w-4 → h-5 w-5)
+- [ ] Tester sur fond bleu de la popup
+
