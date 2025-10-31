@@ -821,7 +821,7 @@ export default function PresenterControl() {
                           background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((zoom - 50) / 150) * 100}%, #6b7280 ${((zoom - 50) / 150) * 100}%, #6b7280 100%)`
                         }}
                       />
-                      <span className="absolute -bottom-3 text-white text-[8px] font-semibold">
+                      <span className="absolute -bottom-4 text-white text-[8px] font-semibold">
                         {zoom}%
                       </span>
                     </div>
@@ -1181,7 +1181,7 @@ export default function PresenterControl() {
                                     background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((zoom - 50) / 150) * 100}%, #6b7280 ${((zoom - 50) / 150) * 100}%, #6b7280 100%)`
                                   }}
                                 />
-                                <span className="absolute -bottom-3 text-white text-[8px] font-semibold">
+                                <span className="absolute -bottom-4 text-white text-[8px] font-semibold">
                                   {zoom}%
                                 </span>
                               </div>
