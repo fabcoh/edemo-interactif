@@ -139,3 +139,16 @@
 
 **Impact** : Moyen - Amélioration UX critique
 
+
+
+### **Mini barre de zoom PDF**
+- [x] Créer une mini barre de zoom à côté de la barre de pages
+- [x] Boutons - et + pour zoom
+- [x] Indicateur de zoom (ex: 100%)
+- [x] Même style compact que la barre de pages
+- [x] Tester le fonctionnement
+
+**Raison** : Faciliter le zoom sans utiliser la grande barre en bas
+
+**Impact** : Moyen - Amélioration UX
+
