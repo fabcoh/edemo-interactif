@@ -1003,7 +1003,7 @@ export default function PresenterControl() {
                               }}
                               onMouseEnter={(e) => e.currentTarget.select()}
                               onFocus={(e) => e.currentTarget.select()}
-                              className="w-12 h-7 px-1.5 text-xs text-center bg-gray-800 text-white border border-gray-600 rounded focus:outline-none focus:border-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                              className="w-16 h-7 px-1.5 text-xs text-center bg-gray-800 text-white border border-gray-600 rounded focus:outline-none focus:border-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                               autoComplete="off"
                               autoCorrect="off"
                               autoCapitalize="off"
