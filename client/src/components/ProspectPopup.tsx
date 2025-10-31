@@ -1,16 +1,15 @@
 /**
  * Prospect Popup Component
- * Displays prospect information with navigation between contacts
+ * Displays prospect information with 2 pages and automatic enrichment
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ChevronLeft, ChevronRight, Star, Trash2, RefreshCw } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Star, Search, ChevronDown } from 'lucide-react';
 import type { ProspectContact } from '@/lib/excelParser';
 
 interface EnrichedData {
@@ -55,18 +54,44 @@ export default function ProspectPopup({
 }: ProspectPopupProps) {
   const [enrichedData, setEnrichedData] = useState<EnrichedData | null>(null);
   const [isEnriching, setIsEnriching] = useState(false);
+  const [hasEnrichedData, setHasEnrichedData] = useState(false);
   const [notes, setNotes] = useState('');
   const [rappelDate, setRappelDate] = useState('');
   const [status, setStatus] = useState<string>('nouveau');
   const [isSaving, setIsSaving] = useState(false);
+  const [currentPage, setCurrentPage] = useState<'summary' | 'details'>('summary');
 
   const currentContact = contacts[currentIndex];
   const totalContacts = contacts.length;
+
+  // Recherche automatique dès l'ouverture de la fiche
+  useEffect(() => {
+    if (currentContact && open) {
+      handleAutoEnrich();
+    }
+  }, [currentIndex, open]);
+
+  const handleAutoEnrich = async () => {
+    if (!currentContact) return;
+    
+    setIsEnriching(true);
+    setHasEnrichedData(false);
+    try {
+      const data = await onEnrich(currentContact);
+      setEnrichedData(data);
+      setHasEnrichedData(data !== null && Object.keys(data).length > 0);
+    } catch (error) {
+      console.error('Enrichment failed:', error);
+    } finally {
+      setIsEnriching(false);
+    }
+  };
 
   const handlePrevious = () => {
     if (currentIndex > 0) {
       onNavigate(currentIndex - 1);
       resetForm();
+      setCurrentPage('summary');
     }
   };
 
@@ -74,28 +99,16 @@ export default function ProspectPopup({
     if (currentIndex < totalContacts - 1) {
       onNavigate(currentIndex + 1);
       resetForm();
+      setCurrentPage('summary');
     }
   };
 
   const resetForm = () => {
     setEnrichedData(null);
+    setHasEnrichedData(false);
     setNotes('');
     setRappelDate('');
     setStatus('nouveau');
-  };
-
-  const handleEnrich = async () => {
-    if (!currentContact) return;
-    
-    setIsEnriching(true);
-    try {
-      const data = await onEnrich(currentContact);
-      setEnrichedData(data);
-    } catch (error) {
-      console.error('Enrichment failed:', error);
-    } finally {
-      setIsEnriching(false);
-    }
   };
 
   const handleSave = async () => {
@@ -104,7 +117,6 @@ export default function ProspectPopup({
     setIsSaving(true);
     try {
       await onSave(currentContact, enrichedData, notes, rappelDate, status);
-      // Reset form after save
       resetForm();
     } catch (error) {
       console.error('Save failed:', error);
@@ -113,150 +125,185 @@ export default function ProspectPopup({
     }
   };
 
-  if (!currentContact) return null;
+  if (!currentContact || !open) return null;
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-blue-50">
-        <DialogHeader>
-          <DialogTitle className="flex items-center justify-between text-black">
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={handlePrevious}
-                disabled={currentIndex === 0}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <span className="text-lg font-bold">
-                FICHE {currentIndex + 1}/{totalContacts}
-              </span>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={handleNext}
-                disabled={currentIndex === totalContacts - 1}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
+    <div className="space-y-4">
+      {/* Navigation */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={handlePrevious}
+            disabled={currentIndex === 0}
+            className="h-8 w-8"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <span className="text-lg font-bold text-black">
+            FICHE {currentIndex + 1}/{totalContacts}
+          </span>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={handleNext}
+            disabled={currentIndex === totalContacts - 1}
+            className="h-8 w-8"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+
+        {/* Icône de recherche avec animation */}
+        <div className="relative">
+          <div
+            className={`
+              flex items-center justify-center w-10 h-10 rounded-full
+              ${isEnriching ? 'animate-spin bg-blue-500' : ''}
+              ${hasEnrichedData && !isEnriching ? 'animate-pulse bg-green-500' : ''}
+              ${!isEnriching && !hasEnrichedData ? 'bg-gray-300' : ''}
+            `}
+          >
+            <Search className="h-5 w-5 text-white" />
+          </div>
+          {hasEnrichedData && !isEnriching && (
+            <span className="absolute -top-2 -right-2 flex h-4 w-4">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-4 w-4 bg-green-500"></span>
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Page 1 : Résumé */}
+      {currentPage === 'summary' && (
+        <div className="space-y-4">
+          <h3 className="font-semibold text-lg border-b pb-2 text-black">Informations de contact</h3>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label className="text-black">Nom</Label>
+              <Input value={currentContact.nom} readOnly className="bg-white/50 text-black" />
             </div>
+            <div>
+              <Label className="text-black">Prénom</Label>
+              <Input value={currentContact.prenom} readOnly className="bg-white/50 text-black" />
+            </div>
+            <div>
+              <Label className="text-black">Âge</Label>
+              <Input value={currentContact.age} readOnly className="bg-white/50 text-black" />
+            </div>
+            <div>
+              <Label className="text-black">Téléphone</Label>
+              <Input value={currentContact.telephone} readOnly className="bg-white/50 text-black" />
+            </div>
+            <div className="col-span-2">
+              <Label className="text-black">Email</Label>
+              <Input value={currentContact.email} readOnly className="bg-white/50 text-black" />
+            </div>
+            <div className="col-span-2">
+              <Label className="text-black">Adresse</Label>
+              <Input value={currentContact.adresse} readOnly className="bg-white/50 text-black" />
+            </div>
+            {currentContact.infos && (
+              <div className="col-span-2">
+                <Label className="text-black">Infos</Label>
+                <Textarea value={currentContact.infos} readOnly className="bg-white/50 text-black" rows={2} />
+              </div>
+            )}
+          </div>
+
+          {/* Message si infos trouvées */}
+          {hasEnrichedData && !isEnriching && (
+            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+              <strong className="font-bold">Informations trouvées !</strong>
+              <span className="block sm:inline"> Des données supplémentaires sont disponibles.</span>
+            </div>
+          )}
+
+          {/* Bouton pour voir les détails */}
+          {hasEnrichedData && (
             <Button
-              variant="default"
-              size="sm"
-              onClick={handleEnrich}
-              disabled={isEnriching || (!currentContact.email && !currentContact.telephone)}
+              onClick={() => setCurrentPage('details')}
+              className="w-full bg-purple-600 hover:bg-purple-700"
             >
-              <RefreshCw className={`h-4 w-4 mr-2 ${isEnriching ? 'animate-spin' : ''}`} />
-              {isEnriching ? 'Enrichissement...' : 'Enrichir'}
+              Voir les détails
+              <ChevronDown className="ml-2 h-4 w-4" />
             </Button>
-          </DialogTitle>
-        </DialogHeader>
+          )}
+        </div>
+      )}
 
-        {/* Photo du prospect en haut si disponible */}
-        {enrichedData?.photoUrl && (
-          <div className="flex justify-center py-4">
-            <img 
-              src={enrichedData.photoUrl} 
-              alt={`${currentContact.nom} ${currentContact.prenom}`} 
-              className="w-32 h-32 rounded-full object-cover border-4 border-blue-300 shadow-lg"
-            />
-          </div>
-        )}
-        
-        <div className="space-y-6 text-black">
-          {/* Contact Information */}
-          <div className="space-y-4">
-            <h3 className="font-semibold text-lg border-b pb-2">Informations de contact</h3>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>Nom</Label>
-                <Input value={currentContact.nom} readOnly className="bg-muted" />
-              </div>
-              <div>
-                <Label>Prénom</Label>
-                <Input value={currentContact.prenom} readOnly className="bg-muted" />
-              </div>
-              <div>
-                <Label>Âge</Label>
-                <Input value={currentContact.age} readOnly className="bg-muted" />
-              </div>
-              <div>
-                <Label>Téléphone</Label>
-                <Input value={currentContact.telephone} readOnly className="bg-muted" />
-              </div>
-              <div className="col-span-2">
-                <Label>Email</Label>
-                <Input value={currentContact.email} readOnly className="bg-muted" />
-              </div>
-              <div className="col-span-2">
-                <Label>Adresse</Label>
-                <Input value={currentContact.adresse} readOnly className="bg-muted" />
-              </div>
-              {currentContact.infos && (
-                <div className="col-span-2">
-                  <Label>Infos</Label>
-                  <Textarea value={currentContact.infos} readOnly className="bg-muted" rows={2} />
-                </div>
-              )}
+      {/* Page 2 : Détails complets */}
+      {currentPage === 'details' && (
+        <div className="space-y-6">
+          {/* Bouton retour */}
+          <Button
+            onClick={() => setCurrentPage('summary')}
+            variant="outline"
+            className="mb-4"
+          >
+            <ChevronLeft className="mr-2 h-4 w-4" />
+            Retour au résumé
+          </Button>
+
+          {/* Photo du prospect */}
+          {enrichedData?.photoUrl && (
+            <div className="flex justify-center py-4">
+              <img 
+                src={enrichedData.photoUrl} 
+                alt={`${currentContact.nom} ${currentContact.prenom}`} 
+                className="w-32 h-32 rounded-full object-cover border-4 border-purple-300 shadow-lg"
+              />
             </div>
-          </div>
+          )}
 
-          {/* Enriched Data */}
+          {/* Informations enrichies */}
           {enrichedData && (
             <div className="space-y-4">
-              <h3 className="font-semibold text-lg border-b pb-2">📊 Informations enrichies</h3>
+              <h3 className="font-semibold text-lg border-b pb-2 text-black">📊 Informations enrichies</h3>
               
               <div className="grid grid-cols-2 gap-4">
-                {enrichedData.photoUrl && (
-                  <div className="col-span-2 flex justify-center">
-                    <img 
-                      src={enrichedData.photoUrl} 
-                      alt="Profile" 
-                      className="w-24 h-24 rounded-full object-cover"
-                    />
-                  </div>
-                )}
                 {enrichedData.fullName && (
                   <div className="col-span-2">
-                    <Label>Nom complet</Label>
-                    <Input value={enrichedData.fullName} readOnly className="bg-muted" />
+                    <Label className="text-black">Nom complet</Label>
+                    <Input value={enrichedData.fullName} readOnly className="bg-white/50 text-black" />
                   </div>
                 )}
                 {enrichedData.jobTitle && (
                   <div>
-                    <Label>Poste</Label>
-                    <Input value={enrichedData.jobTitle} readOnly className="bg-muted" />
+                    <Label className="text-black">Poste</Label>
+                    <Input value={enrichedData.jobTitle} readOnly className="bg-white/50 text-black" />
                   </div>
                 )}
                 {enrichedData.company && (
                   <div>
-                    <Label>Entreprise</Label>
-                    <Input value={enrichedData.company} readOnly className="bg-muted" />
+                    <Label className="text-black">Entreprise</Label>
+                    <Input value={enrichedData.company} readOnly className="bg-white/50 text-black" />
                   </div>
                 )}
                 {enrichedData.industry && (
                   <div>
-                    <Label>Secteur</Label>
-                    <Input value={enrichedData.industry} readOnly className="bg-muted" />
+                    <Label className="text-black">Secteur</Label>
+                    <Input value={enrichedData.industry} readOnly className="bg-white/50 text-black" />
                   </div>
                 )}
                 {enrichedData.companySize && (
                   <div>
-                    <Label>Taille entreprise</Label>
-                    <Input value={enrichedData.companySize} readOnly className="bg-muted" />
+                    <Label className="text-black">Taille entreprise</Label>
+                    <Input value={enrichedData.companySize} readOnly className="bg-white/50 text-black" />
                   </div>
                 )}
                 {enrichedData.education && (
                   <div className="col-span-2">
-                    <Label>Formation</Label>
-                    <Textarea value={enrichedData.education} readOnly className="bg-muted" rows={2} />
+                    <Label className="text-black">Formation</Label>
+                    <Textarea value={enrichedData.education} readOnly className="bg-white/50 text-black" rows={2} />
                   </div>
                 )}
                 {enrichedData.linkedinUrl && (
                   <div className="col-span-2">
-                    <Label>LinkedIn</Label>
+                    <Label className="text-black">LinkedIn</Label>
                     <a 
                       href={enrichedData.linkedinUrl} 
                       target="_blank" 
@@ -271,41 +318,41 @@ export default function ProspectPopup({
             </div>
           )}
 
-          {/* Device Info */}
+          {/* Détection automatique */}
           {deviceInfo && (
             <div className="space-y-4">
-              <h3 className="font-semibold text-lg border-b pb-2">💻 Détection automatique</h3>
+              <h3 className="font-semibold text-lg border-b pb-2 text-black">💻 Détection automatique</h3>
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>Type d'appareil</Label>
-                  <Input value={deviceInfo.deviceType} readOnly className="bg-muted" />
+                  <Label className="text-black">Type d'appareil</Label>
+                  <Input value={deviceInfo.deviceType} readOnly className="bg-white/50 text-black" />
                 </div>
                 <div>
-                  <Label>Navigateur</Label>
-                  <Input value={deviceInfo.browser} readOnly className="bg-muted" />
+                  <Label className="text-black">Navigateur</Label>
+                  <Input value={deviceInfo.browser} readOnly className="bg-white/50 text-black" />
                 </div>
                 <div>
-                  <Label>Système d'exploitation</Label>
-                  <Input value={deviceInfo.os} readOnly className="bg-muted" />
+                  <Label className="text-black">Système d'exploitation</Label>
+                  <Input value={deviceInfo.os} readOnly className="bg-white/50 text-black" />
                 </div>
                 <div>
-                  <Label>Résolution</Label>
-                  <Input value={deviceInfo.screenResolution} readOnly className="bg-muted" />
+                  <Label className="text-black">Résolution</Label>
+                  <Input value={deviceInfo.screenResolution} readOnly className="bg-white/50 text-black" />
                 </div>
               </div>
             </div>
           )}
 
-          {/* Save Section */}
+          {/* Formulaire de suivi */}
           <div className="space-y-4 border-t pt-4">
-            <h3 className="font-semibold text-lg">⭐ Marquer comme intéressante</h3>
+            <h3 className="font-semibold text-lg text-black">⭐ Marquer comme intéressante</h3>
             
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>Statut</Label>
+                <Label className="text-black">Statut</Label>
                 <Select value={status} onValueChange={setStatus}>
-                  <SelectTrigger>
+                  <SelectTrigger className="bg-white">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -318,45 +365,38 @@ export default function ProspectPopup({
                 </Select>
               </div>
               <div>
-                <Label>Date de rappel</Label>
+                <Label className="text-black">Date de rappel</Label>
                 <Input 
                   type="datetime-local" 
                   value={rappelDate}
                   onChange={(e) => setRappelDate(e.target.value)}
+                  className="bg-white"
                 />
               </div>
               <div className="col-span-2">
-                <Label>Notes</Label>
+                <Label className="text-black">Notes</Label>
                 <Textarea 
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Ajouter des notes sur ce prospect..."
                   rows={3}
+                  className="bg-white text-black"
                 />
               </div>
             </div>
 
-            <div className="flex gap-2">
-              <Button 
-                onClick={handleSave}
-                disabled={isSaving}
-                className="flex-1"
-              >
-                <Star className="h-4 w-4 mr-2" />
-                {isSaving ? 'Sauvegarde...' : 'Sauvegarder'}
-              </Button>
-              <Button 
-                variant="destructive"
-                onClick={onClose}
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Fermer
-              </Button>
-            </div>
+            <Button 
+              onClick={handleSave}
+              disabled={isSaving}
+              className="w-full bg-purple-600 hover:bg-purple-700"
+            >
+              <Star className="h-4 w-4 mr-2" />
+              {isSaving ? 'Sauvegarde...' : 'Sauvegarder'}
+            </Button>
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+      )}
+    </div>
   );
 }
 

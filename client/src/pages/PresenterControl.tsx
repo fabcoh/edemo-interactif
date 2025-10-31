@@ -408,6 +408,16 @@ export default function PresenterControl() {
             >
               <Monitor className="w-3.5 h-3.5" />
             </Button>
+            {/* Bouton Fiches de prospection */}
+            <Button
+              onClick={() => setShowProspectPopup(!showProspectPopup)}
+              className="h-7 px-2 gap-1 bg-purple-600 hover:bg-purple-700"
+              size="sm"
+              title="Afficher les fiches de prospection"
+              disabled={prospectContacts.length === 0}
+            >
+              📋
+            </Button>
             {/* Compteur de spectateurs */}
             <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-900 rounded-lg">
               <Users className="w-3 h-3" />
@@ -1301,24 +1311,58 @@ export default function PresenterControl() {
         </div>
       )}
 
-      {/* Prospect Popup */}
-      <ProspectPopup
-        open={showProspectPopup}
-        onClose={() => setShowProspectPopup(false)}
-        contacts={prospectContacts}
-        currentIndex={currentProspectIndex}
-        onNavigate={(index) => setCurrentProspectIndex(index)}
-        onEnrich={async (contact) => {
-          // TODO: Implémenter l'enrichissement via API
-          console.log('Enrichissement de:', contact);
-          return null;
-        }}
-        onSave={async (contact, enrichedData, notes, rappelDate, status) => {
-          // TODO: Implémenter la sauvegarde en DB
-          console.log('Sauvegarde:', { contact, enrichedData, notes, rappelDate, status });
-        }}
-        deviceInfo={getDeviceInfo()}
-      />
+      {/* Fenêtre flottante Fiches de prospection */}
+      {showProspectPopup && prospectContacts.length > 0 && (
+        <div
+          className="fixed z-50 bg-white rounded-lg shadow-2xl border-4 border-purple-600 overflow-hidden"
+          style={{
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '800px',
+            height: '600px',
+            minWidth: '300px',
+            minHeight: '400px',
+            maxWidth: '90vw',
+            maxHeight: '90vh',
+          }}
+        >
+          {/* Header */}
+          <div className="bg-purple-600 px-3 py-2 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-white text-sm font-semibold">📋 Fiches de prospection</span>
+            </div>
+            <Button
+              onClick={() => setShowProspectPopup(false)}
+              variant="ghost"
+              size="sm"
+              className="h-6 w-6 p-0 text-white hover:bg-purple-700"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+          {/* Content */}
+          <div className="w-full h-[calc(100%-40px)] overflow-y-auto p-4">
+            <ProspectPopup
+              open={true}
+              onClose={() => setShowProspectPopup(false)}
+              contacts={prospectContacts}
+              currentIndex={currentProspectIndex}
+              onNavigate={(index) => setCurrentProspectIndex(index)}
+              onEnrich={async (contact) => {
+                // TODO: Implémenter l'enrichissement via API
+                console.log('Enrichissement de:', contact);
+                return null;
+              }}
+              onSave={async (contact, enrichedData, notes, rappelDate, status) => {
+                // TODO: Implémenter la sauvegarde en DB
+                console.log('Sauvegarde:', { contact, enrichedData, notes, rappelDate, status });
+              }}
+              deviceInfo={getDeviceInfo()}
+            />
+          </div>
+        </div>
+      )}
 
     </div>
   );

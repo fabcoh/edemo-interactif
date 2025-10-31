@@ -522,3 +522,27 @@ Le projet Edemo Live est maintenant complet avec :
 - [ ] Comparer avec les anciennes infos
 - [ ] Afficher les changements (nouveau poste, nouvelle entreprise, etc.)
 
+
+
+
+## 📋 Icône Fiches et fenêtre flottante
+
+- [ ] Ajouter l'icône "📋 Fiches" à côté de l'icône "Vue Lecteur"
+- [ ] Transformer le popup Dialog en fenêtre flottante (style Vue Lecteur)
+- [ ] Conserver les fiches en mémoire jusqu'au prochain import
+- [ ] Ouvrir la fenêtre flottante au clic sur l'icône
+
+
+
+
+## 🔄 Refonte popup prospection
+
+- [x] Créer 2 pages : Résumé (page 1) + Détails (page 2)
+- [x] Page 1 : Nom, Prénom, Âge, Téléphone, Email, Adresse + Icône recherche
+- [x] Page 2 : Infos enrichies + Détection + Formulaire de suivi
+- [x] Recherche automatique dès l'ouverture de la fiche
+- [x] Animation spirale sur l'icône 🔍 pendant la recherche
+- [x] Clignotement de l'icône si infos trouvées
+- [x] Supprimer le bouton "Enrichir"
+- [x] Fenêtre flottante avec fond violet (contour violet)
+
