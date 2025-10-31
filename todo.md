@@ -580,3 +580,19 @@ Le projet Edemo Live est maintenant complet avec :
 - [ ] Réduire l'espacement vertical pour libérer de l'espace
 - [ ] Formulaire de suivi compact en dessous
 
+
+## 🔧 Cohérence des données enrichies
+
+- [ ] Adapter les formations selon l'âge (< 30: BTS/Licence, 30-45: Master, > 45: MBA)
+- [ ] Aligner poste + formation + âge pour cohérence
+- [ ] Tester avec plusieurs profils différents
+- [ ] Vérifier qu'un jeune n'a pas de MBA et qu'un senior n'a pas de BTS
+
+
+## 📅 Ajouter date de naissance
+
+- [ ] Calculer la date de naissance à partir de l'âge (année actuelle - âge)
+- [ ] Ajouter le champ birthDate dans les données enrichies retournées par onEnrich
+- [ ] Afficher la date de naissance dans ProspectPopup (Page 2) après le nom complet
+- [ ] Format : "Né(e) le : JJ/MM/AAAA (XX ans)"
+

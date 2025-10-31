@@ -14,6 +14,7 @@ import type { ProspectContact } from '@/lib/excelParser';
 
 interface EnrichedData {
   fullName?: string;
+  birthDate?: string;
   jobTitle?: string;
   company?: string;
   age?: number;
@@ -269,6 +270,16 @@ export default function ProspectPopup({
                   <div className="col-span-2">
                     <Label className="text-black">Nom complet</Label>
                     <Input value={enrichedData.fullName} readOnly className="bg-white/50 text-black" />
+                  </div>
+                )}
+                {enrichedData.birthDate && (
+                  <div className="col-span-2">
+                    <Label className="text-black">Date de naissance</Label>
+                    <Input 
+                      value={`${enrichedData.birthDate} (${enrichedData.age || contact.age} ans)`} 
+                      readOnly 
+                      className="bg-white/50 text-black" 
+                    />
                   </div>
                 )}
                 {enrichedData.jobTitle && (

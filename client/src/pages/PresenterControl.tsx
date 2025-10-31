@@ -1364,14 +1364,18 @@ export default function PresenterControl() {
                   ? ['Directeur Commercial', 'Responsable Développement', 'Chef des Ventes', 'Manager Commercial']
                   : ['Directeur Général', 'Directeur Régional', 'Président', 'Vice-Président'];
                 
+                // Formations adaptées à l'âge
+                const formations = age < 30
+                  ? ['BTS Commerce', 'DUT Gestion', 'Licence Économie - Sorbonne', 'Licence Commerce']
+                  : age < 45
+                  ? ['Master Commerce - ESSEC', 'Master Marketing - Sciences Po', 'École de Commerce - EDHEC', 'Master Gestion']
+                  : ['MBA - HEC Paris', 'Executive MBA - INSEAD', 'Doctorat Économie', 'Grande École Commerce'];
+                
                 // Entreprises variées
                 const entreprises = ['Acme Corporation', 'TechCorp', 'InnovateLab', 'FutureTech', 'GlobalSolutions', 'SmartBusiness', 'NextGen SA', 'Visionary Group'];
                 
                 // Secteurs variés
                 const secteurs = ['Tech / SaaS', 'Finance', 'Santé', 'E-commerce', 'Industrie', 'Services', 'Consulting', 'Marketing'];
-                
-                // Formations variées
-                const formations = ['MBA - HEC Paris', 'Master Commerce - ESSEC', 'Licence Économie - Sorbonne', 'École de Commerce - EDHEC', 'Master Marketing - Sciences Po', 'BTS Commerce', 'DUT Gestion'];
                 
                 // Tailles d'entreprise variées
                 const tailles = ['1-10 employés', '10-50 employés', '50-200 employés', '200-500 employés', '500+ employés'];
@@ -1387,8 +1391,17 @@ export default function PresenterControl() {
                 const couleurs = ['3b82f6', 'ef4444', '10b981', 'f59e0b', '8b5cf6', 'ec4899', '06b6d4', '84cc16'];
                 const couleurIndex = nameHash % couleurs.length;
                 
+                // Calculer la date de naissance à partir de l'âge
+                const currentYear = new Date().getFullYear();
+                const birthYear = currentYear - age;
+                // Générer un mois et jour aléatoires mais cohérents (basés sur le hash)
+                const birthMonth = (nameHash % 12) + 1; // 1-12
+                const birthDay = (nameHash % 28) + 1; // 1-28 (pour éviter les problèmes de mois)
+                const birthDate = `${birthDay.toString().padStart(2, '0')}/${birthMonth.toString().padStart(2, '0')}/${birthYear}`;
+                
                 return {
                   fullName: `${contact.prenom} ${contact.nom}`,
+                  birthDate: birthDate,
                   jobTitle: postes[posteIndex],
                   company: entreprises[entrepriseIndex],
                   age: age,
