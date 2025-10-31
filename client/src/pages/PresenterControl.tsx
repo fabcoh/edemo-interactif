@@ -9,7 +9,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import ChatPanel from "@/components/ChatPanel";
-import { DebugPanel } from "@/components/DebugPanel";
 import { Document, Page, pdfjs } from 'react-pdf';
 import {
   AlertDialog,
@@ -325,38 +324,39 @@ export default function PresenterControl() {
     <div className="min-h-screen bg-gray-900 text-white flex flex-col">
       {/* Header */}
       <header className="bg-black shadow-lg">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+        <div className="container mx-auto px-4 py-1.5 flex items-center justify-between">
+          <div className="flex items-center gap-3">
             <Link href="/presenter">
-              <Button variant="ghost" size="sm" className="gap-2 text-white hover:bg-gray-800">
-                <ArrowLeft className="w-4 h-4" />
+              <Button variant="ghost" size="sm" className="gap-1.5 text-white hover:bg-gray-800 h-7 px-2">
+                <ArrowLeft className="w-3.5 h-3.5" />
                 Retour
               </Button>
             </Link>
             <div>
-              <h1 className="text-sm font-bold">{currentSession.title}</h1>
-              <p className="text-[10px] text-gray-400">Code: {currentSession.sessionCode}</p>
+              <h1 className="text-xs font-bold">{currentSession.title}</h1>
+              <p className="text-[9px] text-gray-400">Code: {currentSession.sessionCode}</p>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 px-2 py-1 bg-blue-900 rounded-lg">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-900 rounded-lg">
               <Users className="w-3 h-3" />
-              <span className="text-[10px] text-gray-300">Spectateurs: <span className="font-bold">{viewerCount}</span></span>
+              <span className="text-xs font-bold">{viewerCount}</span>
             </div>
             <Button
               onClick={handleEndSession}
               variant="destructive"
-              className="h-6 px-2 text-[10px]"
+              className="h-7 w-7 p-0"
+              title="Terminer la présentation"
             >
-              Terminer
+              <X className="w-4 h-4" />
             </Button>
           </div>
         </div>
       </header>
 
-      <main className="flex-1 container mx-auto px-4 py-6 flex flex-col gap-4 overflow-hidden">
+      <main className="flex-1 container mx-auto px-4 py-2 flex flex-col gap-2 overflow-hidden">
         {/* Zoom Controls + Upload - Sur la même ligne */}
-        <div className="flex items-center gap-3 bg-gray-800 p-1.5 rounded-lg border border-gray-700">
+        <div className="flex items-center gap-2 bg-gray-800 p-1 rounded-lg border border-gray-700">
           <span className="text-xs text-gray-400 whitespace-nowrap">Zoom:</span>
           <Button
             onClick={() => {
@@ -1071,23 +1071,7 @@ export default function PresenterControl() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Debug Panel */}
-      <DebugPanel
-        title="Présentateur Debug"
-        data={{
-          zoom: `${zoom}%`,
-          pan: `x:${Math.round(panOffset.x)} y:${Math.round(panOffset.y)}`,
-          cursor: showMouseCursor ? `x:${Math.round(mousePos.x)} y:${Math.round(mousePos.y)}` : 'hidden',
-          rectangle: rectangle.visible ? `${Math.round(rectangle.width)}x${Math.round(rectangle.height)}` : 'none',
-          isPanning,
-          isDrawing: isDrawingRectangle,
-        }}
-        actions={[
-          { label: 'Reset Zoom', onClick: () => setZoom(100) },
-          { label: 'Reset Pan', onClick: () => setPanOffset({ x: 0, y: 0 }) },
-          { label: 'Hide Rectangle', onClick: () => setRectangle({ ...rectangle, visible: false }) },
-        ]}
-      />
+
     </div>
   );
 }
