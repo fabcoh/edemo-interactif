@@ -26,10 +26,12 @@
 - **Note** : Railway surveille le dépôt GitHub et redéploie automatiquement
 
 ### **Base de données**
-- **Type** : MySQL/TiDB
-- **Hébergement** : Fourni par Manus
+- **Type** : MySQL/TiDB Cloud
+- **Hébergement** : TiDB Cloud (fourni par Manus)
 - **Connexion** : Via `DATABASE_URL` (env variable)
 - **Statut** : ✅ Opérationnelle
+- **Partage dev/prod** : ✅ OUI (même base de données pour les deux environnements)
+- **Host** : `gateway02.us-east-1.prod.aws.tidbcloud.com:4000`
 - **Tables principales** :
   - `users` - Utilisateurs et commerciaux
   - `presentation_sessions` - Sessions de présentation
@@ -62,7 +64,7 @@
    - URL : **https://edemo-interactif-production.up.railway.app**
    - Déploiement : Automatique depuis GitHub
    - Status : 🟢 ACTIVE
-   - Base de données : Partagée avec dev (à confirmer)
+   - Base de données : ✅ Partagée avec dev (même DATABASE_URL)
 
 ### **Workflow de déploiement**
 
