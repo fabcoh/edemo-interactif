@@ -374,3 +374,13 @@ Le projet Edemo Live est maintenant complet avec :
 
 - [ ] Corriger l'erreur React #310 sur la page présentateur après authentification PIN
 
+
+
+
+## 🔧 Réimplémentation aperçu flottant
+
+- [x] Ajouter l'import Monitor dans PresenterControl.tsx
+- [x] Ajouter l'état showViewerPreview
+- [x] Ajouter le bouton avec icône Monitor dans le header
+- [x] Créer la fenêtre flottante avec iframe scrollable
+

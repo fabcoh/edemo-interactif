@@ -4,7 +4,7 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useParams, Link } from "wouter";
-import { ArrowLeft, Users, Copy, Share2, Upload, X, ZoomIn, ZoomOut, Check, Send, Download, MessageCircle } from "lucide-react";
+import { ArrowLeft, Users, Copy, Share2, Upload, X, ZoomIn, ZoomOut, Check, Send, Download, MessageCircle, Monitor } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -53,6 +53,8 @@ export default function PresenterControl() {
   const [rectangle, setRectangle] = useState({ x: 0, y: 0, width: 0, height: 0, visible: false });
   const [isDrawingRectangle, setIsDrawingRectangle] = useState(false);
   const [rectangleStart, setRectangleStart] = useState({ x: 0, y: 0 });
+  // Viewer preview floating window
+  const [showViewerPreview, setShowViewerPreview] = useState(false);
 
   const sessionIdNum = sessionId ? parseInt(sessionId) : 0;
 
@@ -364,6 +366,15 @@ export default function PresenterControl() {
                 <Share2 className="w-3.5 h-3.5" />
               </Button>
             </a>
+            {/* Bouton écran flottant viewer */}
+            <Button
+              onClick={() => setShowViewerPreview(!showViewerPreview)}
+              className="h-7 px-2 gap-1 bg-purple-600 hover:bg-purple-700"
+              size="sm"
+              title="Afficher la vue lecteur"
+            >
+              <Monitor className="w-3.5 h-3.5" />
+            </Button>
             {/* Compteur de spectateurs */}
             <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-900 rounded-lg">
               <Users className="w-3 h-3" />
@@ -1351,6 +1362,46 @@ export default function PresenterControl() {
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* Floating Viewer Preview Window */}
+      {showViewerPreview && currentSession && (
+        <div
+          className="fixed bg-gray-900 border-2 border-purple-500 rounded-lg shadow-2xl overflow-hidden z-50"
+          style={{
+            top: '100px',
+            right: '20px',
+            width: '400px',
+            height: '600px',
+            resize: 'both',
+            minWidth: '300px',
+            minHeight: '400px',
+            maxWidth: '90vw',
+            maxHeight: '90vh',
+          }}
+        >
+          {/* Header */}
+          <div className="bg-purple-600 px-3 py-2 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Monitor className="w-4 h-4 text-white" />
+              <span className="text-white text-sm font-semibold">Vue Lecteur</span>
+            </div>
+            <Button
+              onClick={() => setShowViewerPreview(false)}
+              variant="ghost"
+              size="sm"
+              className="h-6 w-6 p-0 text-white hover:bg-purple-700"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+          {/* Iframe */}
+          <iframe
+            src={`/view/${currentSession.sessionCode}`}
+            className="w-full h-[calc(100%-40px)] border-0"
+            title="Vue Lecteur"
+            style={{ overflow: 'auto' }}
+          />
+        </div>
+      )}
 
     </div>
   );
