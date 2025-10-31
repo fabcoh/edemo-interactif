@@ -1281,9 +1281,9 @@ export default function PresenterControl() {
             height: '600px',
             resize: 'both',
             minWidth: '300px',
-            minHeight: '400px',
+            minHeight: '600px',
             maxWidth: '90vw',
-            maxHeight: '90vh',
+            maxHeight: '95vh',
           }}
         >
           {/* Header */}
@@ -1322,9 +1322,9 @@ export default function PresenterControl() {
             width: '800px',
             height: '600px',
             minWidth: '300px',
-            minHeight: '400px',
+            minHeight: '600px',
             maxWidth: '90vw',
-            maxHeight: '90vh',
+            maxHeight: '95vh',
           }}
         >
           {/* Header */}

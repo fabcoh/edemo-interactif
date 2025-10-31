@@ -65,6 +65,19 @@ export default function ProspectPopup({
   const [isSaving, setIsSaving] = useState(false);
   const [editablePhone, setEditablePhone] = useState(currentContact.telephone);
   const [photoModalOpen, setPhotoModalOpen] = useState(false);
+  const [favorites, setFavorites] = useState<ProspectContact[]>([]);
+
+  // Charger les favoris depuis localStorage
+  useEffect(() => {
+    const savedFavorites = localStorage.getItem('prospectFavorites');
+    if (savedFavorites) {
+      try {
+        setFavorites(JSON.parse(savedFavorites));
+      } catch (error) {
+        console.error('Failed to load favorites:', error);
+      }
+    }
+  }, []);
 
   // Recherche automatique dès l'ouverture de la fiche
   useEffect(() => {

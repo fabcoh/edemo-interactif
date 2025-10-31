@@ -10,7 +10,6 @@ import PresenterSession from "./pages/PresenterSession";
 import PresenterControl from "./pages/PresenterControl";
 import Viewer from "./pages/Viewer";
 import AdminInvitations from "./pages/AdminInvitations";
-// import AdminSettings from "./pages/AdminSettings";
 import InvitationAccept from "./pages/InvitationAccept";
 import CommercialAccess from "./pages/CommercialAccess";
 

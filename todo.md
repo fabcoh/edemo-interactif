@@ -715,3 +715,27 @@ Le projet Edemo Live est maintenant complet avec :
 - [ ] Vérifier que toutes les infos enrichies sont présentes
 - [ ] Vérifier l'aperçu LinkedIn (page 1)
 
+
+## ⭐ Phase 1 : Système de favoris de base
+
+- [ ] Ajouter states pour favoris (localStorage)
+- [ ] Créer fonction toggleFavorite()
+- [ ] Ajouter bouton ⭐ dans le header
+- [ ] Tester ajout/retrait favoris
+
+
+## 🖥️ Agrandissement popup Vue Lecteur
+
+- [ ] Agrandir largeur popup Vue Lecteur
+- [ ] Agrandir hauteur popup Vue Lecteur
+- [ ] Retirer zone de saisie message
+- [ ] Retirer bouton d'envoi
+- [ ] Garder uniquement icône 📎 aperçu messages
+
+
+## 📐 Agrandissement zone document Vue Lecteur
+
+- [ ] Déplacer barre d'outils chat en bas
+- [ ] Agrandir zone d'affichage document
+- [ ] Tester
+
