@@ -936,6 +936,66 @@ export default function PresenterControl() {
                     )}
                     {displayedDocument.type === "pdf" && (
                       <div className="w-full h-full flex flex-col items-center justify-center">
+                        {numPages && numPages > 1 && (
+                          <div className="w-full flex justify-center mb-1">
+                            <div className="px-3 py-0.5 rounded-full flex items-center gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-5 w-5 p-0 text-[10px]"
+                                onClick={() => setPageNumber(prev => Math.max(1, prev - 1))}
+                                disabled={pageNumber <= 1}
+                              >
+                                ←
+                              </Button>
+                              <span className="text-white text-[9px] font-medium min-w-[40px] text-center">
+                                {pageNumber}/{numPages}
+                              </span>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-5 w-5 p-0 text-[10px]"
+                                onClick={() => setPageNumber(prev => Math.min(numPages, prev + 1))}
+                                disabled={pageNumber >= numPages}
+                              >
+                                →
+                              </Button>
+                              <div className="w-px h-3 bg-gray-500"></div>
+                            <input
+                              type="number"
+                              min="1"
+                              max={numPages}
+                              value={pageNumber}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                // Permettre la saisie vide ou de chiffres pendant la frappe
+                                if (value === '' || /^\d+$/.test(value)) {
+                                  const numValue = parseInt(value);
+                                  if (!isNaN(numValue)) {
+                                    setPageNumber(numValue);
+                                  }
+                                }
+                              }}
+                              onBlur={(e) => {
+                                // Valider et corriger quand l'utilisateur quitte le champ
+                                const value = parseInt(e.target.value);
+                                if (isNaN(value) || value < 1) {
+                                  setPageNumber(1);
+                                } else if (value > numPages) {
+                                  setPageNumber(numPages);
+                                }
+                              }}
+                              onMouseEnter={(e) => e.currentTarget.select()}
+                              onFocus={(e) => e.currentTarget.select()}
+                              className="w-10 h-5 px-1 text-[9px] text-center bg-gray-900 text-white border border-gray-700 rounded focus:outline-none focus:border-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                              autoComplete="off"
+                              autoCorrect="off"
+                              autoCapitalize="off"
+                              spellCheck="false"
+                            />
+                            </div>
+                          </div>
+                        )}
                         <Document
                           key={displayedDocument.fileUrl}
                           file={displayedDocument.fileUrl}
@@ -966,64 +1026,6 @@ export default function PresenterControl() {
                             renderAnnotationLayer={true}
                           />
                         </Document>
-                        {numPages && numPages > 1 && (
-                          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-black/70 px-2 py-1 rounded-lg flex items-center gap-1 z-10">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="h-7 w-7 p-0"
-                              onClick={() => setPageNumber(prev => Math.max(1, prev - 1))}
-                              disabled={pageNumber <= 1}
-                            >
-                              ←
-                            </Button>
-                            <span className="text-white text-[10px]">
-                              {pageNumber}/{numPages}
-                            </span>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="h-7 w-7 p-0"
-                              onClick={() => setPageNumber(prev => Math.min(numPages, prev + 1))}
-                              disabled={pageNumber >= numPages}
-                            >
-                              →
-                            </Button>
-                            <div className="w-px h-4 bg-gray-500 mx-0.5"></div>
-                            <input
-                              type="number"
-                              min="1"
-                              max={numPages}
-                              value={pageNumber}
-                              onChange={(e) => {
-                                const value = e.target.value;
-                                // Permettre la saisie vide ou de chiffres pendant la frappe
-                                if (value === '' || /^\d+$/.test(value)) {
-                                  const numValue = parseInt(value);
-                                  if (!isNaN(numValue)) {
-                                    setPageNumber(numValue);
-                                  }
-                                }
-                              }}
-                              onBlur={(e) => {
-                                // Valider et corriger quand l'utilisateur quitte le champ
-                                const value = parseInt(e.target.value);
-                                if (isNaN(value) || value < 1) {
-                                  setPageNumber(1);
-                                } else if (value > numPages) {
-                                  setPageNumber(numPages);
-                                }
-                              }}
-                              onMouseEnter={(e) => e.currentTarget.select()}
-                              onFocus={(e) => e.currentTarget.select()}
-                              className="w-11 h-6 px-1 text-[10px] text-center bg-gray-800 text-white border border-gray-600 rounded focus:outline-none focus:border-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                              autoComplete="off"
-                              autoCorrect="off"
-                              autoCapitalize="off"
-                              spellCheck="false"
-                            />
-                          </div>
-                        )}
                       </div>
                     )}
                     {displayedDocument.type === "video" && (

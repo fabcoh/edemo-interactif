@@ -116,3 +116,14 @@
 
 **Impact** : Très faible - Amélioration UX mineure
 
+
+
+### **Barre de navigation PDF - Affinage final**
+- [x] Affiner encore plus la barre (padding, hauteur)
+- [x] Allonger la barre (plus large)
+- [x] Déplacer la barre au-dessus du fichier (pas à l'intérieur)
+
+**Raison** : Améliorer la visibilité et l'ergonomie de la navigation PDF
+
+**Impact** : Faible - Amélioration visuelle
+
