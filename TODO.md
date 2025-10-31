@@ -106,3 +106,13 @@
 
 **Impact** : Faible - Amélioration UX
 
+
+
+### **Amélioration champ de saisie de page**
+- [x] Retirer les flèches du champ numérique (input type="number")
+- [x] Effacer automatiquement le contenu au survol de la souris (onMouseEnter)
+
+**Raison** : Améliorer l'expérience utilisateur pour la saisie rapide de numéro de page
+
+**Impact** : Très faible - Amélioration UX mineure
+
