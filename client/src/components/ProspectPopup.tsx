@@ -58,8 +58,9 @@ export default function ProspectPopup({
   const [hasEnrichedData, setHasEnrichedData] = useState(false);
   const [notes, setNotes] = useState('');
   const [rappelDate, setRappelDate] = useState('');
-  const [status, setStatus] = useState<string>('nouveau');
+  const [status, setStatus] = useState<'nouveau' | 'en_cours' | 'qualifie' | 'non_interesse'>('nouveau');
   const [isSaving, setIsSaving] = useState(false);
+  const [editablePhone, setEditablePhone] = useState(currentContact.telephone);
   const [currentPage, setCurrentPage] = useState<'summary' | 'details'>('summary');
 
   const currentContact = contacts[currentIndex];
@@ -110,6 +111,43 @@ export default function ProspectPopup({
     setNotes('');
     setRappelDate('');
     setStatus('nouveau');
+    setEditablePhone(currentContact.telephone);
+  };
+
+  // Formater le numéro de téléphone par groupes de 2
+  const formatPhoneNumber = (phone: string) => {
+    const cleaned = phone.replace(/\D/g, '');
+    const groups = cleaned.match(/.{1,2}/g) || [];
+    return groups.join(' ');
+  };
+
+  // Générer le message WhatsApp
+  const generateWhatsAppMessage = () => {
+    const nom = currentContact.nom;
+    const prenom = currentContact.prenom;
+    const age = parseInt(currentContact.age);
+    const birthDate = enrichedData?.birthDate || 'votre date de naissance';
+    
+    // Déterminer Bonjour/Bonsoir selon l'heure (fuseau Paris)
+    const now = new Date();
+    const parisTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Paris' }));
+    const hour = parisTime.getHours();
+    const greeting = hour >= 18 ? 'Bonsoir' : 'Bonjour';
+    
+    // Pour les moins de 30 ans : juste le prénom
+    if (age < 30) {
+      return `${greeting} ${prenom}\nSuite à votre demande de devis pour la mutuelle santé, je voulais confirmer votre date de naissance, c'est bien le ${birthDate} ?`;
+    }
+    
+    // Pour les 30 ans et plus : Prénom + Nom (sans titre pour éviter erreur de genre)
+    return `${greeting} ${prenom} ${nom}\nSuite à votre demande de devis pour la mutuelle santé, je voulais confirmer votre date de naissance, c'est bien le ${birthDate} ?`;
+  };
+
+  // Créer le lien WhatsApp
+  const getWhatsAppLink = () => {
+    const phone = editablePhone.replace(/\D/g, '');
+    const message = encodeURIComponent(generateWhatsAppMessage());
+    return `https://wa.me/${phone}?text=${message}`;
   };
 
   const handleSave = async () => {
@@ -206,9 +244,22 @@ export default function ProspectPopup({
               <Label className="text-black">Âge</Label>
               <Input value={currentContact.age} readOnly className="bg-white/50 text-black" />
             </div>
-            <div>
+            <div className="col-span-2">
               <Label className="text-black">Téléphone</Label>
-              <Input value={currentContact.telephone} readOnly className="bg-white/50 text-black" />
+              <div className="flex items-center gap-2">
+                <Input 
+                  value={formatPhoneNumber(editablePhone)} 
+                  onChange={(e) => setEditablePhone(e.target.value.replace(/\s/g, ''))}
+                  className="flex-1 bg-white text-black font-bold"
+                  placeholder="06 12 34 56 78"
+                />
+                <a href={`tel:${editablePhone}`} className="flex items-center justify-center h-10 w-10 bg-green-500 hover:bg-green-600 rounded-md" title="Appeler">
+                  <span className="text-2xl">☎️</span>
+                </a>
+                <a href={getWhatsAppLink()} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center h-10 w-10 bg-green-500 hover:bg-green-600 rounded-md" title="WhatsApp">
+                  <span className="text-2xl">💬</span>
+                </a>
+              </div>
             </div>
             <div className="col-span-2">
               <Label className="text-black">Email</Label>
@@ -259,6 +310,25 @@ export default function ProspectPopup({
             <ChevronLeft className="mr-2 h-4 w-4" />
             Retour au résumé
           </Button>
+
+          {/* Téléphone et WhatsApp */}
+          <div className="bg-white/80 p-4 rounded-lg border-2 border-gray-300">
+            <Label className="text-black mb-2 block">Téléphone</Label>
+            <div className="flex items-center gap-2">
+              <Input 
+                value={formatPhoneNumber(editablePhone)} 
+                onChange={(e) => setEditablePhone(e.target.value.replace(/\s/g, ''))}
+                className="flex-1 bg-white text-black font-bold text-lg"
+                placeholder="06 12 34 56 78"
+              />
+              <a href={`tel:${editablePhone}`} className="flex items-center justify-center h-12 w-12 bg-green-500 hover:bg-green-600 rounded-md" title="Appeler">
+                <span className="text-3xl">☎️</span>
+              </a>
+              <a href={getWhatsAppLink()} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center h-12 w-12 bg-green-500 hover:bg-green-600 rounded-md" title="WhatsApp">
+                <span className="text-3xl">💬</span>
+              </a>
+            </div>
+          </div>
 
           {/* Photo du prospect */}
           {enrichedData?.photoUrl && (

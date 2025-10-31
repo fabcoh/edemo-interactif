@@ -636,3 +636,45 @@ Le projet Edemo Live est maintenant complet avec :
 - [ ] Augmenter taille des icônes (h-4 w-4 → h-5 w-5)
 - [ ] Tester sur fond bleu de la popup
 
+
+## 📞 Icônes téléphone et WhatsApp
+
+- [ ] Formater le numéro de téléphone par groupes de 2 chiffres en gras (06 12 34 56 78)
+- [ ] Ajouter icône ☎️ à côté du téléphone
+- [ ] Ajouter bouton WhatsApp avec icône 💬
+- [ ] Générer message WhatsApp : "Bonjour Mr [Nom Prénom] Suite à votre demande de devis pour la mutuelle santé, je voulais confirmer votre date de naissance, c'est bien le [date] ?"
+- [ ] Créer lien WhatsApp : whatsapp://send?phone=[numéro]&text=[message]
+- [ ] Afficher en haut des pages 1 et 2
+
+
+## 🔤 Détection Mr/Mme pour message WhatsApp
+
+- [ ] Ajouter colonne "Genre" dans l'Excel (Homme/Femme ou H/F)
+- [ ] Extraire le genre dans le parser Excel
+- [ ] Adapter le message WhatsApp : Mr pour Homme, Mme pour Femme
+- [ ] Logique : < 30 ans = prénom seul, ≥ 30 ans = Mr/Mme + Nom Prénom
+
+
+## ⏰ Adapter message selon l'heure
+
+- [x] Détecter l'heure actuelle (fuseau Paris)
+- [x] Avant 18h : "Bonjour..."
+- [x] Après 18h : "Bonsoir..."
+- [ ] Attendre instructions utilisateur pour détection Mr/Mme
+
+
+## ✅ Logique message WhatsApp simplifiée
+
+- [ ] < 30 ans : "[Bonjour/Bonsoir] [Prénom]"
+- [ ] ≥ 30 ans : "[Bonjour/Bonsoir] [Prénom] [Nom]" (sans Mr/Mme)
+- [ ] Évite les erreurs de genre en n'utilisant pas de titre
+
+
+## 📝 Rendre le téléphone modifiable
+
+- [ ] Ajouter state editablePhone pour stocker le numéro modifié
+- [ ] Remplacer le champ lecture seule par Input éditable
+- [ ] Formater automatiquement pendant la saisie (groupes de 2)
+- [ ] Mettre à jour les liens ☎️ et WhatsApp avec le numéro modifié
+- [ ] Appliquer dans Pages 1 et 2
+
