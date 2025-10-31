@@ -66,7 +66,7 @@
 
 ---
 
-### **Étape 4 : Commit**
+### **Étape 4 : Commit et Push**
 
 1. **Commit local** :
    ```bash
@@ -75,30 +75,30 @@
    git commit -m "Description claire de la modification"
    ```
 
-2. **Note importante** :
-   - ⚠️ Le push vers GitHub nécessite les credentials
-   - ⚠️ Le push doit être fait depuis la machine locale de l'utilisateur
-   - ✅ Le commit local est sauvegardé et peut être récupéré
+2. **Push vers GitHub** :
+   ```bash
+   git push github main
+   ```
+
+3. **Note importante** :
+   - ✅ Manus peut pusher directement sur GitHub (token configuré)
+   - ✅ Le push déclenche automatiquement le déploiement Railway
+   - ✅ Pas besoin de passer par la machine locale
 
 ---
 
-### **Étape 5 : Déploiement**
+### **Étape 5 : Déploiement automatique**
 
-#### **Option A : Via GitHub + Railway (Recommandé)**
+**Railway détecte automatiquement le push** :
+- Railway surveille le dépôt `fabcoh/edemo-interactif`
+- Dès qu'un push est détecté sur `main` :
+  - Rebuild automatique
+  - Redéploiement automatique
+  - Production mise à jour en ~2-5 minutes
 
-1. **Sur la machine locale de l'utilisateur** :
-   ```bash
-   git pull origin main
-   git push origin main
-   ```
+**Aucune action supplémentaire requise !**
 
-2. **Railway détecte automatiquement** :
-   - Railway surveille le dépôt GitHub
-   - Rebuild automatique
-   - Redéploiement automatique
-   - Production mise à jour en ~2-5 minutes
-
-#### **Option B : Via Manus Checkpoint**
+#### **Option alternative : Manus Checkpoint**
 
 1. **Créer un checkpoint** :
    ```bash
@@ -108,6 +108,7 @@
 2. **Publier via l'interface Manus** :
    - Cliquer sur le bouton "Publish" dans l'interface
    - ⚠️ Nécessite des checkpoints disponibles sur le plan
+   - ⚠️ Actuellement : Plus de checkpoints disponibles
 
 ---
 

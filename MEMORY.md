@@ -8,18 +8,20 @@
 ## 📡 CONNEXIONS EXTERNES
 
 ### **GitHub**
-- **Dépôt** : `edemo-interactif` (à confirmer le nom exact)
+- **Dépôt** : `fabcoh/edemo-interactif`
+- **URL** : `https://github.com/fabcoh/edemo-interactif`
 - **Branche principale** : `main`
-- **Propriétaire** : À confirmer
-- **Statut** : ✅ Configuré
-- **Push automatique** : ❌ Non (nécessite credentials depuis Manus)
-- **Note** : Les commits locaux doivent être pushés depuis la machine locale
+- **Propriétaire** : `fabcoh`
+- **Statut** : ✅ Configuré avec token
+- **Push automatique** : ✅ OUI (Manus peut pusher directement)
+- **Note** : Les commits peuvent être pushés automatiquement via `git push github main`
 
 ### **Railway (Production)**
 - **Service** : Hébergement du site en production
-- **Connexion GitHub** : ✅ Configuré (à confirmer)
-- **Déploiement auto** : ✅ Oui (quand push sur GitHub)
-- **URL de production** : À documenter
+- **Connexion GitHub** : ✅ Configuré sur `fabcoh/edemo-interactif`
+- **Déploiement auto** : ✅ Oui (détecte les push sur GitHub)
+- **URL de production** : À documenter (vérifier sur railway.app)
+- **Temps de déploiement** : ~2-5 minutes après push
 - **Note** : Railway surveille le dépôt GitHub et redéploie automatiquement
 
 ### **Base de données**
@@ -134,9 +136,13 @@
 
 ## 🔄 DERNIÈRE SYNCHRONISATION
 
-- **Dernier commit local** : `c6ad23b`
-- **Dernier push GitHub** : À faire depuis machine locale
-- **Dernier déploiement Railway** : En attente du push GitHub
+- **Dernier commit local** : `cd90a57`
+- **Dernier push GitHub** : ✅ `cd90a57` (31 octobre 2025)
+- **Dernier déploiement Railway** : En cours (~2-5 min)
+- **Commits récents** :
+  - `cd90a57` - Ajout système de mémoire persistante (MEMORY, VIGILANCE, WORKFLOW)
+  - `c6ad23b` - Interface présentateur optimisée - Header compact + Debug supprimé
+  - `1647dbc` - Icône messages fond bleu + Plus grande
 
 ---
 
