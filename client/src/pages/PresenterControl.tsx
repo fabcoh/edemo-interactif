@@ -801,25 +801,30 @@ export default function PresenterControl() {
                       →
                     </Button>
                     <div className="w-px h-4 bg-gray-400 ml-1"></div>
-                    <input
-                      type="range"
-                      min="50"
-                      max="200"
-                      step="5"
-                      value={zoom}
-                      onChange={(e) => {
-                        const newZoom = parseInt(e.target.value);
-                        setZoom(newZoom);
-                        updatePresenterState({
-                          zoomLevel: newZoom,
-                          cursorVisible: showMouseCursor && newZoom > 100,
-                        });
-                      }}
-                      className="w-20 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
-                      style={{
-                        background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((zoom - 50) / 150) * 100}%, #6b7280 ${((zoom - 50) / 150) * 100}%, #6b7280 100%)`
-                      }}
-                    />
+                    <div className="relative flex flex-col items-center">
+                      <span className="absolute -top-4 text-white/70 text-[8px] font-semibold">
+                        {zoom}%
+                      </span>
+                      <input
+                        type="range"
+                        min="50"
+                        max="200"
+                        step="5"
+                        value={zoom}
+                        onChange={(e) => {
+                          const newZoom = parseInt(e.target.value);
+                          setZoom(newZoom);
+                          updatePresenterState({
+                            zoomLevel: newZoom,
+                            cursorVisible: showMouseCursor && newZoom > 100,
+                          });
+                        }}
+                        className="w-20 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                        style={{
+                          background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((zoom - 50) / 150) * 100}%, #6b7280 ${((zoom - 50) / 150) * 100}%, #6b7280 100%)`
+                        }}
+                      />
+                    </div>
                     <Button
                       onClick={() => {
                         setZoom(100);
@@ -1156,25 +1161,30 @@ export default function PresenterControl() {
                               </Button>
                               {/* Mini barre de zoom simplifiée */}
                               <div className="w-px h-4 bg-gray-400 ml-1"></div>
-                              <input
-                                type="range"
-                                min="50"
-                                max="200"
-                                step="5"
-                                value={zoom}
-                                onChange={(e) => {
-                                  const newZoom = parseInt(e.target.value);
-                                  setZoom(newZoom);
-                                  updatePresenterState({
-                                    zoomLevel: newZoom,
-                                    cursorVisible: showMouseCursor && newZoom > 100,
-                                  });
-                                }}
-                                className="w-20 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
-                                style={{
-                                  background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((zoom - 50) / 150) * 100}%, #6b7280 ${((zoom - 50) / 150) * 100}%, #6b7280 100%)`
-                                }}
-                              />
+                              <div className="relative flex flex-col items-center">
+                                <span className="absolute -top-4 text-white/70 text-[8px] font-semibold">
+                                  {zoom}%
+                                </span>
+                                <input
+                                  type="range"
+                                  min="50"
+                                  max="200"
+                                  step="5"
+                                  value={zoom}
+                                  onChange={(e) => {
+                                    const newZoom = parseInt(e.target.value);
+                                    setZoom(newZoom);
+                                    updatePresenterState({
+                                      zoomLevel: newZoom,
+                                      cursorVisible: showMouseCursor && newZoom > 100,
+                                    });
+                                  }}
+                                  className="w-20 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                                  style={{
+                                    background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((zoom - 50) / 150) * 100}%, #6b7280 ${((zoom - 50) / 150) * 100}%, #6b7280 100%)`
+                                  }}
+                                />
+                              </div>
                               <Button
                                 onClick={() => {
                                   setZoom(100);
