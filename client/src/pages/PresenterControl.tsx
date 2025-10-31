@@ -996,9 +996,22 @@ export default function PresenterControl() {
                               max={numPages}
                               value={pageNumber}
                               onChange={(e) => {
+                                const value = e.target.value;
+                                // Permettre la saisie vide ou de chiffres pendant la frappe
+                                if (value === '' || /^\d+$/.test(value)) {
+                                  const numValue = parseInt(value);
+                                  if (!isNaN(numValue)) {
+                                    setPageNumber(numValue);
+                                  }
+                                }
+                              }}
+                              onBlur={(e) => {
+                                // Valider et corriger quand l'utilisateur quitte le champ
                                 const value = parseInt(e.target.value);
-                                if (value >= 1 && value <= numPages) {
-                                  setPageNumber(value);
+                                if (isNaN(value) || value < 1) {
+                                  setPageNumber(1);
+                                } else if (value > numPages) {
+                                  setPageNumber(numPages);
                                 }
                               }}
                               onMouseEnter={(e) => e.currentTarget.select()}
