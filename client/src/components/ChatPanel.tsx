@@ -121,7 +121,7 @@ export default function ChatPanel({
   return (
     <div className="flex flex-col h-full bg-gray-800 rounded-lg overflow-hidden" style={{border: '1px solid rgb(55, 65, 81)'}}>
       {/* Input Area - EN HAUT */}
-      <div className="flex items-center gap-2 p-2" style={{borderBottom: '1px solid rgb(55, 65, 81)'}}>
+      <div className="flex items-center gap-2 p-1" style={{borderBottom: '1px solid rgb(55, 65, 81)'}}>
         <input
           ref={fileInputRef}
           type="file"
@@ -176,10 +176,10 @@ export default function ChatPanel({
         )}
       </div>
 
-      {/* Messages Area - EN BAS */}
+      {/* Messages Area - HIDDEN */}
       <div 
         ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto space-y-2 p-3 bg-gray-900"
+        className="hidden flex-1 overflow-y-auto space-y-2 p-3 bg-gray-900"
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => {
           e.preventDefault();

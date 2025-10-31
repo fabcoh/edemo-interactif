@@ -232,7 +232,7 @@ export default function Viewer() {
         {/* Main Content Area - Vertical Layout */}
         <div className="h-full flex flex-col">
           {/* Document Display - Full height with padding for chat */}
-          <div className="bg-black flex flex-col items-center justify-center overflow-hidden relative" style={{ height: "calc(100vh - 120px)" }}>
+          <div className="bg-black flex flex-col items-center justify-center overflow-hidden relative" style={{ height: "calc(100vh - 50px)" }}>
 
           {/* Document Content */}
           <div 

@@ -745,3 +745,10 @@ Le projet Edemo Live est maintenant complet avec :
 - [ ] Remplacer ViewerChatPanel par ChatPanel
 - [ ] Retirer import commenté
 
+
+## 📐 Optimisation Vue Lecteur
+
+- [ ] Retirer zone noire drop fichiers
+- [ ] Réduire hauteur ChatPanel
+- [ ] Agrandir zone document
+
