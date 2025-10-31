@@ -752,3 +752,9 @@ Le projet Edemo Live est maintenant complet avec :
 - [ ] Réduire hauteur ChatPanel
 - [ ] Agrandir zone document
 
+
+## 🗑️ Retirer ChatPanel Vue Lecteur
+
+- [ ] Cacher ChatPanel complètement
+- [ ] Document en 100vh
+

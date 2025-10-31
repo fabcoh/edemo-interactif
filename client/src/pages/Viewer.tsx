@@ -232,7 +232,7 @@ export default function Viewer() {
         {/* Main Content Area - Vertical Layout */}
         <div className="h-full flex flex-col">
           {/* Document Display - Full height with padding for chat */}
-          <div className="bg-black flex flex-col items-center justify-center overflow-hidden relative" style={{ height: "calc(100vh - 50px)" }}>
+          <div className="bg-black flex flex-col items-center justify-center overflow-hidden relative" style={{ height: "100vh" }}>
 
           {/* Document Content */}
           <div 
@@ -364,8 +364,8 @@ export default function Viewer() {
           </div>
           </div>
 
-          {/* ChatPanel - Overlay en bas */}
-          <ChatPanel
+          {/* ChatPanel - HIDDEN */}
+          {false && <ChatPanel
             sessionCode={sessionCode}
             onLoadDocument={async (url: string, name: string, type: string) => {
               // TODO: Fix this - displayDocument is read-only from session
@@ -385,7 +385,7 @@ export default function Viewer() {
                 });
               }
             }}
-          />
+          />}
         </div>
 
 
