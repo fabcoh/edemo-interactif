@@ -411,7 +411,7 @@ export default function PresenterControl() {
             {/* Bouton Fiches de prospection */}
             <Button
               onClick={() => setShowProspectPopup(!showProspectPopup)}
-              className="h-7 px-2 gap-1 bg-purple-600 hover:bg-purple-700"
+              className="h-7 px-2 gap-1 bg-blue-600 hover:bg-blue-700"
               size="sm"
               title="Afficher les fiches de prospection"
               disabled={prospectContacts.length === 0}
@@ -1287,7 +1287,7 @@ export default function PresenterControl() {
           }}
         >
           {/* Header */}
-          <div className="bg-purple-600 px-3 py-2 flex items-center justify-between">
+          <div className="bg-blue-600 px-3 py-2 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Monitor className="w-4 h-4 text-white" />
               <span className="text-white text-sm font-semibold">Vue Lecteur</span>
@@ -1296,7 +1296,7 @@ export default function PresenterControl() {
               onClick={() => setShowViewerPreview(false)}
               variant="ghost"
               size="sm"
-              className="h-6 w-6 p-0 text-white hover:bg-purple-700"
+              className="h-6 w-6 p-0 text-white hover:bg-blue-700"
             >
               <X className="w-4 h-4" />
             </Button>
@@ -1314,7 +1314,7 @@ export default function PresenterControl() {
       {/* Fenêtre flottante Fiches de prospection */}
       {showProspectPopup && prospectContacts.length > 0 && (
         <div
-          className="fixed z-50 bg-white rounded-lg shadow-2xl border-4 border-purple-600 overflow-hidden"
+          className="fixed z-50 bg-blue-50 rounded-lg shadow-2xl border-4 border-blue-600 overflow-hidden"
           style={{
             top: '50%',
             left: '50%',
@@ -1328,7 +1328,7 @@ export default function PresenterControl() {
           }}
         >
           {/* Header */}
-          <div className="bg-purple-600 px-3 py-2 flex items-center justify-between">
+          <div className="bg-blue-600 px-3 py-2 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-white text-sm font-semibold">📋 Fiches de prospection</span>
             </div>
@@ -1336,7 +1336,7 @@ export default function PresenterControl() {
               onClick={() => setShowProspectPopup(false)}
               variant="ghost"
               size="sm"
-              className="h-6 w-6 p-0 text-white hover:bg-purple-700"
+              className="h-6 w-6 p-0 text-white hover:bg-blue-700"
             >
               <X className="w-4 h-4" />
             </Button>

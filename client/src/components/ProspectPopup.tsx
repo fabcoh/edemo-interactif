@@ -159,13 +159,13 @@ export default function ProspectPopup({
         <div className="relative">
           <div
             className={`
-              flex items-center justify-center w-10 h-10 rounded-full
-              ${isEnriching ? 'animate-spin bg-blue-500' : ''}
-              ${hasEnrichedData && !isEnriching ? 'animate-pulse bg-green-500' : ''}
-              ${!isEnriching && !hasEnrichedData ? 'bg-gray-300' : ''}
+              flex items-center justify-center w-12 h-12 rounded-full border-4
+              ${isEnriching ? 'animate-spin bg-blue-500 border-blue-300' : ''}
+              ${hasEnrichedData && !isEnriching ? 'animate-pulse bg-blue-500 border-blue-300' : ''}
+              ${!isEnriching && !hasEnrichedData ? 'bg-blue-200 border-blue-300' : ''}
             `}
           >
-            <Search className="h-5 w-5 text-white" />
+            <Search className="h-6 w-6 text-white" />
           </div>
           {hasEnrichedData && !isEnriching && (
             <span className="absolute -top-2 -right-2 flex h-4 w-4">
@@ -226,7 +226,7 @@ export default function ProspectPopup({
           {hasEnrichedData && (
             <Button
               onClick={() => setCurrentPage('details')}
-              className="w-full bg-purple-600 hover:bg-purple-700"
+              className="w-full bg-blue-600 hover:bg-blue-700"
             >
               Voir les détails
               <ChevronDown className="ml-2 h-4 w-4" />
@@ -254,7 +254,7 @@ export default function ProspectPopup({
               <img 
                 src={enrichedData.photoUrl} 
                 alt={`${currentContact.nom} ${currentContact.prenom}`} 
-                className="w-32 h-32 rounded-full object-cover border-4 border-purple-300 shadow-lg"
+                className="w-32 h-32 rounded-full object-cover border-4 border-blue-300 shadow-lg"
               />
             </div>
           )}
@@ -388,7 +388,7 @@ export default function ProspectPopup({
             <Button 
               onClick={handleSave}
               disabled={isSaving}
-              className="w-full bg-purple-600 hover:bg-purple-700"
+              className="w-full bg-blue-600 hover:bg-blue-700"
             >
               <Star className="h-4 w-4 mr-2" />
               {isSaving ? 'Sauvegarde...' : 'Sauvegarder'}

@@ -546,3 +546,15 @@ Le projet Edemo Live est maintenant complet avec :
 - [x] Supprimer le bouton "Enrichir"
 - [x] Fenêtre flottante avec fond violet (contour violet)
 
+
+
+
+## 🎨 Corrections couleurs popup
+
+- [x] Contour violet → bleu
+- [x] Header violet → bleu
+- [x] Icône 📋 violette → bleue
+- [x] Fond blanc → bleu clair
+- [x] Icône recherche grise → bleue et bien visible (w-12 h-12 avec bordure)
+- [x] Bouton "Voir les détails" visible sur page 1
+
