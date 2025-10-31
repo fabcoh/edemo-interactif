@@ -1350,13 +1350,26 @@ export default function PresenterControl() {
               currentIndex={currentProspectIndex}
               onNavigate={(index) => setCurrentProspectIndex(index)}
               onEnrich={async (contact) => {
-                // TODO: Implémenter l'enrichissement via API
-                console.log('Enrichissement de:', contact);
-                return null;
+                // Simulation de recherche (2 secondes)
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Retourner des données fictives pour la démo
+                return {
+                  fullName: `${contact.prenom} ${contact.nom}`,
+                  jobTitle: 'Directeur Commercial',
+                  company: 'Acme Corporation',
+                  age: parseInt(contact.age),
+                  photoUrl: `https://ui-avatars.com/api/?name=${contact.prenom}+${contact.nom}&size=128&background=3b82f6&color=fff`,
+                  linkedinUrl: `https://linkedin.com/in/${contact.prenom.toLowerCase()}-${contact.nom.toLowerCase()}`,
+                  education: 'MBA - HEC Paris',
+                  companySize: '50-200 employés',
+                  industry: 'Tech / SaaS',
+                };
               }}
               onSave={async (contact, enrichedData, notes, rappelDate, status) => {
-                // TODO: Implémenter la sauvegarde en DB
+                // Simulation de sauvegarde
                 console.log('Sauvegarde:', { contact, enrichedData, notes, rappelDate, status });
+                alert(`Fiche sauvegardée pour ${contact.prenom} ${contact.nom} !\nStatut: ${status}\nRappel: ${rappelDate || 'Aucun'}`);
               }}
               deviceInfo={getDeviceInfo()}
             />

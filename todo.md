@@ -558,3 +558,14 @@ Le projet Edemo Live est maintenant complet avec :
 - [x] Icône recherche grise → bleue et bien visible (w-12 h-12 avec bordure)
 - [x] Bouton "Voir les détails" visible sur page 1
 
+
+
+
+## 🔧 Activer recherche automatique et 2ème page
+
+- [x] Créer la fonction handleEnrich dans PresenterControl (simulation 2s + données fictives)
+- [x] Créer la fonction handleSave dans PresenterControl (alert de confirmation)
+- [x] Passer les fonctions au composant ProspectPopup
+- [x] Recherche automatique au chargement de la fiche
+- [x] Bouton "Voir les détails" et 2ème page fonctionnels
+
