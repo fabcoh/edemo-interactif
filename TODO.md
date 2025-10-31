@@ -201,3 +201,23 @@
 
 **Impact** : Faible - Amélioration UX
 
+
+
+
+### **✅ Réduire la taille du titre de la présentation**
+- [x] Changer la taille du titre de `text-xs` à `text-[9px]`
+- [x] Conserver l'écriture blanche et le font-bold
+- [x] Vérifier que le titre et le code ont la même taille
+
+**Solution appliquée** :
+- Titre changé de `text-xs` à `text-[9px]`
+- Ajout explicite de `text-white` pour garantir la couleur blanche
+- Titre et code ont maintenant la même taille
+
+**Fichiers modifiés** :
+- client/src/pages/PresenterControl.tsx : Modification de la classe du h1
+
+**Raison** : Harmoniser la taille du texte dans le header
+
+**Impact** : Très faible - Amélioration visuelle mineure
+

@@ -335,7 +335,7 @@ export default function PresenterControl() {
               </Button>
             </Link>
             <div>
-              <h1 className="text-xs font-bold">{currentSession.title}</h1>
+              <h1 className="text-[9px] font-bold text-white">{currentSession.title}</h1>
               <p className="text-[9px] text-gray-400">Code: {currentSession.sessionCode}</p>
             </div>
           </div>
