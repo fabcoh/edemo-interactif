@@ -127,3 +127,15 @@
 
 **Impact** : Faible - Amélioration visuelle
 
+
+
+### **Corrections barre PDF**
+- [x] Supprimer la bande noire au-dessus de la barre
+- [x] Rendre les flèches visibles (fond blanc ou couleur)
+- [x] Agrandir les boutons pour faciliter le clic
+- [x] Allonger la barre (augmenter gap et padding)
+
+**Raison** : Améliorer la visibilité et l'accessibilité de la barre de navigation
+
+**Impact** : Moyen - Amélioration UX critique
+

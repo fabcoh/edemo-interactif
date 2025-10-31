@@ -937,30 +937,30 @@ export default function PresenterControl() {
                     {displayedDocument.type === "pdf" && (
                       <div className="w-full h-full flex flex-col items-center justify-center">
                         {numPages && numPages > 1 && (
-                          <div className="w-full flex justify-center mb-1">
-                            <div className="px-3 py-0.5 rounded-full flex items-center gap-2">
+                          <div className="w-full flex justify-center mb-2">
+                            <div className="bg-black/60 backdrop-blur-sm px-4 py-1 rounded-full flex items-center gap-3 shadow-lg">
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="h-5 w-5 p-0 text-[10px]"
+                                className="h-7 w-7 p-0 text-sm font-bold bg-white/90 hover:bg-white border-none"
                                 onClick={() => setPageNumber(prev => Math.max(1, prev - 1))}
                                 disabled={pageNumber <= 1}
                               >
                                 ←
                               </Button>
-                              <span className="text-white text-[9px] font-medium min-w-[40px] text-center">
+                              <span className="text-white text-xs font-semibold min-w-[50px] text-center">
                                 {pageNumber}/{numPages}
                               </span>
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="h-5 w-5 p-0 text-[10px]"
+                                className="h-7 w-7 p-0 text-sm font-bold bg-white/90 hover:bg-white border-none"
                                 onClick={() => setPageNumber(prev => Math.min(numPages, prev + 1))}
                                 disabled={pageNumber >= numPages}
                               >
                                 →
                               </Button>
-                              <div className="w-px h-3 bg-gray-500"></div>
+                              <div className="w-px h-5 bg-gray-400"></div>
                             <input
                               type="number"
                               min="1"
@@ -987,7 +987,7 @@ export default function PresenterControl() {
                               }}
                               onMouseEnter={(e) => e.currentTarget.select()}
                               onFocus={(e) => e.currentTarget.select()}
-                              className="w-10 h-5 px-1 text-[9px] text-center bg-gray-900 text-white border border-gray-700 rounded focus:outline-none focus:border-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                              className="w-12 h-6 px-1.5 text-xs text-center bg-white/90 text-gray-900 border-none rounded focus:outline-none focus:ring-2 focus:ring-blue-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                               autoComplete="off"
                               autoCorrect="off"
                               autoCapitalize="off"
