@@ -384,3 +384,11 @@ Le projet Edemo Live est maintenant complet avec :
 - [x] Ajouter le bouton avec icône Monitor dans le header
 - [x] Créer la fenêtre flottante avec iframe scrollable
 
+
+
+
+## 🎯 Restauration du pointeur (main avec doigt)
+
+- [x] Restaurer le pointeur 👆 côté présentateur (cursor: none au zoom ≥ 100%)
+- [x] Restaurer le pointeur 👆 côté spectateur (affichage de la position du présentateur)
+
