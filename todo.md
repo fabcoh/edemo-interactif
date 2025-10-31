@@ -392,3 +392,10 @@ Le projet Edemo Live est maintenant complet avec :
 - [x] Restaurer le pointeur 👆 côté présentateur (cursor: none au zoom ≥ 100%)
 - [x] Restaurer le pointeur 👆 côté spectateur (affichage de la position du présentateur)
 
+
+
+
+## 🎨 Afficher mini barre pour tous les PDFs
+
+- [x] Modifier la condition pour afficher la mini barre même pour les PDFs multi-pages
+
