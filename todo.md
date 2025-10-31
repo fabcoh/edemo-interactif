@@ -693,3 +693,15 @@ Le projet Edemo Live est maintenant complet avec :
 - [ ] Format final : 33622197336 (au lieu de 06 22 19 73 36)
 - [ ] Tester avec numéro français
 
+
+## 🎨 Refonte popup sur une seule page
+
+- [ ] Supprimer le système Page 1/Page 2
+- [ ] Fusionner toutes les infos sur une seule page scrollable
+- [ ] Section Contact : Nom/Prénom/Âge + Téléphone + Email/Adresse
+- [ ] Section Enrichie : Infos en 2 colonnes compactes
+- [ ] Section Suivi : Notes + Statut + Date rappel
+- [ ] Réduire tailles : text-sm, py-1, gap-2
+- [ ] Mini vignette photo cliquable (modal agrandissement)
+- [ ] Layout optimisé et compact
+
