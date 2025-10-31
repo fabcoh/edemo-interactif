@@ -748,7 +748,7 @@ export default function PresenterControl() {
           <div className="lg:col-span-3 flex flex-col gap-2 overflow-hidden">
             <Card className="border-0 flex-1 flex flex-col overflow-hidden bg-transparent">
               <CardContent className="flex-1 flex items-start justify-center overflow-hidden relative p-0">
-                {/* Mini barre toujours visible - Position absolute en haut (sauf pour les PDFs multi-pages qui ont leur propre barre) */}
+                {/* Mini barre visible sauf pour les PDFs multi-pages */}
                 {(displayedDocument?.type !== "pdf" || (displayedDocument?.type === "pdf" && numPages === 1)) && (
                 <div className="absolute top-2 left-2 z-50">
                   <div className="bg-black/60 backdrop-blur-sm px-3 py-0.5 rounded-full flex items-center gap-2 shadow-lg">
