@@ -344,6 +344,30 @@ export default function PresenterControl() {
               <Users className="w-3 h-3" />
               <span className="text-xs font-bold">{viewerCount}</span>
             </div>
+            {/* Bouton Copier le lien */}
+            <Button
+              onClick={() => copyToClipboard(getShareLink(currentSession.sessionCode))}
+              variant="outline"
+              className="h-7 px-2 gap-1 bg-gray-700 border-gray-600 hover:bg-gray-600 text-white"
+              size="sm"
+              title="Copier le lien de partage"
+            >
+              <Copy className="w-3.5 h-3.5" />
+            </Button>
+            {/* Bouton WhatsApp */}
+            <a
+              href={generateWhatsAppLink(currentSession.sessionCode)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button
+                className="h-7 px-2 gap-1 bg-green-600 hover:bg-green-700"
+                size="sm"
+                title="Partager sur WhatsApp"
+              >
+                <Share2 className="w-3.5 h-3.5" />
+              </Button>
+            </a>
             <Button
               onClick={handleEndSession}
               variant="destructive"

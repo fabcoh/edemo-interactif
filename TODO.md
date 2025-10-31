@@ -178,3 +178,26 @@
 
 **Impact** : CRITIQUE - Fonctionnalité principale restaurée
 
+
+
+
+### **✅ Cloner boutons Copier et WhatsApp sur la ligne du haut**
+- [x] Localiser les boutons "Copier le lien" et "Partager sur WhatsApp"
+- [x] Localiser le bouton "✕ Terminer" pour connaître sa taille
+- [x] Cloner les 2 boutons sur la ligne du haut à côté de "✕ Terminer"
+- [x] Respecter la même taille que le bouton "✕ Terminer" (h-7)
+- [x] Tester le fonctionnement
+
+**Solution appliquée** :
+- Bouton Copier ajouté dans le header (gris, h-7 px-2)
+- Bouton WhatsApp ajouté dans le header (vert, h-7 px-2)
+- Placés entre le compteur de spectateurs et le bouton Terminer
+- Icônes w-3.5 h-3.5 pour bonne visibilité
+
+**Fichiers modifiés** :
+- client/src/pages/PresenterControl.tsx : Ajout des 2 boutons dans le header
+
+**Raison** : Faciliter l'accès aux boutons de partage depuis le haut de l'écran
+
+**Impact** : Faible - Amélioration UX
+
