@@ -1166,23 +1166,8 @@ export default function PresenterControl() {
                               autoCapitalize="off"
                               spellCheck="false"
                             />
-                              {/* Mini barre de zoom - Clone de la grande barre */}
+                              {/* Mini barre de zoom simplifiée */}
                               <div className="w-px h-4 bg-gray-400 ml-1"></div>
-                              <Button
-                                onClick={() => {
-                                  const newZoom = Math.max(50, zoom - 10);
-                                  setZoom(newZoom);
-                                  updatePresenterState({
-                                    zoomLevel: newZoom,
-                                    cursorVisible: showMouseCursor && newZoom > 100,
-                                  });
-                                }}
-                                variant="outline"
-                                size="sm"
-                                className="h-6 w-6 p-0 bg-white/90 hover:bg-white border-none"
-                              >
-                                <ZoomOut className="w-3 h-3" />
-                              </Button>
                               <input
                                 type="range"
                                 min="50"
@@ -1197,40 +1182,25 @@ export default function PresenterControl() {
                                     cursorVisible: showMouseCursor && newZoom > 100,
                                   });
                                 }}
-                                className="w-12 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                                className="w-20 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
                                 style={{
                                   background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((zoom - 50) / 150) * 100}%, #6b7280 ${((zoom - 50) / 150) * 100}%, #6b7280 100%)`
                                 }}
                               />
-                              <span className="text-white text-[10px] font-semibold min-w-[32px] text-center">
-                                {zoom}%
-                              </span>
-                              <Button
-                                onClick={() => {
-                                  const newZoom = Math.min(200, zoom + 10);
-                                  setZoom(newZoom);
-                                  updatePresenterState({
-                                    zoomLevel: newZoom,
-                                    cursorVisible: showMouseCursor && newZoom > 100,
-                                  });
-                                }}
-                                variant="outline"
-                                size="sm"
-                                className="h-6 w-6 p-0 bg-white/90 hover:bg-white border-none"
-                              >
-                                <ZoomIn className="w-3 h-3" />
-                              </Button>
                               <Button
                                 onClick={() => {
                                   setZoom(100);
+                                  setPanOffset({ x: 0, y: 0 });
                                   updatePresenterState({
                                     zoomLevel: 100,
+                                    panOffsetX: 0,
+                                    panOffsetY: 0,
                                     cursorVisible: false,
                                   });
                                 }}
                                 variant="outline"
                                 size="sm"
-                                className="h-5 px-1.5 text-[9px] bg-white/90 hover:bg-white border-none"
+                                className="h-5 w-5 p-0 text-[9px] bg-white/90 hover:bg-white border-none font-semibold"
                               >
                                 R
                               </Button>
