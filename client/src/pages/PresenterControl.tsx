@@ -134,14 +134,29 @@ export default function PresenterControl() {
     pageNumber: number;
   }> = {}) => {
     if (!currentSession) return;
+    
+    // Convert panOffset from pixels to percentage based on container size
+    let panOffsetXToSend = overrides.panOffsetX ?? panOffset.x;
+    let panOffsetYToSend = overrides.panOffsetY ?? panOffset.y;
+    
+    // Get container dimensions for percentage calculation
+    if (imageRef.current) {
+      const containerRect = imageRef.current.parentElement?.getBoundingClientRect();
+      if (containerRect) {
+        // Convert to percentage of container width/height
+        panOffsetXToSend = (panOffsetXToSend / containerRect.width) * 100;
+        panOffsetYToSend = (panOffsetYToSend / containerRect.height) * 100;
+      }
+    }
+    
     updateZoomAndCursorMutation.mutate({
       sessionId: sessionIdNum,
       zoomLevel: overrides.zoomLevel ?? zoom,
       cursorX: overrides.cursorX ?? mousePos.x,
       cursorY: overrides.cursorY ?? mousePos.y,
       cursorVisible: overrides.cursorVisible ?? showMouseCursor,
-      panOffsetX: overrides.panOffsetX ?? panOffset.x,
-      panOffsetY: overrides.panOffsetY ?? panOffset.y,
+      panOffsetX: panOffsetXToSend,
+      panOffsetY: panOffsetYToSend,
       pageNumber: overrides.pageNumber ?? pageNumber,
       rectangleX: rectangle.x,
       rectangleY: rectangle.y,

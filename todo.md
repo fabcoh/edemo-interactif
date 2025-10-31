@@ -785,3 +785,24 @@ Le projet Edemo Live est maintenant complet avec :
 - [x] Envoyer updatePresenterState() dans onTouchMove (pendant le drag tactile) - Images et PDF
 - [ ] Tester la synchronisation en temps réel
 
+
+
+
+## 🔧 Retirer les limites de calcul du déplacement
+
+- [x] Restaurer overflow-hidden pour éviter de couvrir l'interface
+- [ ] Chercher les limites de calcul dans le code
+- [ ] Retirer les limites de calcul (pas overflow)
+- [ ] Permettre un déplacement infini à l'intérieur du conteneur
+- [ ] Tester le déplacement libre
+
+
+
+
+## 🐛 Bug synchronisation zone affichée (panOffset en pourcentage)
+
+- [x] Analyser le système actuel de panOffset (pixels)
+- [x] Convertir panOffset en pourcentage côté présentateur
+- [x] Adapter l'affichage côté spectateur pour utiliser les pourcentages (images et PDF)
+- [ ] Tester la synchronisation de la zone affichée
+
