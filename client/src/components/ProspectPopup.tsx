@@ -145,7 +145,13 @@ export default function ProspectPopup({
 
   // Créer le lien WhatsApp
   const getWhatsAppLink = () => {
-    const phone = editablePhone.replace(/\D/g, '');
+    let phone = editablePhone.replace(/\D/g, '');
+    
+    // Convertir au format international si numéro français (commence par 0)
+    if (phone.startsWith('0')) {
+      phone = '33' + phone.substring(1);
+    }
+    
     const message = encodeURIComponent(generateWhatsAppMessage());
     return `https://wa.me/${phone}?text=${message}`;
   };

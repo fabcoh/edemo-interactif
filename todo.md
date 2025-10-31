@@ -685,3 +685,11 @@ Le projet Edemo Live est maintenant complet avec :
 - [ ] Initialiser editablePhone avec contacts[currentIndex].telephone
 - [ ] Tester l'import Excel pour vérifier que l'erreur est corrigée
 
+
+## 🌍 Convertir numéro au format international WhatsApp
+
+- [ ] Supprimer les espaces du numéro
+- [ ] Si commence par 0 : supprimer le 0 et ajouter 33
+- [ ] Format final : 33622197336 (au lieu de 06 22 19 73 36)
+- [ ] Tester avec numéro français
+
