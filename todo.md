@@ -678,3 +678,10 @@ Le projet Edemo Live est maintenant complet avec :
 - [ ] Mettre à jour les liens ☎️ et WhatsApp avec le numéro modifié
 - [ ] Appliquer dans Pages 1 et 2
 
+
+## 🐛 Corriger erreur initialisation editablePhone
+
+- [ ] Déplacer la définition de currentContact avant les useState
+- [ ] Initialiser editablePhone avec contacts[currentIndex].telephone
+- [ ] Tester l'import Excel pour vérifier que l'erreur est corrigée
+

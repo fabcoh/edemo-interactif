@@ -53,6 +53,9 @@ export default function ProspectPopup({
   onSave,
   deviceInfo,
 }: ProspectPopupProps) {
+  const currentContact = contacts[currentIndex];
+  const totalContacts = contacts.length;
+
   const [enrichedData, setEnrichedData] = useState<EnrichedData | null>(null);
   const [isEnriching, setIsEnriching] = useState(false);
   const [hasEnrichedData, setHasEnrichedData] = useState(false);
@@ -62,9 +65,6 @@ export default function ProspectPopup({
   const [isSaving, setIsSaving] = useState(false);
   const [editablePhone, setEditablePhone] = useState(currentContact.telephone);
   const [currentPage, setCurrentPage] = useState<'summary' | 'details'>('summary');
-
-  const currentContact = contacts[currentIndex];
-  const totalContacts = contacts.length;
 
   // Recherche automatique dès l'ouverture de la fiche
   useEffect(() => {
