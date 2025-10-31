@@ -399,3 +399,12 @@ Le projet Edemo Live est maintenant complet avec :
 
 - [x] Modifier la condition pour afficher la mini barre même pour les PDFs multi-pages
 
+
+
+
+## 🎨 Utiliser barre PDF pour tous les documents
+
+- [x] Supprimer la barre PDF dupliquée (celle dans la condition PDF)
+- [x] Garder uniquement la mini barre universelle (fonctionne pour tous les documents)
+- [x] Mini barre affiche : ← page/total → | Zoom slider 100% | R | Glisser fichier
+
