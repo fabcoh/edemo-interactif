@@ -806,7 +806,6 @@ export default function PresenterControl() {
                       spellCheck="false"
                     />
                     <div className="w-px h-4 bg-gray-400 ml-1"></div>
-                    <span className="text-white text-xs">🔍</span>
                     <input
                       type="range"
                       min="50"
@@ -821,11 +820,28 @@ export default function PresenterControl() {
                           cursorVisible: showMouseCursor && newZoom > 100,
                         });
                       }}
-                      className="w-16 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                      className="w-20 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
                       style={{
                         background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((zoom - 50) / 150) * 100}%, #6b7280 ${((zoom - 50) / 150) * 100}%, #6b7280 100%)`
                       }}
                     />
+                    <Button
+                      onClick={() => {
+                        setZoom(100);
+                        setPanOffset({ x: 0, y: 0 });
+                        updatePresenterState({
+                          zoomLevel: 100,
+                          panOffsetX: 0,
+                          panOffsetY: 0,
+                          cursorVisible: false,
+                        });
+                      }}
+                      variant="outline"
+                      size="sm"
+                      className="h-5 w-5 p-0 text-[9px] bg-white/90 hover:bg-white border-none font-semibold"
+                    >
+                      R
+                    </Button>
                     <div className="w-px h-4 bg-gray-400 ml-1"></div>
                     <input
                       type="file"
