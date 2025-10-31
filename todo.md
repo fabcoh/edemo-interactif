@@ -408,3 +408,7 @@ Le projet Edemo Live est maintenant complet avec :
 - [x] Garder uniquement la mini barre universelle (fonctionne pour tous les documents)
 - [x] Mini barre affiche : ← page/total → | Zoom slider 100% | R | Glisser fichier
 
+
+
+- [x] Supprimer la barre PDF dupliquée (celle dans la condition type === "pdf")
+

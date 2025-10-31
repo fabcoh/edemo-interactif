@@ -747,10 +747,10 @@ export default function PresenterControl() {
           {/* Center - Preview Area */}
           <div className="lg:col-span-3 flex flex-col gap-2 overflow-hidden">
             <Card className="border-0 flex-1 flex flex-col overflow-hidden bg-transparent">
-              <CardContent className="flex-1 flex items-start justify-center overflow-hidden relative p-0">
-                {/* Mini barre toujours visible pour tous les documents */}
+              <CardContent className="flex-1 flex flex-col overflow-hidden relative p-0">
+                {/* Mini barre centrée au-dessus des documents */}
                 {displayedDocument && (
-                <div className="absolute top-2 left-2 z-50">
+                <div className="w-full flex justify-center py-2 z-50">
                   <div className="bg-black/60 backdrop-blur-sm px-3 py-0.5 rounded-full flex items-center gap-2 shadow-lg">
                     <Button
                       size="sm"
@@ -884,7 +884,7 @@ export default function PresenterControl() {
                 )}
                 {displayedDocument ? (
                   <div
-                    className="relative w-full h-full flex items-start justify-center overflow-hidden"
+                    className="relative w-full flex-1 flex items-start justify-center overflow-hidden"
                     style={{ cursor: zoom >= 100 ? 'none' : 'default' }}
                     onMouseDown={(e) => {
                       if (e.ctrlKey && imageRef.current) {
@@ -1108,7 +1108,7 @@ export default function PresenterControl() {
                     )}
                     {displayedDocument.type === "pdf" && (
                       <div className="w-full h-full flex flex-col items-center justify-center">
-                        {/* Barre PDF supprimée - utilisation de la mini barre universelle */}
+                        {/* Barre PDF supprimée - utilisation de la mini barre universelle centrée en haut */}
                         <Document
                           key={displayedDocument.fileUrl}
                           file={displayedDocument.fileUrl}
