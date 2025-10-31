@@ -776,3 +776,12 @@ Le projet Edemo Live est maintenant complet avec :
 - [x] Ajouter drag & drop pour les PDF côté présentateur
 - [ ] Tester la synchronisation
 
+
+
+
+## 🐛 Bug synchronisation déplacement PDF
+
+- [x] Envoyer updatePresenterState() dans onMouseMove (pendant le drag) - Images et PDF
+- [x] Envoyer updatePresenterState() dans onTouchMove (pendant le drag tactile) - Images et PDF
+- [ ] Tester la synchronisation en temps réel
+

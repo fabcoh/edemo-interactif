@@ -968,9 +968,15 @@ export default function PresenterControl() {
                           visible: true,
                         });
                       } else if (isPanning && zoom >= 100) {
-                        setPanOffset({
+                        const newPanOffset = {
                           x: e.clientX - panStart.x,
                           y: e.clientY - panStart.y,
+                        };
+                        setPanOffset(newPanOffset);
+                        // Synchronize in real-time during panning
+                        updatePresenterState({
+                          panOffsetX: newPanOffset.x,
+                          panOffsetY: newPanOffset.y,
                         });
                       }
                       if (!isPanning) {
@@ -1059,9 +1065,15 @@ export default function PresenterControl() {
                           setMousePos({ x: cursorX, y: cursorY });
                         
                           if (isPanning && zoom >= 100) {
-                            setPanOffset({
+                            const newPanOffset = {
                               x: e.touches[0].clientX - panStart.x,
                               y: e.touches[0].clientY - panStart.y,
+                            };
+                            setPanOffset(newPanOffset);
+                            // Synchronize pan offset in real-time
+                            updatePresenterState({
+                              panOffsetX: newPanOffset.x,
+                              panOffsetY: newPanOffset.y,
                             });
                           }
                           
@@ -1180,9 +1192,15 @@ export default function PresenterControl() {
                               visible: true,
                             });
                           } else if (isPanning && zoom >= 100) {
-                            setPanOffset({
+                            const newPanOffset = {
                               x: e.clientX - panStart.x,
                               y: e.clientY - panStart.y,
+                            };
+                            setPanOffset(newPanOffset);
+                            // Synchronize in real-time during panning
+                            updatePresenterState({
+                              panOffsetX: newPanOffset.x,
+                              panOffsetY: newPanOffset.y,
                             });
                           }
                           if (!isPanning) {
@@ -1218,9 +1236,15 @@ export default function PresenterControl() {
                         }}
                         onTouchMove={(e) => {
                           if (isPanning && e.touches.length === 1 && zoom >= 100) {
-                            setPanOffset({
+                            const newPanOffset = {
                               x: e.touches[0].clientX - panStart.x,
                               y: e.touches[0].clientY - panStart.y,
+                            };
+                            setPanOffset(newPanOffset);
+                            // Synchronize in real-time during panning
+                            updatePresenterState({
+                              panOffsetX: newPanOffset.x,
+                              panOffsetY: newPanOffset.y,
                             });
                           }
                         }}
