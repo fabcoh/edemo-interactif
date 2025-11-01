@@ -363,6 +363,9 @@ export default function Viewer() {
             {!documentError && displayDocument.type === "image" && (
               <div 
                 className="flex items-center justify-center w-full h-full relative"
+                onMouseMove={handleViewerMouseMove}
+                onMouseEnter={() => setViewerCursorVisible(true)}
+                onMouseLeave={() => setViewerCursorVisible(false)}
               >
                 <img
                   ref={imageRef}
