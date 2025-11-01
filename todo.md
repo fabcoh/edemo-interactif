@@ -873,3 +873,13 @@ Le projet Edemo Live est maintenant complet avec :
 - [ ] Sauvegarder checkpoint
 - [ ] Diagnostiquer problème création session Railway
 
+
+
+
+## 🔐 Authentification Simple (Railway)
+- [x] Modifier le schéma de base de données pour supporter email/mot de passe hashé
+- [x] Créer les procédures tRPC pour inscription et connexion
+- [x] Créer la page de login simple
+- [x] Créer la page d'inscription
+- [ ] Tester sur Railway
+

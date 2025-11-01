@@ -12,12 +12,16 @@ import Viewer from "./pages/Viewer";
 import AdminInvitations from "./pages/AdminInvitations";
 import InvitationAccept from "./pages/InvitationAccept";
 import CommercialAccess from "./pages/CommercialAccess";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
       <Route path={"/"} component={Home} />
+      <Route path={"/login"} component={Login} />
+      <Route path={"/register"} component={Register} />
       <Route path={"/presenter"} component={Presenter} />
       <Route path={"/presenter/session/:sessionId"} component={PresenterSession} />
       <Route path={"/presenter/control/:sessionId"} component={PresenterControl} />

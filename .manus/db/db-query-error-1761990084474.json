@@ -1,0 +1,8 @@
+{
+  "query": "ALTER TABLE `users` \nMODIFY COLUMN `openId` varchar(64) UNIQUE,\nADD COLUMN IF NOT EXISTS `password` varchar(255),\nMODIFY COLUMN `email` varchar(320) UNIQUE;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3j1v42nUZuvgHzn.root --database 8CbieS7mEqbTHNrWVL4VaZ --execute ALTER TABLE `users` \nMODIFY COLUMN `openId` varchar(64) UNIQUE,\nADD COLUMN IF NOT EXISTS `password` varchar(255),\nMODIFY COLUMN `email` varchar(320) UNIQUE;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 8200 (HY000) at line 1: can't change column constraint (UNIQUE KEY)"
+  ]
+}

@@ -1,6 +1,7 @@
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
+import { authRouter } from "./authRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import {
@@ -85,6 +86,7 @@ async function uploadFileToStorage(
 
 export const appRouter = router({
   system: systemRouter,
+  simpleAuth: authRouter,
 
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
