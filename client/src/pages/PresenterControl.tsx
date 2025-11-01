@@ -91,10 +91,10 @@ export default function PresenterControl() {
   );
   
   // Get viewer cursors in real-time
-  const viewerCursorsQuery = trpc.presentation.getViewerCursors.useQuery(
-    { sessionId: sessionIdNum },
+  const viewerCursorsQuery = trpc.viewer.getCursors.useQuery(
+    { sessionCode: sessionsQuery.data?.find(s => s.id === sessionIdNum)?.sessionCode || "" },
     {
-      enabled: !!sessionIdNum && isAuthenticated,
+      enabled: !!sessionIdNum && isAuthenticated && !!sessionsQuery.data,
       refetchInterval: 500, // Poll every 500ms for smooth cursor tracking
     }
   );
