@@ -894,3 +894,15 @@ Le projet Edemo Live est maintenant complet avec :
 - [x] Vérifier qu'il n'y a pas d'iframe de prévisualisation (pas de duplication)
 - [x] Tester et sauvegarder le checkpoint
 
+
+
+
+## ✅ Correction curseur PDF bloqué (Complété)
+
+- [x] Analyser le code actuel du curseur PDF dans Viewer.tsx
+- [x] Identifier le problème : utilisation de containerRect au lieu de pdfRect
+- [x] Ajouter une ref pdfPageRef pour le div du Page PDF
+- [x] Corriger le calcul de position pour utiliser pdfRect.width/height + offset
+- [x] Utiliser la même logique que pour les images (qui fonctionne)
+- [x] Tester le curseur sur les PDF
+

@@ -48,6 +48,7 @@ export default function Viewer() {
   const [numPages, setNumPages] = useState<number | null>(null);
   const [pageNumber, setPageNumber] = useState(1);
   const imageRef = useRef<HTMLImageElement>(null);
+  const pdfPageRef = useRef<HTMLDivElement>(null);
   const [pdfPageWidth, setPdfPageWidth] = useState<number>(800);
 
   // Extract session code from URL if present
@@ -272,7 +273,7 @@ export default function Viewer() {
                   }
                   className="flex flex-col items-center"
                 >
-                  <div style={{
+                  <div ref={pdfPageRef} style={{
                     transform: `scale(${presenterZoom / 100}) translate(${presenterPanOffsetX / (presenterZoom / 100)}px, ${presenterPanOffsetY / (presenterZoom / 100)}px)`,
                     transition: "transform 0.2s ease-out",
                   }}>
@@ -286,12 +287,13 @@ export default function Viewer() {
                   </div>
                 </Document>
                 {/* Pointeur main du présentateur visible pour les spectateurs sur PDF */}
-                {presenterCursorVisible && pdfContainerRef.current && (() => {
+                {presenterCursorVisible && pdfPageRef.current && pdfContainerRef.current && (() => {
+                  const pdfRect = pdfPageRef.current.getBoundingClientRect();
                   const containerRect = pdfContainerRef.current.getBoundingClientRect();
                   
-                  // Calculate cursor position in pixels
-                  const cursorX = (presenterCursorX / 100) * containerRect.width;
-                  const cursorY = (presenterCursorY / 100) * containerRect.height;
+                  // Calculate cursor position in pixels (same logic as images)
+                  const cursorX = (presenterCursorX / 100) * pdfRect.width + (pdfRect.left - containerRect.left);
+                  const cursorY = (presenterCursorY / 100) * pdfRect.height + (pdfRect.top - containerRect.top);
                   
                   return (
                     <div
