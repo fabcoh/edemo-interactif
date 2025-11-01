@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `viewerCursors` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `sessionCode` varchar(255) NOT NULL,\n  `viewerIdentifier` varchar(255) NOT NULL,\n  `cursorX` float NOT NULL,\n  `cursorY` float NOT NULL,\n  `cursorVisible` boolean NOT NULL DEFAULT false,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `viewerCursors_id` PRIMARY KEY(`id`),\n  UNIQUE KEY `unique_viewer` (`sessionCode`, `viewerIdentifier`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3j1v42nUZuvgHzn.root --database 8CbieS7mEqbTHNrWVL4VaZ --execute CREATE TABLE IF NOT EXISTS `viewerCursors` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `sessionCode` varchar(255) NOT NULL,\n  `viewerIdentifier` varchar(255) NOT NULL,\n  `cursorX` float NOT NULL,\n  `cursorY` float NOT NULL,\n  `cursorVisible` boolean NOT NULL DEFAULT false,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `viewerCursors_id` PRIMARY KEY(`id`),\n  UNIQUE KEY `unique_viewer` (`sessionCode`, `viewerIdentifier`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 90
+}

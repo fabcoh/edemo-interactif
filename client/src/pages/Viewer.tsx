@@ -97,7 +97,7 @@ export default function Viewer() {
   });
   
   // Send viewer cursor position to presenter
-  const updateViewerCursorMutation = trpc.presentation.updateViewerCursor.useMutation();
+  const updateViewerCursorMutation = trpc.viewer.updateCursor.useMutation();
 
   // Get presenter's cursor and zoom in real-time
   const cursorQuery = trpc.presentation.getCursorAndZoom.useQuery(
@@ -172,11 +172,9 @@ export default function Viewer() {
   
   // Handle viewer mouse move to send cursor position to presenter
   const handleViewerMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    console.log('[Viewer] handleViewerMouseMove CALLED!');
-    console.log('[Viewer] session:', session);
-    console.log('[Viewer] displayDocument:', displayDocument);
+    console.log('[Viewer] handleViewerMouseMove called', { session: !!session, displayDocument: !!displayDocument });
     if (!session || !displayDocument) {
-      console.log('[Viewer] Exiting: session or displayDocument is null');
+      console.log('[Viewer] Blocked: no session or displayDocument');
       return;
     }
     
@@ -196,7 +194,6 @@ export default function Viewer() {
     const yPercent = (elementY / elementRect.height) * 100;
     
     // Send cursor position to presenter
-    console.log('[Viewer] Sending cursor:', { sessionCode: enteredCode, viewerIdentifier, xPercent, yPercent, viewerCursorVisible });
     updateViewerCursorMutation.mutate({
       sessionCode: enteredCode,
       viewerIdentifier,
@@ -366,9 +363,6 @@ export default function Viewer() {
             {!documentError && displayDocument.type === "image" && (
               <div 
                 className="flex items-center justify-center w-full h-full relative"
-                onMouseMove={handleViewerMouseMove}
-                onMouseEnter={() => setViewerCursorVisible(true)}
-                onMouseLeave={() => setViewerCursorVisible(false)}
               >
                 <img
                   ref={imageRef}

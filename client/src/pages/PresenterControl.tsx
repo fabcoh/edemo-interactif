@@ -1165,12 +1165,16 @@ export default function PresenterControl() {
                         {viewerCursorsQuery.data?.map((viewerCursor) => {
                           if (!viewerCursor.cursorVisible || !imageRef.current) return null;
                           
+                          // Use the same calculation method as presenter cursor
                           const imageRect = imageRef.current.getBoundingClientRect();
                           const containerRect = imageRef.current.parentElement?.getBoundingClientRect();
                           if (!containerRect) return null;
                           
-                          const cursorX = (viewerCursor.cursorX / 100) * imageRect.width + (imageRect.left - containerRect.left);
-                          const cursorY = (viewerCursor.cursorY / 100) * imageRect.height + (imageRect.top - containerRect.top);
+                          // Calculate position relative to image, then add image offset from container
+                          const imageX = (viewerCursor.cursorX / 100) * imageRect.width;
+                          const imageY = (viewerCursor.cursorY / 100) * imageRect.height;
+                          const cursorX = imageRect.left - containerRect.left + imageX;
+                          const cursorY = imageRect.top - containerRect.top + imageY;
                           
                           return (
                             <div
@@ -1183,7 +1187,7 @@ export default function PresenterControl() {
                                 zIndex: 9999,
                               }}
                             >
-                              <div className="w-4 h-4 bg-red-500 rounded-full" style={{ boxShadow: '0 0 8px rgba(255, 0, 0, 0.8)' }} />
+                              <div className="w-6 h-6 bg-red-500 rounded-full border-2 border-white" style={{ boxShadow: '0 0 10px rgba(255, 0, 0, 1)' }} />
                             </div>
                           );
                         })}
@@ -1362,12 +1366,16 @@ export default function PresenterControl() {
                           {viewerCursorsQuery.data?.map((viewerCursor) => {
                             if (!viewerCursor.cursorVisible || !pdfPageRef.current) return null;
                             
+                            // Use the same calculation method as presenter cursor
                             const pdfRect = pdfPageRef.current.getBoundingClientRect();
                             const containerRect = pdfPageRef.current.parentElement?.getBoundingClientRect();
                             if (!containerRect) return null;
                             
-                            const cursorX = (viewerCursor.cursorX / 100) * pdfRect.width + (pdfRect.left - containerRect.left);
-                            const cursorY = (viewerCursor.cursorY / 100) * pdfRect.height + (pdfRect.top - containerRect.top);
+                            // Calculate position relative to PDF page, then add page offset from container
+                            const pdfX = (viewerCursor.cursorX / 100) * pdfRect.width;
+                            const pdfY = (viewerCursor.cursorY / 100) * pdfRect.height;
+                            const cursorX = pdfRect.left - containerRect.left + pdfX;
+                            const cursorY = pdfRect.top - containerRect.top + pdfY;
                             
                             return (
                               <div
@@ -1380,7 +1388,7 @@ export default function PresenterControl() {
                                   zIndex: 9999,
                                 }}
                               >
-                                <div className="w-4 h-4 bg-red-500 rounded-full" style={{ boxShadow: '0 0 8px rgba(255, 0, 0, 0.8)' }} />
+                                <div className="w-6 h-6 bg-red-500 rounded-full border-2 border-white" style={{ boxShadow: '0 0 10px rgba(255, 0, 0, 1)' }} />
                               </div>
                             );
                           })}
