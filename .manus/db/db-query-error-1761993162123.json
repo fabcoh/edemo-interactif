@@ -1,0 +1,8 @@
+{
+  "query": "\n-- Réinitialiser le mot de passe de fcohen@santeo.net\nUPDATE users SET password = '$2b$10$9q/pB/RIeYObYIzdDg0X7.h9vX84ZuuoOEh3J83hz4JFKg7fOpdEK' WHERE email = 'fcohen@santeo.net';\n\n-- Créer le compte antony@santeo.net avec openId NULL\nINSERT INTO users (openId, email, password, name, loginMethod, role) \nVALUES (NULL, 'antony@santeo.net', '$2b$10$9q/pB/RIeYObYIzdDg0X7.h9vX84ZuuoOEh3J83hz4JFKg7fOpdEK', 'Antony', 'email', 'user')\nON DUPLICATE KEY UPDATE password = '$2b$10$9q/pB/RIeYObYIzdDg0X7.h9vX84ZuuoOEh3J83hz4JFKg7fOpdEK';\n\n-- Vérifier les comptes\nSELECT id, email, name, role FROM users WHERE email IN ('fcohen@santeo.net', 'antony@santeo.net');\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3j1v42nUZuvgHzn.root --database 8CbieS7mEqbTHNrWVL4VaZ --execute \n-- Réinitialiser le mot de passe de fcohen@santeo.net\nUPDATE users SET password = '$2b$10$9q/pB/RIeYObYIzdDg0X7.h9vX84ZuuoOEh3J83hz4JFKg7fOpdEK' WHERE email = 'fcohen@santeo.net';\n\n-- Créer le compte antony@santeo.net avec openId NULL\nINSERT INTO users (openId, email, password, name, loginMethod, role) \nVALUES (NULL, 'antony@santeo.net', '$2b$10$9q/pB/RIeYObYIzdDg0X7.h9vX84ZuuoOEh3J83hz4JFKg7fOpdEK', 'Antony', 'email', 'user')\nON DUPLICATE KEY UPDATE password = '$2b$10$9q/pB/RIeYObYIzdDg0X7.h9vX84ZuuoOEh3J83hz4JFKg7fOpdEK';\n\n-- Vérifier les comptes\nSELECT id, email, name, role FROM users WHERE email IN ('fcohen@santeo.net', 'antony@santeo.net');\n",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1048 (23000) at line 6: Column 'openId' cannot be null"
+  ]
+}

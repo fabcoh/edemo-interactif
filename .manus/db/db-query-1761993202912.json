@@ -1,0 +1,28 @@
+{
+  "query": "\n-- Réinitialiser le mot de passe de fcohen@santeo.net\nUPDATE users SET password = '$2b$10$9q/pB/RIeYObYIzdDg0X7.h9vX84ZuuoOEh3J83hz4JFKg7fOpdEK' WHERE email = 'fcohen@santeo.net';\n\n-- Créer le compte antony@santeo.net avec openId factice\nINSERT INTO users (openId, email, password, name, loginMethod, role) \nVALUES ('email_antony_santeo', 'antony@santeo.net', '$2b$10$9q/pB/RIeYObYIzdDg0X7.h9vX84ZuuoOEh3J83hz4JFKg7fOpdEK', 'Antony', 'email', 'user')\nON DUPLICATE KEY UPDATE password = '$2b$10$9q/pB/RIeYObYIzdDg0X7.h9vX84ZuuoOEh3J83hz4JFKg7fOpdEK';\n\n-- Vérifier les comptes\nSELECT id, email, name, role FROM users WHERE email IN ('fcohen@santeo.net', 'antony@santeo.net');\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3j1v42nUZuvgHzn.root --database 8CbieS7mEqbTHNrWVL4VaZ --execute \n-- Réinitialiser le mot de passe de fcohen@santeo.net\nUPDATE users SET password = '$2b$10$9q/pB/RIeYObYIzdDg0X7.h9vX84ZuuoOEh3J83hz4JFKg7fOpdEK' WHERE email = 'fcohen@santeo.net';\n\n-- Créer le compte antony@santeo.net avec openId factice\nINSERT INTO users (openId, email, password, name, loginMethod, role) \nVALUES ('email_antony_santeo', 'antony@santeo.net', '$2b$10$9q/pB/RIeYObYIzdDg0X7.h9vX84ZuuoOEh3J83hz4JFKg7fOpdEK', 'Antony', 'email', 'user')\nON DUPLICATE KEY UPDATE password = '$2b$10$9q/pB/RIeYObYIzdDg0X7.h9vX84ZuuoOEh3J83hz4JFKg7fOpdEK';\n\n-- Vérifier les comptes\nSELECT id, email, name, role FROM users WHERE email IN ('fcohen@santeo.net', 'antony@santeo.net');\n",
+  "rows": [
+    {
+      "id": "1",
+      "email": "fcohen@santeo.net",
+      "name": "Fabrice Cohen",
+      "role": "admin"
+    },
+    {
+      "id": "2430001",
+      "email": "fcohen@santeo.net",
+      "name": "Fabrice Cohen",
+      "role": "user"
+    },
+    {
+      "id": "2730001",
+      "email": "antony@santeo.net",
+      "name": "Antony",
+      "role": "user"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tname\trole\n1\tfcohen@santeo.net\tFabrice Cohen\tadmin\n2430001\tfcohen@santeo.net\tFabrice Cohen\tuser\n2730001\tantony@santeo.net\tAntony\tuser\n",
+  "stderr": "",
+  "execution_time_ms": 132
+}
