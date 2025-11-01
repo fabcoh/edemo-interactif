@@ -272,13 +272,13 @@ export default function Viewer() {
                   className="flex flex-col items-center"
                 >
                   <div style={{
-                    transform: `scale(${presenterZoom / 100}) translate(${(presenterPanOffsetX / 2.5) / (presenterZoom / 100)}px, ${(presenterPanOffsetY / 2.5) / (presenterZoom / 100)}px)`,
+                    transform: `scale(${presenterZoom / 100}) translate(${presenterPanOffsetX / (presenterZoom / 100)}px, ${presenterPanOffsetY / (presenterZoom / 100)}px)`,
                     transition: "transform 0.2s ease-out",
                   }}>
                     <Page
                       pageNumber={pageNumber}
                       width={window.innerWidth < 768 ? window.innerWidth * 0.95 : Math.min(window.innerWidth * 0.8, 900)}
-                      className="max-w-full"
+                      className=""
                       renderTextLayer={true}
                       renderAnnotationLayer={true}
                     />
@@ -294,10 +294,10 @@ export default function Viewer() {
                   src={displayDocument.fileUrl}
                   alt="Document"
                   style={{
-                    transform: `scale(${presenterZoom / 100}) translate(${(presenterPanOffsetX / 2.5) / (presenterZoom / 100)}px, ${(presenterPanOffsetY / 2.5) / (presenterZoom / 100)}px)`,
+                    transform: `scale(${presenterZoom / 100}) translate(${presenterPanOffsetX / (presenterZoom / 100)}px, ${presenterPanOffsetY / (presenterZoom / 100)}px)`,
                     transition: "transform 0.2s ease-out",
                   }}
-                  className="max-w-full max-h-full object-contain"
+                  className="object-contain"
                   onError={() => setDocumentError("Impossible de charger l'image")}
                 />
                 {/* Pointeur main du présentateur visible pour les spectateurs */}
@@ -320,7 +320,7 @@ export default function Viewer() {
                         transform: "translate(-50%, -50%)",
                       }}
                     >
-                      <div className="text-3xl" style={{ filter: 'drop-shadow(0 0 3px rgba(255, 0, 0, 0.8))' }}>
+                      <div className="text-3xl" style={{ filter: 'drop-shadow(0 0 3px rgba(0, 255, 0, 0.8))' }}>
                         👆
                       </div>
                     </div>

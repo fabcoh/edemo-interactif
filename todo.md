@@ -774,7 +774,9 @@ Le projet Edemo Live est maintenant complet avec :
 - [x] Drag & drop déjà implémenté côté présentateur (images uniquement)
 - [x] Synchronisation déjà en place (panOffsetX/Y)
 - [x] Ajouter drag & drop pour les PDF côté présentateur
-- [ ] Tester la synchronisation
+- [x] Synchronisation en temps réel (updatePresenterState dans onMouseMove/onTouchMove)
+- [x] Coefficient optimal trouvé : 2.5 (pour réduire amplification côté spectateur)
+- [x] Tester la synchronisation
 
 
 
@@ -832,4 +834,42 @@ Le projet Edemo Live est maintenant complet avec :
 - [x] Diviser panOffset par 2.5 côté spectateur (images)
 - [x] Diviser panOffset par 2.5 côté spectateur (PDF)
 - [x] Coefficient optimal trouvé : 2.5
+
+
+## 🎯 Pointeurs colorés sur tous les documents
+
+- [x] Ajouter pointeur rouge présentateur sur PDF
+- [x] Changer couleur pointeur spectateur en vert (images et PDF)
+- [x] Corriger le pointeur qui se bloque à l'entrée du PDF
+- [x] Tester sur tous les types de documents (PDF)
+- [ ] Tester sur tous les types de documents
+
+
+
+
+## 🔍 Modifier plage de zoom (80% à 400%)
+
+- [x] Changer min de 50% à 80%
+- [x] Changer max de 200% à 400%
+- [x] Ajuster le slider et les calculs
+- [x] Tester le zoom
+
+
+
+
+## 🐛 Bug synchronisation zoom spectateur
+
+- [x] Vérifier le code d'application du zoom côté spectateur
+- [x] Corriger la limite serveur (50-200 → 80-400)
+- [x] Retirer les limites CSS (max-w-full, max-h-full)
+- [x] Tester avec zoom 400%
+
+
+
+
+## 🎉 Finalisation
+
+- [x] Retirer l'affichage debug du zoom
+- [ ] Sauvegarder checkpoint
+- [ ] Diagnostiquer problème création session Railway
 

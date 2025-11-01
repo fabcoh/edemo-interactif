@@ -297,7 +297,7 @@ export const appRouter = router({
     updateZoomAndCursor: protectedProcedure
       .input(z.object({
         sessionId: z.number(),
-        zoomLevel: z.number().min(50).max(200),
+        zoomLevel: z.number().min(80).max(400),
         cursorX: z.number(),
         cursorY: z.number(),
         cursorVisible: z.boolean(),

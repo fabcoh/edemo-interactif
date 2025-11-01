@@ -446,7 +446,7 @@ export default function PresenterControl() {
           <span className="text-xs text-gray-400 whitespace-nowrap">Zoom:</span>
           <Button
             onClick={() => {
-              const newZoom = Math.max(50, zoom - 10);
+              const newZoom = Math.max(80, zoom - 10);
               setZoom(newZoom);
               updatePresenterState({
                 zoomLevel: newZoom,
@@ -461,8 +461,8 @@ export default function PresenterControl() {
           </Button>
           <input
             type="range"
-            min="50"
-            max="200"
+            min="80"
+            max="400"
             step="5"
             value={zoom}
             onChange={(e) => {
@@ -483,7 +483,7 @@ export default function PresenterControl() {
           </div>
           <Button
             onClick={() => {
-              const newZoom = Math.min(200, zoom + 10);
+              const newZoom = Math.min(400, zoom + 10);
               setZoom(newZoom);
               updatePresenterState({
                 zoomLevel: newZoom,
@@ -863,8 +863,8 @@ export default function PresenterControl() {
                     <div className="relative flex flex-col items-center">
                       <input
                         type="range"
-                        min="50"
-                        max="200"
+                        min="80"
+                        max="400"
                         step="5"
                         value={zoom}
                         onChange={(e) => {
@@ -1051,7 +1051,7 @@ export default function PresenterControl() {
                         e.preventDefault();
                         const currentDistance = getTouchDistance(e.touches);
                         const scale = currentDistance / initialPinchDistance;
-                        const newZoom = Math.max(50, Math.min(200, initialZoom * scale));
+                        const newZoom = Math.max(80, Math.min(400, initialZoom * scale));
                         setZoom(Math.round(newZoom));
                         
                         updatePresenterState({
@@ -1208,9 +1208,8 @@ export default function PresenterControl() {
                               panOffsetY: newPanOffset.y,
                             });
                           }
-                          if (!isPanning) {
-                            handleMouseMove(e);
-                          }
+                          // Always update mouse position for cursor
+                          handleMouseMove(e);
                         }}
                         onMouseUp={() => {
                           if (isDrawingRectangle) {
@@ -1295,6 +1294,21 @@ export default function PresenterControl() {
                               renderAnnotationLayer={true}
                             />
                           </div>
+                          {/* Pointeur main rouge du présentateur sur PDF */}
+                          {showMouseCursor && zoom >= 100 && (
+                            <div
+                              className="absolute pointer-events-none"
+                              style={{
+                                left: `${mousePos.x}px`,
+                                top: `${mousePos.y}px`,
+                                transform: "translate(-50%, -50%)",
+                              }}
+                            >
+                              <div className="text-3xl" style={{ filter: 'drop-shadow(0 0 3px rgba(255, 0, 0, 0.8))' }}>
+                                👆
+                              </div>
+                            </div>
+                          )}
                         </Document>
                       </div>
                     )}
