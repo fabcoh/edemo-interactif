@@ -392,7 +392,10 @@ export default function Viewer() {
           />}
         </div>
 
-
+        {/* Viewer Chat Panel */}
+        {session && (
+          <ViewerChatPanel sessionCode={session.sessionCode} />
+        )}
       </div>
     );
   }
