@@ -883,3 +883,14 @@ Le projet Edemo Live est maintenant complet avec :
 - [x] Créer la page d'inscription
 - [ ] Tester sur Railway
 
+
+
+
+## ✅ Curseur sur PDF (Complété)
+
+- [x] Ajouter le curseur du présentateur (👆 vert) sur les PDF côté lecteur
+- [x] Utiliser la même logique que pour les images
+- [x] Calculer la position en pourcentage (0-100%)
+- [x] Vérifier qu'il n'y a pas d'iframe de prévisualisation (pas de duplication)
+- [x] Tester et sauvegarder le checkpoint
+

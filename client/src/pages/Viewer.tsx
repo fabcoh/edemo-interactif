@@ -285,6 +285,29 @@ export default function Viewer() {
                     />
                   </div>
                 </Document>
+                {/* Pointeur main du présentateur visible pour les spectateurs sur PDF */}
+                {presenterCursorVisible && pdfContainerRef.current && (() => {
+                  const containerRect = pdfContainerRef.current.getBoundingClientRect();
+                  
+                  // Calculate cursor position in pixels
+                  const cursorX = (presenterCursorX / 100) * containerRect.width;
+                  const cursorY = (presenterCursorY / 100) * containerRect.height;
+                  
+                  return (
+                    <div
+                      className="absolute pointer-events-none"
+                      style={{
+                        left: `${cursorX}px`,
+                        top: `${cursorY}px`,
+                        transform: "translate(-50%, -50%)",
+                      }}
+                    >
+                      <div className="text-3xl" style={{ filter: 'drop-shadow(0 0 3px rgba(0, 255, 0, 0.8))' }}>
+                        👆
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             )}
 
