@@ -918,3 +918,14 @@ Le projet Edemo Live est maintenant complet avec :
 - [x] Ajouter vérification iframe dans PresenterControl.tsx (handleMouseMove et onTouchStart)
 - [x] Tester le curseur visible au-dessus du PDF
 
+
+
+
+## ✅ Correction curseur bloqué (Complété)
+
+- [x] Identifier le problème : vérification iframe bloque TOUT l'envoi de curseur
+- [x] Retirer la vérification iframe de handleMouseMove
+- [x] Retirer la vérification iframe de onTouchStart
+- [x] Le curseur peut maintenant suivre la souris normalement
+- [x] Garder uniquement le z-index: 9999 pour la visibilité
+
