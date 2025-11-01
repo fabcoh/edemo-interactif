@@ -148,11 +148,12 @@ export default function PresenterControl() {
       panOffsetX: panOffsetXToSend,
       panOffsetY: panOffsetYToSend,
       pageNumber: overrides.pageNumber ?? pageNumber,
-      rectangleX: rectangle.x,
-      rectangleY: rectangle.y,
-      rectangleWidth: rectangle.width,
-      rectangleHeight: rectangle.height,
-      rectangleVisible: rectangle.visible,
+      // Rectangle feature not yet implemented in backend
+      // rectangleX: rectangle.x,
+      // rectangleY: rectangle.y,
+      // rectangleWidth: rectangle.width,
+      // rectangleHeight: rectangle.height,
+      // rectangleVisible: rectangle.visible,
     });
   };
 
@@ -1214,13 +1215,14 @@ export default function PresenterControl() {
                         onMouseUp={() => {
                           if (isDrawingRectangle) {
                             setIsDrawingRectangle(false);
-                            updatePresenterState({
-                              rectangleX: rectangle.x,
-                              rectangleY: rectangle.y,
-                              rectangleWidth: rectangle.width,
-                              rectangleHeight: rectangle.height,
-                              rectangleVisible: rectangle.visible,
-                            });
+                            // Rectangle feature not yet implemented in backend
+                            // updatePresenterState({
+                            //   rectangleX: rectangle.x,
+                            //   rectangleY: rectangle.y,
+                            //   rectangleWidth: rectangle.width,
+                            //   rectangleHeight: rectangle.height,
+                            //   rectangleVisible: rectangle.visible,
+                            // });
                           }
                           setIsPanning(false);
                           updatePresenterState();

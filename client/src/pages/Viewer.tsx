@@ -367,7 +367,9 @@ export default function Viewer() {
 
           {/* ChatPanel - HIDDEN */}
           {false && <ChatPanel
-            sessionCode={sessionCode}
+            sessionId={session?.id ?? 0}
+            senderType="viewer"
+            senderName="Spectateur"
             onLoadDocument={async (url: string, name: string, type: string) => {
               // TODO: Fix this - displayDocument is read-only from session
               // setDisplayDocument({ fileUrl: url, fileName: name, type });

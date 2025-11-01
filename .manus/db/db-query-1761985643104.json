@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `session_instances` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `sessionId` int NOT NULL,\n  `presenterId` int NOT NULL,\n  `instanceCode` varchar(16) NOT NULL UNIQUE,\n  `status` enum('active','ended') NOT NULL DEFAULT 'active',\n  `startedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `endedAt` timestamp NULL,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `session_instances_id` PRIMARY KEY(`id`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3j1v42nUZuvgHzn.root --database 8CbieS7mEqbTHNrWVL4VaZ --execute CREATE TABLE IF NOT EXISTS `session_instances` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `sessionId` int NOT NULL,\n  `presenterId` int NOT NULL,\n  `instanceCode` varchar(16) NOT NULL UNIQUE,\n  `status` enum('active','ended') NOT NULL DEFAULT 'active',\n  `startedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `endedAt` timestamp NULL,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `session_instances_id` PRIMARY KEY(`id`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 180
+}
