@@ -18,7 +18,7 @@ import { useEffect } from "react";
 export default function Presenter() {
   const { user, isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
-  const [userEmail] = useState<string>("presenter@edemo.local"); // Auto-authenticated
+  const userEmail = user?.email || "guest@edemo.local";
   const [newSessionTitle, setNewSessionTitle] = useState("");
   const [selectedSessionId, setSelectedSessionId] = useState<number | null>(null);
   const [collaboratorEmail, setCollaboratorEmail] = useState("");
