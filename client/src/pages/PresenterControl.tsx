@@ -42,6 +42,7 @@ export default function PresenterControl() {
   const [zoom, setZoom] = useState(100);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const imageRef = useRef<HTMLImageElement>(null);
+  const pdfPageRef = useRef<HTMLDivElement>(null);
   const [showMouseCursor, setShowMouseCursor] = useState(false);
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
@@ -313,23 +314,27 @@ export default function PresenterControl() {
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (displayedDocumentId && currentSession && imageRef.current) {
-      // Get container and image dimensions
+    if (displayedDocumentId && currentSession) {
       const containerRect = e.currentTarget.getBoundingClientRect();
-      const imageRect = imageRef.current.getBoundingClientRect();
       
-      // Position relative to image
-      const imageX = e.clientX - imageRect.left;
-      const imageY = e.clientY - imageRect.top;
+      // Use imageRef for images, pdfPageRef for PDFs
+      const elementRef = imageRef.current || pdfPageRef.current;
+      if (!elementRef) return;
       
-      // Position for cursor display (relative to container, but accounting for image position)
-      const cursorX = imageRect.left - containerRect.left + imageX;
-      const cursorY = imageRect.top - containerRect.top + imageY;
+      const elementRect = elementRef.getBoundingClientRect();
+      
+      // Position relative to element (image or PDF page)
+      const elementX = e.clientX - elementRect.left;
+      const elementY = e.clientY - elementRect.top;
+      
+      // Position for cursor display (relative to container, but accounting for element position)
+      const cursorX = elementRect.left - containerRect.left + elementX;
+      const cursorY = elementRect.top - containerRect.top + elementY;
       setMousePos({ x: cursorX, y: cursorY });
       
-      // Convert pixel coordinates to percentage (0-100) relative to image
-      const xPercent = (imageX / imageRect.width) * 100;
-      const yPercent = (imageY / imageRect.height) * 100;
+      // Convert pixel coordinates to percentage (0-100) relative to element
+      const xPercent = (elementX / elementRect.width) * 100;
+      const yPercent = (elementY / elementRect.height) * 100;
       
       updatePresenterState({
         cursorX: xPercent,
@@ -1284,7 +1289,7 @@ export default function PresenterControl() {
                           }
                           className="flex flex-col items-center"
                         >
-                          <div style={{
+                          <div ref={pdfPageRef} style={{
                             transform: `scale(${zoom / 100}) translate(${panOffset.x / (zoom / 100)}px, ${panOffset.y / (zoom / 100)}px)`,
                             transition: isPanning ? 'none' : 'transform 0.2s ease-out',
                           }}>

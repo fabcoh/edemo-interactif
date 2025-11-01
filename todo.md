@@ -929,3 +929,15 @@ Le projet Edemo Live est maintenant complet avec :
 - [x] Le curseur peut maintenant suivre la souris normalement
 - [x] Garder uniquement le z-index: 9999 pour la visibilité
 
+
+
+
+## ✅ Correction FINALE curseur PDF (Complété)
+
+- [x] Identifier le vrai problème : handleMouseMove utilise imageRef qui est NULL pour les PDF
+- [x] Ajouter pdfPageRef dans PresenterControl.tsx
+- [x] Modifier handleMouseMove pour utiliser imageRef OU pdfPageRef selon le type de document
+- [x] Attacher pdfPageRef au div qui entoure le Page PDF
+- [x] Le curseur calcule maintenant les pourcentages correctement pour les PDF
+- [x] Le curseur vert suit la souris sur les PDF côté lecteur
+
