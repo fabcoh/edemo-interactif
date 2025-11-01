@@ -172,7 +172,13 @@ export default function Viewer() {
   
   // Handle viewer mouse move to send cursor position to presenter
   const handleViewerMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!session || !displayDocument) return;
+    console.log('[Viewer] handleViewerMouseMove CALLED!');
+    console.log('[Viewer] session:', session);
+    console.log('[Viewer] displayDocument:', displayDocument);
+    if (!session || !displayDocument) {
+      console.log('[Viewer] Exiting: session or displayDocument is null');
+      return;
+    }
     
     // Use imageRef for images, pdfPageRef for PDFs
     const elementRef = imageRef.current || pdfPageRef.current;
@@ -190,6 +196,7 @@ export default function Viewer() {
     const yPercent = (elementY / elementRect.height) * 100;
     
     // Send cursor position to presenter
+    console.log('[Viewer] Sending cursor:', { sessionCode: enteredCode, viewerIdentifier, xPercent, yPercent, viewerCursorVisible });
     updateViewerCursorMutation.mutate({
       sessionCode: enteredCode,
       viewerIdentifier,

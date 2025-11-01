@@ -98,6 +98,13 @@ export default function PresenterControl() {
       refetchInterval: 500, // Poll every 500ms for smooth cursor tracking
     }
   );
+  
+  // Log viewer cursors data
+  useEffect(() => {
+    if (viewerCursorsQuery.data) {
+      console.log('[Presenter] Viewer cursors received:', viewerCursorsQuery.data);
+    }
+  }, [viewerCursorsQuery.data]);
 
   // Mutations
   const updateDocumentMutation = trpc.presentation.updateCurrentDocument.useMutation({
