@@ -95,7 +95,7 @@ export default function PresenterControl() {
     { sessionCode: sessionsQuery.data?.find(s => s.id === sessionIdNum)?.sessionCode || "" },
     {
       enabled: !!sessionIdNum && isAuthenticated && !!sessionsQuery.data,
-      refetchInterval: 500, // Poll every 500ms for smooth cursor tracking
+      refetchInterval: 100, // Poll every 100ms for smooth cursor tracking
     }
   );
   
@@ -1183,11 +1183,14 @@ export default function PresenterControl() {
                               style={{
                                 left: `${cursorX}px`,
                                 top: `${cursorY}px`,
-                                transform: "translate(-50%, -50%)",
+                                transform: "translate(0, 0)",
                                 zIndex: 9999,
+                                transition: "left 0.1s ease-out, top 0.1s ease-out",
                               }}
                             >
-                              <div className="w-6 h-6 bg-red-500 rounded-full border-2 border-white" style={{ boxShadow: '0 0 10px rgba(255, 0, 0, 1)' }} />
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }}>
+                                <path d="M5 3L19 12L12 13L9 20L5 3Z" fill="#EF4444" stroke="white" strokeWidth="1.5" strokeLinejoin="round"/>
+                              </svg>
                             </div>
                           );
                         })}
@@ -1384,11 +1387,14 @@ export default function PresenterControl() {
                                 style={{
                                   left: `${cursorX}px`,
                                   top: `${cursorY}px`,
-                                  transform: "translate(-50%, -50%)",
+                                  transform: "translate(0, 0)",
                                   zIndex: 9999,
+                                  transition: "left 0.1s ease-out, top 0.1s ease-out",
                                 }}
                               >
-                                <div className="w-6 h-6 bg-red-500 rounded-full border-2 border-white" style={{ boxShadow: '0 0 10px rgba(255, 0, 0, 1)' }} />
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }}>
+                                  <path d="M5 3L19 12L12 13L9 20L5 3Z" fill="#EF4444" stroke="white" strokeWidth="1.5" strokeLinejoin="round"/>
+                                </svg>
                               </div>
                             );
                           })}
