@@ -89,6 +89,15 @@ export default function PresenterControl() {
       refetchInterval: 2000, // Poll every 2s for synchronization
     }
   );
+  
+  // Get viewer cursors in real-time
+  const viewerCursorsQuery = trpc.presentation.getViewerCursors.useQuery(
+    { sessionId: sessionIdNum },
+    {
+      enabled: !!sessionIdNum && isAuthenticated,
+      refetchInterval: 500, // Poll every 500ms for smooth cursor tracking
+    }
+  );
 
   // Mutations
   const updateDocumentMutation = trpc.presentation.updateCurrentDocument.useMutation({
@@ -1145,6 +1154,32 @@ export default function PresenterControl() {
                             </div>
                           </div>
                         )}
+                        {/* Viewer Cursors - Red dots */}
+                        {viewerCursorsQuery.data?.map((viewerCursor) => {
+                          if (!viewerCursor.cursorVisible || !imageRef.current) return null;
+                          
+                          const imageRect = imageRef.current.getBoundingClientRect();
+                          const containerRect = imageRef.current.parentElement?.getBoundingClientRect();
+                          if (!containerRect) return null;
+                          
+                          const cursorX = (viewerCursor.cursorX / 100) * imageRect.width + (imageRect.left - containerRect.left);
+                          const cursorY = (viewerCursor.cursorY / 100) * imageRect.height + (imageRect.top - containerRect.top);
+                          
+                          return (
+                            <div
+                              key={viewerCursor.viewerIdentifier}
+                              className="absolute pointer-events-none"
+                              style={{
+                                left: `${cursorX}px`,
+                                top: `${cursorY}px`,
+                                transform: "translate(-50%, -50%)",
+                                zIndex: 9999,
+                              }}
+                            >
+                              <div className="w-4 h-4 bg-red-500 rounded-full" style={{ boxShadow: '0 0 8px rgba(255, 0, 0, 0.8)' }} />
+                            </div>
+                          );
+                        })}
                         {/* Rectangle Selection Overlay */}
                         {rectangle.visible && imageRef.current && (
                           <div
@@ -1316,6 +1351,32 @@ export default function PresenterControl() {
                               </div>
                             </div>
                           )}
+                          {/* Viewer Cursors - Red dots on PDF */}
+                          {viewerCursorsQuery.data?.map((viewerCursor) => {
+                            if (!viewerCursor.cursorVisible || !pdfPageRef.current) return null;
+                            
+                            const pdfRect = pdfPageRef.current.getBoundingClientRect();
+                            const containerRect = pdfPageRef.current.parentElement?.getBoundingClientRect();
+                            if (!containerRect) return null;
+                            
+                            const cursorX = (viewerCursor.cursorX / 100) * pdfRect.width + (pdfRect.left - containerRect.left);
+                            const cursorY = (viewerCursor.cursorY / 100) * pdfRect.height + (pdfRect.top - containerRect.top);
+                            
+                            return (
+                              <div
+                                key={viewerCursor.viewerIdentifier}
+                                className="absolute pointer-events-none"
+                                style={{
+                                  left: `${cursorX}px`,
+                                  top: `${cursorY}px`,
+                                  transform: "translate(-50%, -50%)",
+                                  zIndex: 9999,
+                                }}
+                              >
+                                <div className="w-4 h-4 bg-red-500 rounded-full" style={{ boxShadow: '0 0 8px rgba(255, 0, 0, 0.8)' }} />
+                              </div>
+                            );
+                          })}
                         </Document>
                       </div>
                     )}

@@ -941,3 +941,16 @@ Le projet Edemo Live est maintenant complet avec :
 - [x] Le curseur calcule maintenant les pourcentages correctement pour les PDF
 - [x] Le curseur vert suit la souris sur les PDF côté lecteur
 
+
+
+
+## 🔴 Curseur rouge du lecteur (Complété)
+
+- [x] Créer la table viewerCursors dans la base de données
+- [x] Ajouter les procédures tRPC pour envoyer et recevoir les positions du curseur lecteur
+- [x] Ajouter le code côté lecteur (Viewer.tsx) pour envoyer les positions
+- [x] Ajouter le code côté présentateur (PresenterControl.tsx) pour afficher le curseur rouge
+- [x] S'assurer que le curseur rouge ne s'affiche PAS dans la popup de prévisualisation
+- [x] Curseur rouge = point rouge (⬤) au lieu du doigt (👆)
+- [x] Tester et sauvegarder le checkpoint
+

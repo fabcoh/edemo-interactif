@@ -50,6 +50,10 @@ export default function Viewer() {
   const imageRef = useRef<HTMLImageElement>(null);
   const pdfPageRef = useRef<HTMLDivElement>(null);
   const [pdfPageWidth, setPdfPageWidth] = useState<number>(800);
+  
+  // Viewer cursor state
+  const [viewerIdentifier] = useState(() => `viewer_${Math.random().toString(36).substring(2, 15)}`);
+  const [viewerCursorVisible, setViewerCursorVisible] = useState(false);
 
   // Extract session code from URL if present
   useEffect(() => {
@@ -91,6 +95,9 @@ export default function Viewer() {
       sessionQuery.refetch();
     },
   });
+  
+  // Send viewer cursor position to presenter
+  const updateViewerCursorMutation = trpc.presentation.updateViewerCursor.useMutation();
 
   // Get presenter's cursor and zoom in real-time
   const cursorQuery = trpc.presentation.getCursorAndZoom.useQuery(
@@ -161,6 +168,35 @@ export default function Viewer() {
     setZoom(100);
     // Use presenter's zoom if available, otherwise reset to 100
     setZoom(presenterZoom);
+  };
+  
+  // Handle viewer mouse move to send cursor position to presenter
+  const handleViewerMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!session || !displayDocument) return;
+    
+    // Use imageRef for images, pdfPageRef for PDFs
+    const elementRef = imageRef.current || pdfPageRef.current;
+    if (!elementRef) return;
+    
+    const containerRect = e.currentTarget.getBoundingClientRect();
+    const elementRect = elementRef.getBoundingClientRect();
+    
+    // Position relative to element (image or PDF page)
+    const elementX = e.clientX - elementRect.left;
+    const elementY = e.clientY - elementRect.top;
+    
+    // Convert pixel coordinates to percentage (0-100) relative to element
+    const xPercent = (elementX / elementRect.width) * 100;
+    const yPercent = (elementY / elementRect.height) * 100;
+    
+    // Send cursor position to presenter
+    updateViewerCursorMutation.mutate({
+      sessionCode: enteredCode,
+      viewerIdentifier,
+      cursorX: xPercent,
+      cursorY: yPercent,
+      cursorVisible: viewerCursorVisible,
+    });
   };
 
   // Upload file mutation (using chat upload to S3)
@@ -251,7 +287,13 @@ export default function Viewer() {
             )}
 
             {!documentError && displayDocument.type === "pdf" && (
-              <div ref={pdfContainerRef} className="w-full h-full overflow-auto bg-gray-900 relative">
+              <div 
+                ref={pdfContainerRef} 
+                className="w-full h-full overflow-auto bg-gray-900 relative"
+                onMouseMove={handleViewerMouseMove}
+                onMouseEnter={() => setViewerCursorVisible(true)}
+                onMouseLeave={() => setViewerCursorVisible(false)}
+              >
                 <Document
                   file={displayDocument.fileUrl}
                   onLoadSuccess={({ numPages }) => setNumPages(numPages)}
@@ -315,7 +357,12 @@ export default function Viewer() {
             )}
 
             {!documentError && displayDocument.type === "image" && (
-              <div className="flex items-center justify-center w-full h-full relative">
+              <div 
+                className="flex items-center justify-center w-full h-full relative"
+                onMouseMove={handleViewerMouseMove}
+                onMouseEnter={() => setViewerCursorVisible(true)}
+                onMouseLeave={() => setViewerCursorVisible(false)}
+              >
                 <img
                   ref={imageRef}
                   src={displayDocument.fileUrl}
