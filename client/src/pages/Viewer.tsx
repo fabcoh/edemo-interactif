@@ -302,6 +302,7 @@ export default function Viewer() {
                         left: `${cursorX}px`,
                         top: `${cursorY}px`,
                         transform: "translate(-50%, -50%)",
+                        zIndex: 9999,
                       }}
                     >
                       <div className="text-3xl" style={{ filter: 'drop-shadow(0 0 3px rgba(0, 255, 0, 0.8))' }}>
@@ -344,6 +345,7 @@ export default function Viewer() {
                         left: `${cursorX}px`,
                         top: `${cursorY}px`,
                         transform: "translate(-50%, -50%)",
+                        zIndex: 9999,
                       }}
                     >
                       <div className="text-3xl" style={{ filter: 'drop-shadow(0 0 3px rgba(0, 255, 0, 0.8))' }}>

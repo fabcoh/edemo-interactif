@@ -906,3 +906,15 @@ Le projet Edemo Live est maintenant complet avec :
 - [x] Utiliser la même logique que pour les images (qui fonctionne)
 - [x] Tester le curseur sur les PDF
 
+
+
+
+## ✅ Correction z-index curseur PDF (Complété)
+
+- [x] Analyser le code actuel du curseur PDF dans Viewer.tsx
+- [x] Identifier le problème : curseur en arrière-plan (pas de z-index)
+- [x] Ajouter zIndex: 9999 au style du curseur PDF
+- [x] Ajouter zIndex: 9999 au style du curseur images (pour cohérence)
+- [x] Ajouter vérification iframe dans PresenterControl.tsx (handleMouseMove et onTouchStart)
+- [x] Tester le curseur visible au-dessus du PDF
+

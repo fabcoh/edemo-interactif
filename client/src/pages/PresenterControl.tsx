@@ -313,6 +313,11 @@ export default function PresenterControl() {
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Ne pas envoyer de curseur si on est dans un iframe (popup de prévisualisation)
+    if (window.self !== window.top) {
+      return;
+    }
+    
     if (displayedDocumentId && currentSession && imageRef.current) {
       // Get container and image dimensions
       const containerRect = e.currentTarget.getBoundingClientRect();
@@ -1031,6 +1036,9 @@ export default function PresenterControl() {
                         }
                         
                         // Send cursor position to viewers (as percentage)
+                        // Ne pas envoyer de curseur si on est dans un iframe
+                        if (window.self !== window.top) return;
+                        
                         if (displayedDocumentId && currentSession && imageRef.current) {
                           const imageRect = imageRef.current.getBoundingClientRect();
                           const imageX = e.touches[0].clientX - imageRect.left;
