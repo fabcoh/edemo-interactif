@@ -412,3 +412,10 @@ Le projet Edemo Live est maintenant complet avec :
 
 - [x] Supprimer la barre PDF dupliquée (celle dans la condition type === "pdf")
 
+
+
+
+## 🐛 Curseur PDF
+
+- [x] **Curseur du présentateur ne fonctionne pas sur les PDFs** : Implémenter le même système que pour les images avec pdfContainerRef et getBoundingClientRect()
+

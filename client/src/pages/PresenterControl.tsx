@@ -39,6 +39,7 @@ export default function PresenterControl() {
   const [zoom, setZoom] = useState(100);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const imageRef = useRef<HTMLImageElement>(null);
+  const pdfContainerRef = useRef<HTMLDivElement>(null);
   const [showMouseCursor, setShowMouseCursor] = useState(false);
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
@@ -274,29 +275,45 @@ export default function PresenterControl() {
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (displayedDocumentId && currentSession && imageRef.current) {
-      // Get container and image dimensions
+    if (displayedDocumentId && currentSession) {
       const containerRect = e.currentTarget.getBoundingClientRect();
-      const imageRect = imageRef.current.getBoundingClientRect();
       
-      // Position relative to image
-      const imageX = e.clientX - imageRect.left;
-      const imageY = e.clientY - imageRect.top;
-      
-      // Position for cursor display (relative to container, but accounting for image position)
-      const cursorX = imageRect.left - containerRect.left + imageX;
-      const cursorY = imageRect.top - containerRect.top + imageY;
-      setMousePos({ x: cursorX, y: cursorY });
-      
-      // Convert pixel coordinates to percentage (0-100) relative to image
-      const xPercent = (imageX / imageRect.width) * 100;
-      const yPercent = (imageY / imageRect.height) * 100;
-      
-      updatePresenterState({
-        cursorX: xPercent,
-        cursorY: yPercent,
-        cursorVisible: showMouseCursor && zoom >= 100,
-      });
+      // For images
+      if (imageRef.current) {
+        const imageRect = imageRef.current.getBoundingClientRect();
+        const imageX = e.clientX - imageRect.left;
+        const imageY = e.clientY - imageRect.top;
+        const cursorX = imageRect.left - containerRect.left + imageX;
+        const cursorY = imageRect.top - containerRect.top + imageY;
+        setMousePos({ x: cursorX, y: cursorY });
+        
+        const xPercent = (imageX / imageRect.width) * 100;
+        const yPercent = (imageY / imageRect.height) * 100;
+        
+        updatePresenterState({
+          cursorX: xPercent,
+          cursorY: yPercent,
+          cursorVisible: showMouseCursor && zoom >= 100,
+        });
+      }
+      // For PDFs
+      else if (pdfContainerRef.current) {
+        const pdfRect = pdfContainerRef.current.getBoundingClientRect();
+        const pdfX = e.clientX - pdfRect.left;
+        const pdfY = e.clientY - pdfRect.top;
+        const cursorX = pdfRect.left - containerRect.left + pdfX;
+        const cursorY = pdfRect.top - containerRect.top + pdfY;
+        setMousePos({ x: cursorX, y: cursorY });
+        
+        const xPercent = (pdfX / pdfRect.width) * 100;
+        const yPercent = (pdfY / pdfRect.height) * 100;
+        
+        updatePresenterState({
+          cursorX: xPercent,
+          cursorY: yPercent,
+          cursorVisible: showMouseCursor && zoom >= 100,
+        });
+      }
     }
   };
 
@@ -1107,45 +1124,63 @@ export default function PresenterControl() {
                       </>
                     )}
                     {displayedDocument.type === "pdf" && (
-                      <div className="w-full h-full flex flex-col items-center justify-center">
-                        {/* Barre PDF supprimée - utilisation de la mini barre universelle centrée en haut */}
-                        <Document
-                          key={displayedDocument.fileUrl}
-                          file={displayedDocument.fileUrl}
-                          onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-                          onLoadError={(error) => {
-                            console.error('PDF load error:', error);
-                            console.log('Document type:', displayedDocument.type, 'URL:', displayedDocument.fileUrl);
-                          }}
-                          loading={
-                            <div className="text-center">
-                              <div className="text-6xl mb-4">📄</div>
-                              <p className="text-gray-400">Chargement du PDF...</p>
+                      <>
+                        <div ref={pdfContainerRef} className="w-full h-full flex flex-col items-center justify-center">
+                          {/* Barre PDF supprimée - utilisation de la mini barre universelle centrée en haut */}
+                          <Document
+                            key={displayedDocument.fileUrl}
+                            file={displayedDocument.fileUrl}
+                            onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+                            onLoadError={(error) => {
+                              console.error('PDF load error:', error);
+                              console.log('Document type:', displayedDocument.type, 'URL:', displayedDocument.fileUrl);
+                            }}
+                            loading={
+                              <div className="text-center">
+                                <div className="text-6xl mb-4">📄</div>
+                                <p className="text-gray-400">Chargement du PDF...</p>
+                              </div>
+                            }
+                            error={
+                              <div className="text-center">
+                                <div className="text-6xl mb-4">📄</div>
+                                <p className="text-red-400">Impossible de charger le PDF</p>
+                                <p className="text-gray-500 text-sm mt-2">{displayedDocument.title}</p>
+                              </div>
+                            }
+                            className="flex flex-col items-center"
+                          >
+                            <div style={{
+                              transform: `scale(${zoom / 100}) translate(${panOffset.x / (zoom / 100)}px, ${panOffset.y / (zoom / 100)}px)`,
+                              transition: isPanning ? 'none' : 'transform 0.2s ease-out',
+                            }}>
+                              <Page
+                                pageNumber={pageNumber}
+                                width={typeof window !== 'undefined' ? (window.innerWidth < 768 ? window.innerWidth * 0.95 : Math.min(window.innerWidth * 0.8, 900)) : 800}
+                                className="max-w-full"
+                                renderTextLayer={true}
+                                renderAnnotationLayer={true}
+                              />
                             </div>
-                          }
-                          error={
-                            <div className="text-center">
-                              <div className="text-6xl mb-4">📄</div>
-                              <p className="text-red-400">Impossible de charger le PDF</p>
-                              <p className="text-gray-500 text-sm mt-2">{displayedDocument.title}</p>
+                          </Document>
+                        </div>
+                        {/* Cursor Indicator - Red for Presenter - EXACTEMENT comme pour les images */}
+                        {/* Pointeur main avec doigt */}
+                        {showMouseCursor && zoom >= 100 && (
+                          <div
+                            className="absolute pointer-events-none"
+                            style={{
+                              left: `${mousePos.x + 0}px`,
+                              top: `${mousePos.y + 0}px`,
+                              transform: "translate(-50%, -50%)",
+                            }}
+                          >
+                            <div className="text-3xl" style={{ filter: 'drop-shadow(0 0 3px rgba(255, 0, 0, 0.8))' }}>
+                              👆
                             </div>
-                          }
-                          className="flex flex-col items-center"
-                        >
-                          <div style={{
-                            transform: `scale(${zoom / 100}) translate(${panOffset.x / (zoom / 100)}px, ${panOffset.y / (zoom / 100)}px)`,
-                            transition: isPanning ? 'none' : 'transform 0.2s ease-out',
-                          }}>
-                            <Page
-                              pageNumber={pageNumber}
-                              width={typeof window !== 'undefined' ? (window.innerWidth < 768 ? window.innerWidth * 0.95 : Math.min(window.innerWidth * 0.8, 900)) : 800}
-                              className="max-w-full"
-                              renderTextLayer={true}
-                              renderAnnotationLayer={true}
-                            />
                           </div>
-                        </Document>
-                      </div>
+                        )}
+                      </>
                     )}
                     {displayedDocument.type === "video" && (
                       <video
