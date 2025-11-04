@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import ChatPanel from "@/components/ChatPanel";
-import ProspectionPopup from "@/components/ProspectionPopup";
+
 import { Document, Page, pdfjs } from 'react-pdf';
 import {
   AlertDialog,
@@ -57,8 +57,7 @@ export default function PresenterControl() {
   const [rectangleStart, setRectangleStart] = useState({ x: 0, y: 0 });
   // Viewer preview floating window
   const [showViewerPreview, setShowViewerPreview] = useState(false);
-  // Prospection popup
-  const [showProspectionPopup, setShowProspectionPopup] = useState(false);
+
 
   const sessionIdNum = sessionId ? parseInt(sessionId) : 0;
 
@@ -397,7 +396,13 @@ export default function PresenterControl() {
             </Button>
             {/* Bouton Prospection */}
             <Button
-              onClick={() => setShowProspectionPopup(!showProspectionPopup)}
+              onClick={() => {
+                window.open(
+                  'https://whatsappcrm-rbwfcz3k.manus.space/',
+                  'prospection',
+                  `width=${Math.floor(window.innerWidth * 0.4)},height=${Math.floor(window.innerHeight * 0.8)},left=${window.innerWidth - Math.floor(window.innerWidth * 0.4)},top=${Math.floor((window.innerHeight - Math.floor(window.innerHeight * 0.8)) / 2)},resizable=yes,scrollbars=yes`
+                );
+              }}
               className="h-7 px-2 gap-1 bg-blue-600 hover:bg-blue-700"
               size="sm"
               title="Ouvrir la prospection WhatsApp"
@@ -1315,10 +1320,6 @@ export default function PresenterControl() {
         </div>
       )}
 
-      {/* Prospection Popup */}
-      {showProspectionPopup && (
-        <ProspectionPopup onClose={() => setShowProspectionPopup(false)} />
-      )}
 
     </div>
   );
