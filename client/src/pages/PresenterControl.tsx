@@ -4,11 +4,12 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useParams, Link } from "wouter";
-import { ArrowLeft, Users, Copy, Share2, Upload, X, ZoomIn, ZoomOut, Check, Send, Download, MessageCircle, Monitor } from "lucide-react";
+import { ArrowLeft, Users, Copy, Share2, Upload, X, ZoomIn, ZoomOut, Check, Send, Download, MessageCircle, Monitor, FileText } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import ChatPanel from "@/components/ChatPanel";
+import ProspectionPopup from "@/components/ProspectionPopup";
 import { Document, Page, pdfjs } from 'react-pdf';
 import {
   AlertDialog,
@@ -56,6 +57,8 @@ export default function PresenterControl() {
   const [rectangleStart, setRectangleStart] = useState({ x: 0, y: 0 });
   // Viewer preview floating window
   const [showViewerPreview, setShowViewerPreview] = useState(false);
+  // Prospection popup
+  const [showProspectionPopup, setShowProspectionPopup] = useState(false);
 
   const sessionIdNum = sessionId ? parseInt(sessionId) : 0;
 
@@ -391,6 +394,15 @@ export default function PresenterControl() {
               title="Afficher la vue lecteur"
             >
               <Monitor className="w-3.5 h-3.5" />
+            </Button>
+            {/* Bouton Prospection */}
+            <Button
+              onClick={() => setShowProspectionPopup(!showProspectionPopup)}
+              className="h-7 px-2 gap-1 bg-blue-600 hover:bg-blue-700"
+              size="sm"
+              title="Ouvrir la prospection WhatsApp"
+            >
+              <FileText className="w-3.5 h-3.5" />
             </Button>
             {/* Compteur de spectateurs */}
             <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-900 rounded-lg">
@@ -1301,6 +1313,11 @@ export default function PresenterControl() {
             style={{ overflow: 'auto' }}
           />
         </div>
+      )}
+
+      {/* Prospection Popup */}
+      {showProspectionPopup && (
+        <ProspectionPopup onClose={() => setShowProspectionPopup(false)} />
       )}
 
     </div>

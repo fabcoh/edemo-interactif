@@ -419,3 +419,14 @@ Le projet Edemo Live est maintenant complet avec :
 
 - [x] **Curseur du présentateur ne fonctionne pas sur les PDFs** : Implémenter le même système que pour les images avec pdfContainerRef et getBoundingClientRect()
 
+
+
+
+## 🎯 Popup Prospection WhatsApp
+
+- [x] **Bouton prospection dans le header** : Ajouter une icône bleue à côté de l'icône violette (👥 0)
+- [x] **Popup déplaçable** : Permettre de déplacer le popup avec drag & drop
+- [x] **Popup redimensionnable** : Permettre de redimensionner le popup
+- [x] **Iframe WhatsApp CRM** : Intégrer https://whatsappcrm-rbwfcz3k.manus.space/ dans le popup
+- [x] **Taille par défaut** : 80% hauteur × 40% largeur par rapport à la fenêtre du navigateur
+
