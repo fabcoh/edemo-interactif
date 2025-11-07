@@ -430,3 +430,12 @@ Le projet Edemo Live est maintenant complet avec :
 - [x] **Iframe WhatsApp CRM** : Intégrer https://whatsappcrm-rbwfcz3k.manus.space/ dans le popup
 - [x] **Taille par défaut** : 80% hauteur × 40% largeur par rapport à la fenêtre du navigateur
 
+
+
+
+## 🔓 Suppression authentification PIN
+
+- [ ] **Supprimer le système de code PIN** : Permettre l'accès direct à `/presenter` sans authentification
+- [ ] **Modifier les routes** : Retirer les vérifications d'authentification
+- [ ] **Tester et déployer** : Pousser sur GitHub/Railway
+
