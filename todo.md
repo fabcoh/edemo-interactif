@@ -439,3 +439,50 @@ Le projet Edemo Live est maintenant complet avec :
 - [ ] **Modifier les routes** : Retirer les vérifications d'authentification
 - [ ] **Tester et déployer** : Pousser sur GitHub/Railway
 
+
+
+
+## 🐛 BUG RÉCURRENT - Pointeur PDF côté spectateur
+
+### Problème
+Le pointeur main (👆) du présentateur n'apparaît pas sur les PDF côté spectateur, alors qu'il fonctionne sur les images.
+
+### Cause
+Le code du pointeur existe pour les images mais manque pour les PDF dans Viewer.tsx.
+
+### Solution
+Ajouter le même code de pointeur dans la section PDF de Viewer.tsx :
+```tsx
+{presenterCursorVisible && pdfContainerRef.current && (() => {
+  const containerRect = pdfContainerRef.current.getBoundingClientRect();
+  const cursorX = (presenterCursorX / 100) * containerRect.width;
+  const cursorY = (presenterCursorY / 100) * containerRect.height;
+  
+  return (
+    <div
+      className="absolute pointer-events-none z-50"
+      style={{
+        left: `${cursorX}px`,
+        top: `${cursorY}px`,
+        transform: "translate(-50%, -50%)",
+      }}
+    >
+      <div className="text-3xl" style={{ filter: 'drop-shadow(0 0 3px rgba(255, 0, 0, 0.8))' }}>
+        👆
+      </div>
+    </div>
+  );
+})()}
+```
+
+### Emplacement
+Fichier : `client/src/pages/Viewer.tsx`
+Section : Après le composant `<Document>` dans la partie PDF
+
+### Notes importantes
+- ⚠️ Ce bug revient souvent après les rollbacks git
+- ⚠️ Toujours vérifier que le pointeur fonctionne sur IMAGES ET PDF
+- ⚠️ Le code doit être identique pour images et PDF (sauf la ref: imageRef vs pdfContainerRef)
+
+- [x] Corriger le pointeur PDF côté spectateur
+

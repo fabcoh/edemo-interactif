@@ -43,6 +43,7 @@ export default function Viewer() {
   const [rectangleHeight, setRectangleHeight] = useState(0);
   const [rectangleVisible, setRectangleVisible] = useState(false);
   const pdfContainerRef = useRef<HTMLDivElement>(null);
+  const documentContainerRef = useRef<HTMLDivElement>(null);
   const [documentError, setDocumentError] = useState<string | null>(null);
   const [viewerDocuments, setViewerDocuments] = useState<Array<{id: string, url: string, name: string, type: string}>>([]);
   const [numPages, setNumPages] = useState<number | null>(null);
@@ -237,6 +238,7 @@ export default function Viewer() {
 
           {/* Document Content */}
           <div 
+            ref={documentContainerRef}
             className="w-full h-full flex items-center justify-center overflow-auto cursor-pointer"
             onDoubleClick={() => displayDocument && window.open(displayDocument.fileUrl, '_blank')}
             title="Double-cliquer pour ouvrir en plein écran"
@@ -249,6 +251,7 @@ export default function Viewer() {
             )}
 
             {!documentError && displayDocument.type === "pdf" && (
+              <>
               <div ref={pdfContainerRef} className="w-full h-full overflow-auto bg-gray-900 relative">
                 <Document
                   file={displayDocument.fileUrl}
@@ -285,6 +288,32 @@ export default function Viewer() {
                   </div>
                 </Document>
               </div>
+              {/* Cursor Indicator - EXACTEMENT comme pour les images */}
+              {presenterCursorVisible && presenterZoom >= 100 && (() => {
+                if (!pdfContainerRef.current || !documentContainerRef.current) return null;
+                const parentRect = documentContainerRef.current.getBoundingClientRect();
+                const pdfRect = pdfContainerRef.current.getBoundingClientRect();
+                const pdfX = (presenterCursorX / 100) * pdfRect.width;
+                const pdfY = (presenterCursorY / 100) * pdfRect.height;
+                const cursorX = pdfRect.left - parentRect.left + pdfX;
+                const cursorY = pdfRect.top - parentRect.top + pdfY;
+                
+                return (
+                  <div
+                    className="absolute pointer-events-none z-50"
+                    style={{
+                      left: `${cursorX}px`,
+                      top: `${cursorY}px`,
+                      transform: "translate(-50%, -50%)",
+                    }}
+                  >
+                    <div className="text-3xl" style={{ filter: 'drop-shadow(0 0 3px rgba(255, 0, 0, 0.8))' }}>
+                      👆
+                    </div>
+                  </div>
+                );
+              })()}
+              </>
             )}
 
             {!documentError && displayDocument.type === "image" && (
