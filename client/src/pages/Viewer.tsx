@@ -22,6 +22,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/b
 
 /**
  * Viewer Page - Display presentation content in real-time (fullscreen)
+ * Checkpoint: Fix pointeur PDF côté spectateur
  */
 export default function Viewer() {
   const [match, params] = useRoute("/view/:code");
