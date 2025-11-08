@@ -75,7 +75,7 @@ export default function Viewer() {
     { sessionCode: enteredCode },
     { 
       enabled: isJoined && !!enteredCode,
-      refetchInterval: 1000, // Poll every 1 second for real-time updates
+      refetchInterval: 500, // Poll every 500ms for real-time updates
     }
   );
 
@@ -97,7 +97,7 @@ export default function Viewer() {
     { sessionCode: enteredCode },
     {
       enabled: isJoined && !!enteredCode,
-      refetchInterval: 500, // Poll every 500ms for smooth cursor tracking
+      refetchInterval: 200, // Poll every 200ms for smooth cursor tracking
     }
   );
 
