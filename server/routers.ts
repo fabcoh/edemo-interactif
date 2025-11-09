@@ -1027,17 +1027,38 @@ export const appRouter = router({
         fileName: z.string(),
         fileData: z.string(), // base64
         mimeType: z.string(),
+        senderType: z.enum(['presenter', 'viewer']).optional(),
+        senderName: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
-        // Upload file using centralized utility
-        const { key: fileKey, url } = await uploadFileToStorage(
+        // Upload file to S3
+        const { url } = await uploadFileToStorage(
           input.fileData,
           input.fileName,
           input.mimeType,
           `chat/${input.sessionId}`
         );
         
-        return { url, key: fileKey };
+        // Determine file type from filename
+        const fileType = input.fileName.toLowerCase().endsWith('.pdf') 
+          ? 'pdf' 
+          : input.fileName.toLowerCase().match(/\.(jpg|jpeg|png|gif|webp)$/)
+          ? 'image'
+          : input.fileName.toLowerCase().match(/\.(mp4|webm|mov)$/)
+          ? 'video'
+          : 'file';
+        
+        // Create chat message with file
+        await sendChatMessage({
+          sessionId: input.sessionId,
+          senderType: input.senderType || 'viewer',
+          senderName: input.senderName || 'Spectateur',
+          message: input.fileName,
+          fileUrl: url,
+          fileType: fileType,
+        });
+        
+        return { url, key: input.fileName };
       }),
   }),
 

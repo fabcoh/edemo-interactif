@@ -205,7 +205,8 @@ export default function ChatPanel({
         ) : (
           [...messages].reverse().map((msg) => {
             const isPresenter = msg.senderType === "presenter";
-            const isDocument = msg.videoUrl && msg.fileType;
+            const fileUrl = msg.fileUrl || msg.videoUrl; // Utiliser fileUrl en priorité, fallback sur videoUrl
+            const isDocument = fileUrl && msg.fileType;
 
             return (
               <div
@@ -216,14 +217,14 @@ export default function ChatPanel({
                   // Documents sans bulle
                   <div className={`flex ${isPresenter ? "justify-end" : "justify-start"}`}>
                     <button
-                      onClick={() => handleDocumentClick(msg.videoUrl!, msg.message, msg.fileType || 'image')}
+                      onClick={() => handleDocumentClick(fileUrl!, msg.message, msg.fileType || 'image')}
                       className="text-left"
                     >
                       {/* Aperçu vignette pour images */}
                       {msg.fileType === 'image' && (
                         <div>
                           <img 
-                            src={msg.videoUrl || ''} 
+                            src={fileUrl || ''} 
                             alt={msg.message}
                             className="w-full max-w-[200px] hover:opacity-80 transition-opacity"
                           />

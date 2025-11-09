@@ -97,7 +97,7 @@ export default function Viewer() {
     { sessionCode: enteredCode },
     {
       enabled: isJoined && !!enteredCode,
-      refetchInterval: 200, // Poll every 200ms for smooth cursor tracking
+      refetchInterval: 100, // Poll every 100ms for smooth cursor tracking
     }
   );
 

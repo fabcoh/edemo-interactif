@@ -117,26 +117,26 @@ export default function ViewerChatPanel({ sessionCode, onLoadDocument }: ViewerC
   };
 
   const handleFileUpload = async (file: File) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("sessionCode", sessionCode);
+    if (!sessionId) {
+      console.error("No session ID available");
+      return;
+    }
 
     try {
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        // TODO: Fix this - uploadFile expects sessionId (number), not sessionCode
-        console.log('File uploaded to S3:', data);
-        // uploadFileMutation.mutate({
-        //   sessionId: ???,
-        //   fileUrl: data.url,
-        //   fileName: file.name,
-        // });
-      }
+      // Convert file to base64
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64 = reader.result as string;
+        
+        // Upload via tRPC
+        uploadFileMutation.mutate({
+          sessionId: sessionId,
+          fileName: file.name,
+          fileData: base64,
+          mimeType: file.type,
+        });
+      };
+      reader.readAsDataURL(file);
     } catch (error) {
       console.error("Upload error:", error);
     }
@@ -191,7 +191,22 @@ export default function ViewerChatPanel({ sessionCode, onLoadDocument }: ViewerC
                 textOverflow: 'ellipsis'
               }}
             >
-              {msg.message}
+              {msg.fileUrl ? (
+                <a href={msg.fileUrl} download className="flex items-center gap-2">
+                  {msg.fileType === 'image' ? (
+                    <img src={msg.fileUrl} alt={msg.message} className="w-8 h-8 rounded object-cover" />
+                  ) : msg.fileType === 'pdf' ? (
+                    <span className="text-2xl">📄</span>
+                  ) : msg.fileType === 'video' ? (
+                    <span className="text-2xl">🎬</span>
+                  ) : (
+                    <span className="text-2xl">📎</span>
+                  )}
+                  <span className="text-xs truncate">{msg.message}</span>
+                </a>
+              ) : (
+                msg.message
+              )}
             </div>
           ))}
             <div ref={messagesEndRef} />

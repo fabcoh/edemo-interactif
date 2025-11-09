@@ -57,6 +57,7 @@ export default function PresenterControl() {
   const [rectangleStart, setRectangleStart] = useState({ x: 0, y: 0 });
   // Viewer preview floating window
   const [showViewerPreview, setShowViewerPreview] = useState(false);
+  const [tempChatFile, setTempChatFile] = useState<{ url: string; name: string; type: string } | null>(null);
 
 
   const sessionIdNum = sessionId ? parseInt(sessionId) : 0;
@@ -222,7 +223,14 @@ export default function PresenterControl() {
   const displayedDocumentRaw = documents.find(d => d.id === displayedDocumentId);
   
   // Auto-detect file type from URL if type is incorrect
-  const displayedDocument = displayedDocumentRaw ? {
+  const displayedDocument = displayedDocumentId === -1 && tempChatFile ? {
+    id: -1,
+    sessionId: sessionIdNum,
+    title: tempChatFile.name,
+    fileUrl: tempChatFile.url,
+    type: tempChatFile.type as 'image' | 'pdf' | 'video',
+    createdAt: new Date(),
+  } : displayedDocumentRaw ? {
     ...displayedDocumentRaw,
     type: displayedDocumentRaw.fileUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? 'image' as const :
           displayedDocumentRaw.fileUrl.match(/\.pdf$/i) ? 'pdf' as const :
@@ -1228,12 +1236,12 @@ export default function PresenterControl() {
                 senderName={currentSession.title}
                 showDeleteButton={true}
                 onLoadDocument={async (url, name, type) => {
-                  // Trouver le document correspondant dans la liste
-                  const doc = documents.find(d => d.fileUrl === url);
-                  if (doc) {
-                    // Afficher le document pour tous les viewers
-                    await handleDisplayDocument(doc.id);
-                  }
+                  // Afficher directement le fichier du chat (temporaire)
+                  setTempChatFile({ url, name, type });
+                  setDisplayedDocumentId(-1);
+                  
+                  // TODO: Synchroniser avec les spectateurs
+                  // Pour l'instant, le fichier s'affiche uniquement côté présentateur
                 }}
               />
             </div>

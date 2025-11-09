@@ -239,6 +239,8 @@ export const chatMessages = mysqlTable("chat_messages", {
   senderName: varchar("senderName", { length: 255 }).notNull(),
   /** The message content */
   message: text("message").notNull(),
+  /** Optional file URL (for uploaded documents) */
+  fileUrl: text("fileUrl"),
   /** Optional video URL */
   videoUrl: text("videoUrl"),
   /** Type of file: text, image, video, pdf, link */
